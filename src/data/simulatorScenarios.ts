@@ -1,0 +1,206 @@
+import type { SimulatorScenario } from '../types';
+
+export const INITIAL_SIMULATOR_SCENARIOS: SimulatorScenario[] = [
+  {
+    id: 'sim-1',
+    title: 'Notification d\'erreur de transfert mobile money',
+    platform: 'SMS',
+    contextDescription: 'Vous êtes assis chez vous et votre téléphone vibre. Vous découvrez ce SMS, immédiatement suivi d\'un appel d\'un homme très agité.',
+    messageContent: {
+      sender: '+221 77 400 12 34',
+      body: 'Transfert de 45.000 FCFA reçu de Babacar S. Nouveau solde: 47.120 FCFA. Frais: 0 FCFA. Ref: TX-7738291.',
+      timestamp: 'Il y a 2 minutes',
+    },
+    options: [
+      {
+        id: 'opt-1a',
+        text: 'C\'est un vrai transfert officiel de Wave ou Orange Money, je dois immédiatement renvoyer les 45.000 F au monsieur qui pleure.',
+        isCorrect: false,
+        feedback: 'Attention ! Regardez l\'expéditeur : le message provient d\'un numéro mobile personnel à 9 chiffres (+221 77 400 12 34), pas de l\'en-tête officiel de l\'opérateur.',
+      },
+      {
+        id: 'opt-1b',
+        text: 'C\'est suspect : le SMS provient d\'un numéro de téléphone standard et non de l\'émetteur officiel. Mon solde réel dans l\'application doit être vérifié.',
+        isCorrect: true,
+        feedback: 'Excellent réflexe ! Les escrocs rédigent eux-mêmes un faux texte de notification depuis leur propre SIM pour faire croire à un dépôt.',
+      },
+      {
+        id: 'opt-1c',
+        text: 'Le SMS est forcément faux car il comporte une référence TX.',
+        isCorrect: false,
+        feedback: 'Inexact : les vrais messages ont aussi des références. L\'indice flagrant est le numéro de l\'expéditeur personnel et l\'absence d\'augmentation réelle du solde dans votre application.',
+      },
+    ],
+    reasoning: 'Un opérateur de mobile money n\'envoie jamais ses SMS de notification de transfert depuis un numéro mobile classique à 9 chiffres. De plus, seul le solde affiché à l\'intérieur de votre application officielle fait foi.',
+    protectionMethod: 'Ouvrez toujours l\'application officielle pour constater votre solde réel. Si quelqu\'un prétend s\'être trompé, dites-lui de faire une réclamation officielle auprès du service client.',
+    pedagogicalWarning: 'Scénario fictif d\'entraînement conçu par XamSafe. Aucun argent réel n\'est en jeu.',
+  },
+  {
+    id: 'sim-2',
+    title: 'Annonce d\'un gain de tombola inattendu',
+    platform: 'WhatsApp',
+    contextDescription: 'Un numéro inconnu avec un logo doré de l\'opérateur vous envoie un message privé sur WhatsApp.',
+    messageContent: {
+      sender: '+221 70 888 99 00 (Nom affiché : "Tirage Anniversaire")',
+      body: '🎉 FÉLICITATIONS ! Votre numéro fait partie des 3 gagnants du Grand Tirage National 2026. Vous remportez un chèque certifié de 3.500.000 FCFA ! Pour retirer votre chèque, contactez notre juriste au 77XXXXXXX et réglez les frais d\'enregistrement du lot (20.000 FCFA).',
+      timestamp: 'Aujourd\'hui 10:14',
+    },
+    options: [
+      {
+        id: 'opt-2a',
+        text: 'C\'est une arnaque : je n\'ai jamais participé à ce tirage, et un vrai gain n\'exige JAMAIS de paiement préalable pour être versé.',
+        isCorrect: true,
+        feedback: 'Exactement ! C\'est l\'arnaque aux faux frais d\'avance. Si on vous demande de payer pour toucher un cadeau, c\'est toujours une escroquerie.',
+      },
+      {
+        id: 'opt-2b',
+        text: 'C\'est une opportunité à ne pas rater : 20.000 F de frais pour gagner 3.500.000 F, c\'est très rentable.',
+        isCorrect: false,
+        feedback: 'Piège classique ! Dès que vous aurez envoyé les 20.000 F, l\'escroc vous réclamera des frais de timbre de 40.000 F, puis disparaîtra.',
+      },
+      {
+        id: 'opt-2c',
+        text: 'Il faut appeler le numéro pour demander si on peut déduire les 20.000 F directement des 3.500.000 F.',
+        isCorrect: false,
+        feedback: 'Même si cette déduction paraît logique, cela ne change pas la réalité : le gain n\'existe pas du tout. L\'interlocuteur inventera un prétexte légal pour exiger votre argent.',
+      },
+    ],
+    reasoning: 'Les escrocs jouent sur l\'effet d\'aubaine et la joie suscitée par un gain inespéré. Aucun opérateur officiel ne gère de loteries par message WhatsApp anonyme.',
+    protectionMethod: 'Ne croyez jamais aux gains impromptus. Tout concours officiel dispose d\'un règlement déposé chez un huissier accessible publiquement sans avance de frais pour le gagnant.',
+    pedagogicalWarning: 'Scénario fictif d\'entraînement. N\'envoyez jamais d\'argent pour réclamer un prétendu lot.',
+  },
+  {
+    id: 'sim-3',
+    title: 'Offre d\'emploi prestigieuse à Dakar avec frais de dossier',
+    platform: 'Email',
+    contextDescription: 'Vous recevez un courriel en réponse à une candidature spontanée pour un poste dans une organisation internationale.',
+    messageContent: {
+      sender: 'recrutement-unicef-dakar@gmail.com',
+      body: 'Objet : Retenue de votre profil pour le poste d\'Assistant Administratif à Dakar\n\nMadame, Monsieur,\nAprès étude de votre dossier, vous êtes sélectionné(e) pour intégrer notre équipe dès le 1er du mois prochain. Salaire brut : 550.000 FCFA.\nVeuillez vous acquitter des frais d\'authentification médicale et de confection du badge d\'accès (15.000 FCFA) par Wave sur le numéro du comptable.',
+    },
+    options: [
+      {
+        id: 'opt-3a',
+        text: 'L\'offre est normale car 15.000 F est une somme modeste pour un salaire de 550.000 FCFA.',
+        isCorrect: false,
+        feedback: 'C\'est justement le piège psychologique de l\'escroc : minimiser la dépense demandée par rapport au salaire mirobolant promis.',
+      },
+      {
+        id: 'opt-3b',
+        text: 'Deux signaux rouges majeurs : adresse d\'expédition gratuite (@gmail.com au lieu du domaine officiel) et demande de paiement pour être embauché.',
+        isCorrect: true,
+        feedback: 'Parfaitement analysé ! Les agences des Nations Unies disposent de leur propre nom de domaine (@unicef.org) et ne demandent JAMAIS d\'argent aux candidats.',
+      },
+      {
+        id: 'opt-3c',
+        text: 'L\'offre est crédible parce que le poste d\'assistant administratif existe réellement à Dakar.',
+        isCorrect: false,
+        feedback: 'L\'existence du poste n\'authentifie pas le recruteur. Les escrocs copient les intitulés de postes réels pour rendre l\'annonce crédible.',
+      },
+    ],
+    reasoning: 'La politique de tolérance zéro de l\'ONU et des ONG internationales interdit formellement de réclamer le moindre sou aux postulants.',
+    protectionMethod: 'Vérifiez toujours le nom de domaine de l\'adresse e-mail. Consultez les offres sur les sites officiels d\'organisations (ex: unicef.org/careers).',
+    pedagogicalWarning: 'Scénario pédagogique d\'entraînement XamSafe. Tous les éléments sont fictifs.',
+  },
+  {
+    id: 'sim-4',
+    title: 'Fausse alerte de sécurité sur compte bancaire / mobile money',
+    platform: 'SMS',
+    contextDescription: 'Un message d\'urgence arrive sur votre smartphone un vendredi à 19h00.',
+    messageContent: {
+      sender: '+221 76 111 22 33',
+      body: 'ALERTE SÉCURITÉ : Votre compte sera suspendu dans 30 minutes suite à des tentatives d\'accès suspectes. Cliquez d\'urgence pour vérifier votre identité : https://mon-compte-wave-securite.com/verifier',
+      timestamp: 'Il y a 5 minutes',
+    },
+    options: [
+      {
+        id: 'opt-4a',
+        text: 'Je clique tout de suite sur le lien et je saisis mon code secret pour éviter la suspension de mon compte.',
+        isCorrect: false,
+        feedback: 'Danger extrême ! Vous venez de tomber dans l\'attaque de phishing. Le lien mène vers une fausse page clone qui enregistre votre code secret.',
+      },
+      {
+        id: 'opt-4b',
+        text: 'Je ne clique jamais sur le lien. Le nom de domaine « mon-compte-wave-securite.com » est trompeur et l\'urgence imposée est une manipulation typique.',
+        isCorrect: true,
+        feedback: 'Bravo ! C\'est un site d\'hameçonnage (phishing). Le vrai domaine de Wave est wave.com, et ils ne suspendent pas de comptes par lien SMS sous 30 minutes.',
+      },
+      {
+        id: 'opt-4c',
+        text: 'Le lien est sécurisé parce qu\'il commence par https://.',
+        isCorrect: false,
+        feedback: 'Attention à cette idée reçue ! N\'importe qui, y compris un cybercriminel, peut obtenir un certificat HTTPS gratuit en 2 minutes.',
+      },
+    ],
+    reasoning: 'L\'urgence temporelle ("sous 30 minutes") vise à vous priver de votre esprit critique pour que vous cliquiez sans réfléchir.',
+    protectionMethod: 'Ne cliquez jamais sur un lien reçu par SMS pour vous connecter à un compte financier. Ouvrez toujours votre application officielle directement.',
+    pedagogicalWarning: 'Scénario fictif d\'apprentissage. Ne saisissez jamais vos codes secrets sur des liens reçus par message.',
+  },
+  {
+    id: 'sim-5',
+    title: 'Appel d\'un prétendu agent technique demandant une commande USSD',
+    platform: 'USSD',
+    contextDescription: 'Vous recevez un appel d\'un individu qui prétend être ingénieur réseau télécom et vous promet un bonus de 20 Go d\'internet gratuit.',
+    messageContent: {
+      sender: '+221 78 555 44 33 (Appel vocal)',
+      body: '« Pour activer vos 20 Go offerts par la direction générale, tapez directement sur votre clavier de téléphone : *144*2*779998877*25000*VotreCodeSecret# puis appuyez sur Appel. »',
+    },
+    options: [
+      {
+        id: 'opt-5a',
+        text: 'C\'est une commande normale de configuration du réseau.',
+        isCorrect: false,
+        feedback: 'Faux ! La commande *144*2*... est la commande de transfert d\'argent d\'Orange Money. En tapant votre code, vous envoyez 25.000 F de votre propre solde à l\'escroc.',
+      },
+      {
+        id: 'opt-5b',
+        text: 'C\'est un piège : la formule contient la syntaxe d\'envoi d\'argent (*144*2*Numéro*Montant*Code#) masquée sous un faux prétexte technique.',
+        isCorrect: true,
+        feedback: 'Parfait ! L\'escroc utilise votre méconnaissance des codes USSD pour vous faire valider votre propre dépouillement.',
+      },
+      {
+        id: 'opt-5c',
+        text: 'Il faut taper le code mais enlever le code secret à la fin.',
+        isCorrect: false,
+        feedback: 'Même si le transfert échoue sans le bon code, il est dangereux de manipuler des codes USSD dictés par un tiers.',
+      },
+    ],
+    reasoning: 'Les menus USSD servent à déclencher des opérations directes sans passer par une application. Les escrocs abusent de ce mécanisme en dictant rapidement des suites de symboles.',
+    protectionMethod: 'Ne tapez JAMAIS de formule débutant par * et finissant par # dictée par téléphone, surtout si elle contient un montant ou votre code secret.',
+    pedagogicalWarning: 'Scénario fictif et inoffensif d\'entraînement conçu pour XamSafe.',
+  },
+  {
+    id: 'sim-6',
+    title: 'Prise de contact pour demande de code reçu par SMS',
+    platform: 'SMS',
+    contextDescription: 'Votre téléphone reçoit deux messages successifs à 1 minute d\'intervalle.',
+    messageContent: {
+      sender: 'Wave (SMS officiel) puis numéro inconnu',
+      body: 'Message 1 (Officiel) : « Votre code de vérification Wave est 8941. Ne le partagez JAMAIS, même avec un employé de Wave. »\n\nMessage 2 (Inconnu +221 77 123 45 67) : « Bonjour, j\'ai fait une erreur de chiffre en tapant mon numéro et mon code est arrivé chez vous. Pouvez-vous me le dicter s\'il vous plaît ? »',
+      timestamp: 'Il y a 1 minute',
+    },
+    options: [
+      {
+        id: 'opt-6a',
+        text: 'Je lui donne le code par gentillesse car il a fait une erreur innocente.',
+        isCorrect: false,
+        feedback: 'Grave erreur ! Un code de vérification ne peut pas arriver "par erreur" chez vous pour son compte : il a tapé VOTRE numéro pour prendre le contrôle de VOTRE compte.',
+      },
+      {
+        id: 'opt-6b',
+        text: 'Je ne communique jamais ce code : le SMS officiel précise d\'ailleurs expressément « Ne le partagez JAMAIS ». Si je le donne, mon compte sera vidé.',
+        isCorrect: true,
+        feedback: 'Exactement ! Le pirate tente de se connecter à votre compte depuis son smartphone. Ce code est la seule barrière qui protège votre argent.',
+      },
+      {
+        id: 'opt-6c',
+        text: 'Je lui envoie le code mais je lui demande 5.000 F de dédommagement.',
+        isCorrect: false,
+        feedback: 'Une fois qu\'il a le code, il vide votre compte en 10 secondes. Ne négociez jamais.',
+      },
+    ],
+    reasoning: 'Le premier message officiel indique noir sur blanc la règle de sécurité la plus importante : ne jamais partager le code.',
+    protectionMethod: 'Lisez attentivement les avertissements intégrés dans les SMS officiels des opérateurs. Aucun motif ne justifie de dicter un code reçu par SMS à un tiers.',
+    pedagogicalWarning: 'Scénario fictif interactif sans risque pour tester vos réflexes.',
+  },
+];
