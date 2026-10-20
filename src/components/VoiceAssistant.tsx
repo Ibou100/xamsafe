@@ -279,22 +279,12 @@ export const VoiceAssistant: React.FC<VoiceAssistantProps> = ({ isOpen, onClose,
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 overflow-y-auto animate-fadeIn"
+      className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 overflow-y-auto"
       role="dialog"
       aria-modal="true"
       aria-labelledby="voice-modal-title"
     >
-      <div className="bg-white dark:bg-[#0B2236] rounded-3xl max-w-2xl w-full p-6 sm:p-8 space-y-6 shadow-2xl border border-slate-200 dark:border-slate-700 relative text-left overflow-hidden">
-        {/* Subtle decorative glow */}
-        <div
-          className={`absolute -top-24 -right-24 w-64 h-64 rounded-full blur-3xl pointer-events-none transition-all duration-700 ${
-            isListening
-              ? 'bg-emerald-500/30 dark:bg-emerald-500/20 scale-125'
-              : diagnosis?.dangerLevel === 'danger'
-              ? 'bg-red-500/25 dark:bg-red-500/20'
-              : 'bg-emerald-500/10'
-          }`}
-        ></div>
+      <div className="bg-white dark:bg-[#0B2236] rounded-2xl max-w-2xl w-full max-h-[92dvh] flex flex-col overflow-y-auto p-5 sm:p-8 space-y-5 shadow-xl border border-slate-200 dark:border-slate-700 relative text-left">
 
         {/* Header with AI status pill & Settings */}
         <div className="flex items-start justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800 relative">
@@ -433,34 +423,26 @@ export const VoiceAssistant: React.FC<VoiceAssistantProps> = ({ isOpen, onClose,
         )}
 
         {/* BIG MICROPHONE INTERACTION ZONE */}
-        <div className="flex flex-col items-center justify-center py-3 space-y-4 text-center">
+        <div className="flex flex-col items-center justify-center py-2 space-y-3 text-center">
           <div className="relative">
-            {/* Pulsing ring animation when listening */}
-            {isListening && (
-              <>
-                <div className="absolute inset-0 rounded-full bg-emerald-500/20 animate-ping duration-1000"></div>
-                <div className="absolute -inset-4 rounded-full bg-emerald-500/10 animate-pulse duration-700"></div>
-              </>
-            )}
-
             <button
               type="button"
               onClick={toggleListening}
-              className={`relative z-10 w-24 h-24 sm:w-28 sm:h-28 rounded-full flex flex-col items-center justify-center shadow-xl transition-all transform active:scale-95 cursor-pointer ${
+              className={`relative z-10 w-24 h-24 sm:w-28 sm:h-28 rounded-full flex flex-col items-center justify-center shadow-lg transition-colors active:scale-95 cursor-pointer ${
                 isListening
-                  ? 'bg-red-600 text-white shadow-red-600/30 scale-105 animate-pulse'
-                  : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-600/30 hover:scale-105'
+                  ? 'bg-red-600 text-white ring-4 ring-red-400/40'
+                  : 'bg-emerald-600 hover:bg-emerald-700 text-white ring-4 ring-emerald-500/20'
               }`}
               aria-label={isListening ? "Arrêter l'enregistrement" : "Appuyer pour parler"}
             >
               {isListening ? (
                 <>
-                  <MicOff className="w-10 h-10 sm:w-12 sm:h-12" />
+                  <MicOff className="w-9 h-9 sm:w-11 sm:h-11" />
                   <span className="text-[11px] font-bold mt-1 uppercase">Tëj ko</span>
                 </>
               ) : (
                 <>
-                  <Mic className="w-10 h-10 sm:w-12 sm:h-12" />
+                  <Mic className="w-9 h-9 sm:w-11 sm:h-11" />
                   <span className="text-[11px] font-bold mt-1 uppercase">Waxal</span>
                 </>
               )}
@@ -568,9 +550,9 @@ export const VoiceAssistant: React.FC<VoiceAssistantProps> = ({ isOpen, onClose,
                   setPreferredAudioLang('fr');
                   speakText(diagnosis.spokenResponseFr, 'fr');
                 }}
-                className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                className={`inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors cursor-pointer min-h-[44px] ${
                   isSpeaking && preferredAudioLang === 'fr'
-                    ? 'bg-emerald-700 text-white ring-2 ring-emerald-400 animate-pulse'
+                    ? 'bg-emerald-700 text-white ring-2 ring-emerald-400 font-extrabold'
                     : 'bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-700 hover:bg-slate-50'
                 }`}
               >
@@ -584,9 +566,9 @@ export const VoiceAssistant: React.FC<VoiceAssistantProps> = ({ isOpen, onClose,
                   setPreferredAudioLang('wo');
                   speakText(diagnosis.spokenResponseWo, 'wo');
                 }}
-                className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                className={`inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors cursor-pointer min-h-[44px] ${
                   isSpeaking && preferredAudioLang === 'wo'
-                    ? 'bg-emerald-700 text-white ring-2 ring-emerald-400 animate-pulse'
+                    ? 'bg-emerald-700 text-white ring-2 ring-emerald-400 font-extrabold'
                     : 'bg-white dark:bg-slate-800 text-emerald-700 dark:text-emerald-400 border border-slate-300 dark:border-slate-700 hover:bg-slate-50 font-extrabold'
                 }`}
               >

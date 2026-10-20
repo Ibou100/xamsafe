@@ -70,7 +70,7 @@ export const ScamsLibrary: React.FC = () => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Rechercher par mot-clé (ex: Wave, SMS, huissier, code, avance)..."
-            className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-[#0F2B43] text-slate-900 dark:text-white placeholder-slate-400 focus:ring-2 focus:ring-emerald-500 text-sm shadow-xs transition-colors"
+            className="w-full pl-11 pr-4 py-3 min-h-[48px] rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-[#0F2B43] text-slate-900 dark:text-white placeholder-slate-400 focus:ring-2 focus:ring-emerald-500 text-base shadow-xs transition-colors"
           />
           {searchQuery && (
             <button
@@ -189,12 +189,12 @@ export const ScamsLibrary: React.FC = () => {
       {/* MODAL VIEW FOR COMPLETE SCAM CARD */}
       {activeScamModal && (
         <div
-          className="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto animate-fadeIn"
+          className="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto"
           role="dialog"
           aria-modal="true"
           aria-labelledby="modal-scam-title"
         >
-          <div className="bg-white dark:bg-[#0C2438] rounded-3xl max-w-3xl w-full max-h-[90vh] overflow-y-auto p-6 sm:p-8 space-y-6 shadow-2xl border border-slate-200 dark:border-slate-700 text-left">
+          <div className="bg-white dark:bg-[#0C2438] rounded-2xl max-w-3xl w-full max-h-[90dvh] overflow-y-auto p-6 sm:p-8 space-y-6 shadow-xl border border-slate-200 dark:border-slate-700 text-left">
             {/* Modal header */}
             <div className="flex items-start justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800">
               <div className="space-y-1">

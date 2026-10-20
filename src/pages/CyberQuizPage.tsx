@@ -198,7 +198,7 @@ export const CyberQuizPage: React.FC = () => {
                 </button>
               </div>
             ) : (
-              <div className="space-y-6 pt-6 border-t border-slate-200 dark:border-slate-800 animate-fadeIn">
+              <div className="space-y-6 pt-6 border-t border-slate-200 dark:border-slate-800">
                 {/* Result feedback */}
                 <div
                   className={`p-5 rounded-2xl border flex items-start gap-3.5 ${
@@ -252,7 +252,7 @@ export const CyberQuizPage: React.FC = () => {
         </div>
       ) : (
         /* FINAL SCORE & TAILORED ADVICE */
-        <div className="bg-white dark:bg-[#0C2438] rounded-3xl border border-slate-200 dark:border-slate-800 p-8 sm:p-12 space-y-8 shadow-sm text-center animate-fadeIn">
+        <div className="bg-white dark:bg-[#0C2438] rounded-3xl border border-slate-200 dark:border-slate-800 p-8 sm:p-12 space-y-8 shadow-sm text-center">
           <div className="w-20 h-20 rounded-full bg-emerald-100 dark:bg-emerald-950 flex items-center justify-center mx-auto text-emerald-600 dark:text-emerald-400">
             <Award className="w-10 h-10" />
           </div>

@@ -33,29 +33,29 @@ export const Footer: React.FC = () => {
             <h3 className="text-xs font-bold text-white uppercase tracking-wider">
               {language === 'wo' ? 'Jumtukaay yi' : 'Outils pratiques'}
             </h3>
-            <ul className="space-y-2 text-sm text-slate-400">
+            <ul className="space-y-1 text-sm text-slate-400">
               <li>
-                <Link to="/analyser-message" className="hover:text-emerald-400 transition-colors">
+                <Link to="/analyser-message" className="inline-block py-1.5 hover:text-emerald-400 transition-colors">
                   {t.nav.analyzeMessage}
                 </Link>
               </li>
               <li>
-                <Link to="/verifier-url" className="hover:text-emerald-400 transition-colors">
+                <Link to="/verifier-url" className="inline-block py-1.5 hover:text-emerald-400 transition-colors">
                   {t.nav.checkUrl}
                 </Link>
               </li>
               <li>
-                <Link to="/simulateur" className="hover:text-emerald-400 transition-colors">
+                <Link to="/simulateur" className="inline-block py-1.5 hover:text-emerald-400 transition-colors">
                   {t.nav.simulator}
                 </Link>
               </li>
               <li>
-                <Link to="/quiz" className="hover:text-emerald-400 transition-colors">
+                <Link to="/quiz" className="inline-block py-1.5 hover:text-emerald-400 transition-colors">
                   {t.nav.quiz}
                 </Link>
               </li>
               <li>
-                <Link to="/urgence-victime" className="text-red-400 font-medium hover:text-red-300 transition-colors">
+                <Link to="/urgence-victime" className="inline-block py-1.5 text-red-400 font-semibold hover:text-red-300 transition-colors">
                   {t.nav.victim}
                 </Link>
               </li>
@@ -67,29 +67,29 @@ export const Footer: React.FC = () => {
             <h3 className="text-xs font-bold text-white uppercase tracking-wider">
               {language === 'wo' ? 'Xam-xam' : 'Guides & Savoir'}
             </h3>
-            <ul className="space-y-2 text-sm text-slate-400">
+            <ul className="space-y-1 text-sm text-slate-400">
               <li>
-                <Link to="/arnaques" className="hover:text-emerald-400 transition-colors">
+                <Link to="/arnaques" className="inline-block py-1.5 hover:text-emerald-400 transition-colors">
                   {t.nav.scams}
                 </Link>
               </li>
               <li>
-                <Link to="/securiser-comptes" className="hover:text-emerald-400 transition-colors">
+                <Link to="/securiser-comptes" className="inline-block py-1.5 hover:text-emerald-400 transition-colors">
                   {t.nav.secureAccounts}
                 </Link>
               </li>
               <li>
-                <Link to="/ressources" className="hover:text-emerald-400 transition-colors">
+                <Link to="/ressources" className="inline-block py-1.5 hover:text-emerald-400 transition-colors">
                   {t.nav.resources}
                 </Link>
               </li>
               <li>
-                <Link to="/a-propos" className="hover:text-emerald-400 transition-colors">
+                <Link to="/a-propos" className="inline-block py-1.5 hover:text-emerald-400 transition-colors">
                   {t.nav.about}
                 </Link>
               </li>
               <li>
-                <Link to="/confidentialite" className="hover:text-emerald-400 transition-colors">
+                <Link to="/confidentialite" className="inline-block py-1.5 hover:text-emerald-400 transition-colors">
                   {t.nav.privacy}
                 </Link>
               </li>

@@ -138,7 +138,7 @@ export const AdminPage: React.FC = () => {
                 value={passcodeInput}
                 onChange={(e) => setPasscodeInput(e.target.value)}
                 placeholder="Entrez le code administrateur..."
-                className="w-full p-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-[#0F2B43] text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-emerald-500"
+                className="w-full p-3.5 min-h-[48px] rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-[#0F2B43] text-slate-900 dark:text-white text-base focus:ring-2 focus:ring-emerald-500"
               />
             </div>
 
@@ -404,7 +404,7 @@ export const AdminPage: React.FC = () => {
                 value={newTitle}
                 onChange={(e) => setNewTitle(e.target.value)}
                 placeholder="Ex: Fausse tombola sur Telegram..."
-                className="w-full p-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-[#0F2B43] text-sm"
+                className="w-full p-3 min-h-[48px] rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-[#0F2B43] text-base"
               />
             </div>
 
@@ -413,7 +413,7 @@ export const AdminPage: React.FC = () => {
               <select
                 value={newCategory}
                 onChange={(e) => setNewCategory(e.target.value as any)}
-                className="w-full p-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-[#0F2B43] text-sm"
+                className="w-full p-3 min-h-[48px] rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-[#0F2B43] text-base"
               >
                 <option value="mobile-money">Mobile money</option>
                 <option value="sms">SMS frauduleux</option>
@@ -435,7 +435,7 @@ export const AdminPage: React.FC = () => {
               value={newSummary}
               onChange={(e) => setNewSummary(e.target.value)}
               placeholder="Expliquez la mécanique en termes clairs..."
-              className="w-full p-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-[#0F2B43] text-sm"
+              className="w-full p-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-[#0F2B43] text-base"
             />
           </div>
 
@@ -446,7 +446,7 @@ export const AdminPage: React.FC = () => {
               value={newExampleText}
               onChange={(e) => setNewExampleText(e.target.value)}
               placeholder="Ex : « Félicitations, vous avez gagné... »"
-              className="w-full p-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-[#0F2B43] text-sm"
+              className="w-full p-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-[#0F2B43] text-base"
             />
           </div>
 
@@ -457,7 +457,7 @@ export const AdminPage: React.FC = () => {
               value={newAttackerGoal}
               onChange={(e) => setNewAttackerGoal(e.target.value)}
               placeholder="Ex: Voler les codes secrets ou soutirer une avance..."
-              className="w-full p-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-[#0F2B43] text-sm"
+              className="w-full p-3 min-h-[48px] rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-[#0F2B43] text-base"
             />
           </div>
 

@@ -192,7 +192,7 @@ export const PhishingSimulatorPage: React.FC = () => {
             </button>
           </div>
         ) : (
-          <div className="space-y-6 pt-4 border-t border-slate-200 dark:border-slate-800 animate-fadeIn">
+          <div className="space-y-6 pt-4 border-t border-slate-200 dark:border-slate-800">
             {/* Feedback on answer */}
             <div
               className={`p-5 rounded-2xl border flex items-start gap-3 ${

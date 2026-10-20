@@ -52,38 +52,73 @@ export const VictimUrgentPage: React.FC = () => {
           Sélectionnez votre situation ci-dessous pour obtenir immédiatement les démarches prioritaires à faire dans l'heure, les numéros officiels à contacter pour bloquer les flux et la liste des preuves à réunir.
         </p>
 
-        {/* Emergency Hotlines Strip */}
-        <div className="pt-2 flex flex-wrap items-center gap-3 text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-200 border-t border-red-200/80 dark:border-red-900/50">
-          <span className="text-slate-500 dark:text-slate-400 font-normal">Numéros d'urgence gratuits :</span>
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 border border-red-200 dark:border-red-900">
-            <Phone className="w-3.5 h-3.5 text-red-600" />
-            Wave : <strong>200600</strong>
-          </span>
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 border border-red-200 dark:border-red-900">
-            <Phone className="w-3.5 h-3.5 text-red-600" />
-            Orange Money : <strong>1441</strong>
-          </span>
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 border border-red-200 dark:border-red-900">
-            <ShieldAlert className="w-3.5 h-3.5 text-red-600" />
-            Police DSC : <strong>17</strong>
-          </span>
+        {/* Emergency Hotlines Strip - One-tap direct dialing on mobile */}
+        <div className="pt-3 flex flex-wrap items-center gap-2.5 text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-200 border-t border-red-200/80 dark:border-red-900/50">
+          <span className="text-slate-600 dark:text-slate-400 font-medium text-xs sm:text-sm w-full sm:w-auto">Appel gratuit immédiat :</span>
+          <a
+            href="tel:200600"
+            className="inline-flex items-center gap-1.5 px-3 py-2 min-h-[44px] rounded-xl bg-white dark:bg-slate-900 border border-red-200 dark:border-red-900 text-red-600 dark:text-red-400 font-bold active:bg-red-50 dark:active:bg-red-950/40 transition-colors cursor-pointer"
+            aria-label="Appeler gratuitement le service client Wave au 200600"
+          >
+            <Phone className="w-4 h-4 text-red-600 shrink-0" />
+            <span>Wave : <strong>200600</strong></span>
+          </a>
+          <a
+            href="tel:1441"
+            className="inline-flex items-center gap-1.5 px-3 py-2 min-h-[44px] rounded-xl bg-white dark:bg-slate-900 border border-red-200 dark:border-red-900 text-red-600 dark:text-red-400 font-bold active:bg-red-50 dark:active:bg-red-950/40 transition-colors cursor-pointer"
+            aria-label="Appeler gratuitement Orange Money au 1441"
+          >
+            <Phone className="w-4 h-4 text-red-600 shrink-0" />
+            <span>Orange Money : <strong>1441</strong></span>
+          </a>
+          <a
+            href="tel:17"
+            className="inline-flex items-center gap-1.5 px-3 py-2 min-h-[44px] rounded-xl bg-white dark:bg-slate-900 border border-red-200 dark:border-red-900 text-red-600 dark:text-red-400 font-bold active:bg-red-50 dark:active:bg-red-950/40 transition-colors cursor-pointer"
+            aria-label="Appeler la Police Nationale au 17"
+          >
+            <ShieldAlert className="w-4 h-4 text-red-600 shrink-0" />
+            <span>Police DSC : <strong>17</strong></span>
+          </a>
         </div>
       </div>
 
-      {/* Grid of Situations (A to J) */}
+      {/* Grid of Situations (A to J) - Mobile dropdown + Desktop grid */}
       <div className="space-y-3">
-        <h2 className="text-sm font-bold uppercase tracking-wider text-slate-500">
-          Sélectionnez ce qui vous est arrivé :
-        </h2>
+        <div className="flex items-center justify-between">
+          <h2 className="text-sm font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+            Sélectionnez votre situation :
+          </h2>
+          <span className="text-xs text-slate-500 font-medium sm:hidden">
+            Procédure {activeScenario.letter} active
+          </span>
+        </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2.5" role="tablist">
+        {/* Mobile quick scenario selector: Instant 1-tap, prevents vertical stacking of 10 cards */}
+        <div className="sm:hidden">
+          <label htmlFor="mobile-scenario-select" className="sr-only">Sélectionner votre situation d'urgence</label>
+          <select
+            id="mobile-scenario-select"
+            value={selectedScenarioId}
+            onChange={(e) => setSelectedScenarioId(e.target.value)}
+            className="w-full p-3.5 min-h-[48px] rounded-xl border-2 border-red-500/50 bg-white dark:bg-[#0C2438] text-slate-950 dark:text-white font-bold text-base shadow-sm focus:ring-2 focus:ring-red-500"
+          >
+            {INITIAL_EMERGENCY_PATHS.map((scen) => (
+              <option key={scen.id} value={scen.id}>
+                {scen.letter}. {scen.title}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Desktop grid */}
+        <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-5 gap-2.5" role="tablist">
           {INITIAL_EMERGENCY_PATHS.map((scen) => (
             <button
               key={scen.id}
               role="tab"
               aria-selected={scen.id === selectedScenarioId}
               onClick={() => setSelectedScenarioId(scen.id)}
-              className={`p-3.5 rounded-xl border text-left transition-all flex flex-col justify-between gap-2 cursor-pointer ${
+              className={`p-3.5 rounded-xl border text-left transition-colors flex flex-col justify-between gap-2 cursor-pointer min-h-[72px] ${
                 scen.id === selectedScenarioId
                   ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 border-slate-900 dark:border-white shadow-xs'
                   : 'bg-white dark:bg-[#0C2438] text-slate-800 dark:text-slate-200 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
@@ -196,17 +231,17 @@ export const VictimUrgentPage: React.FC = () => {
             <button
               type="button"
               onClick={handleCopyProofChecklist}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
+              className="inline-flex items-center justify-center gap-2 px-4 py-2.5 min-h-[44px] rounded-xl text-xs sm:text-sm font-bold bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-700 active:bg-slate-100 transition-colors cursor-pointer w-full sm:w-auto"
             >
               {copiedProof ? (
                 <>
-                  <Check className="w-3.5 h-3.5 text-emerald-500" />
+                  <Check className="w-4 h-4 text-emerald-500" />
                   <span>Copié dans le presse-papier !</span>
                 </>
               ) : (
                 <>
-                  <Copy className="w-3.5 h-3.5" />
-                  <span>Copier la liste</span>
+                  <Copy className="w-4 h-4" />
+                  <span>Copier la liste de preuves</span>
                 </>
               )}
             </button>
