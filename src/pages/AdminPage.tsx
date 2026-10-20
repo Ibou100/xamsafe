@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { INITIAL_SCAMS } from '../data/scams';
+import { INITIAL_SCAMS, getScamsCatalog, saveScamsCatalog, resetScamsCatalog } from '../data/scams';
 import { INITIAL_QUIZ_QUESTIONS } from '../data/quizQuestions';
 import type { ScamCard, QuizQuestion } from '../types';
 import {
@@ -9,6 +9,7 @@ import {
   Eye,
   Download,
   AlertCircle,
+  RotateCcw,
 } from 'lucide-react';
 
 export const AdminPage: React.FC = () => {
@@ -21,8 +22,8 @@ export const AdminPage: React.FC = () => {
   // Active admin tab: 'scams' | 'quiz' | 'wolof' | 'new-scam'
   const [activeTab, setActiveTab] = useState<'scams' | 'quiz' | 'wolof' | 'new-scam'>('scams');
 
-  // Local state for editable items
-  const [scamsList, setScamsList] = useState<ScamCard[]>(INITIAL_SCAMS);
+  // Persistent state for editable items
+  const [scamsList, setScamsList] = useState<ScamCard[]>(() => getScamsCatalog());
   const [quizList] = useState<QuizQuestion[]>(INITIAL_QUIZ_QUESTIONS);
   const [previewScam, setPreviewScam] = useState<ScamCard | null>(null);
 
@@ -35,7 +36,6 @@ export const AdminPage: React.FC = () => {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    // Default admin passcode configured via VITE_ADMIN_PASSCODE environment variable or fallback 'XamSafeAdmin2026!'
     const configuredCode = (import.meta as any).env?.VITE_ADMIN_PASSCODE || 'XamSafeAdmin2026!';
 
     if (passcodeInput.trim() === configuredCode) {
@@ -78,12 +78,21 @@ export const AdminPage: React.FC = () => {
       lastVerifiedDate: new Date().toISOString().split('T')[0],
     };
 
-    setScamsList([created, ...scamsList]);
+    const updated = [created, ...scamsList];
+    setScamsList(updated);
+    saveScamsCatalog(updated);
     setNewTitle('');
     setNewSummary('');
     setNewAttackerGoal('');
     setNewExampleText('');
     setActiveTab('scams');
+  };
+
+  const handleResetCatalog = () => {
+    if (window.confirm('Voulez-vous vraiment réinitialiser toutes les fiches d\'arnaques aux 15 fiches par défaut ?')) {
+      resetScamsCatalog();
+      setScamsList(INITIAL_SCAMS);
+    }
   };
 
   const handleExportData = () => {
@@ -174,11 +183,21 @@ export const AdminPage: React.FC = () => {
           </h1>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5">
+          <button
+            type="button"
+            onClick={handleResetCatalog}
+            title="Réinitialiser le catalogue aux 15 fiches par défaut"
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 text-slate-600 dark:text-slate-300 cursor-pointer"
+          >
+            <RotateCcw className="w-3.5 h-3.5" />
+            <span>Réinitialiser</span>
+          </button>
+
           <button
             type="button"
             onClick={handleExportData}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 text-slate-700 dark:text-slate-300"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 text-slate-700 dark:text-slate-300 cursor-pointer"
           >
             <Download className="w-3.5 h-3.5" />
             <span>Exporter JSON</span>

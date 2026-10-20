@@ -59,4 +59,22 @@ describe('URL Analyzer — Vérificateur Syntaxique Sécurisé (Sans SSRF)', () 
     expect(result.hostname).toBe('127.0.0.1');
     expect(result.isIpAddress).toBe(true);
   });
+
+  it('détecte un faux site clone de plateforme mondiale (Binance / PayPal)', () => {
+    const url = 'https://binance-security-verify.click/login';
+    const result = analyzeUrlLocally(url);
+
+    expect(result.riskLevel).toBe('dangereux');
+    expect(result.impersonatedBrand).toBe('Binance Crypto');
+    expect(result.clues.some((c) => c.id === 'suspicious-tld')).toBe(true);
+  });
+
+  it('identifie un site de streaming illégal avec extension à risque (kooratv.club) comme Dangereux', () => {
+    const url = 'https://kooratv.club/';
+    const result = analyzeUrlLocally(url);
+
+    expect(result.riskLevel).toBe('dangereux');
+    expect(result.clues.some((c) => c.id === 'piracy-streaming-malvertising')).toBe(true);
+    expect(result.clues.some((c) => c.id === 'suspicious-tld')).toBe(true);
+  });
 });

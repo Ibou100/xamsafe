@@ -88,13 +88,13 @@ export const Navbar: React.FC = () => {
 
           {/* Action buttons (Victim Emergency + Theme + Language) */}
           <div className="flex items-center space-x-2 sm:space-x-3">
-            {/* Prominent Emergency Button */}
+            {/* Professional Emergency Action */}
             <Link
               to="/urgence-victime"
-              className="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl font-bold text-xs sm:text-sm text-white bg-red-600 hover:bg-red-700 active:scale-95 shadow-md shadow-red-600/20 transition-all border border-red-500/30"
+              className="inline-flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-lg font-bold text-xs sm:text-sm text-white bg-red-600 hover:bg-red-700 active:scale-95 transition-all shadow-xs"
               aria-label="Parcours d'urgence : Je suis victime"
             >
-              <AlertTriangle className="w-4 h-4 shrink-0 animate-pulse text-amber-300" />
+              <AlertTriangle className="w-3.5 h-3.5 shrink-0 text-white" />
               <span className="whitespace-nowrap">{t.common.emergencyBtn}</span>
             </Link>
 

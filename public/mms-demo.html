@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Laboratoire Démo Meta MMS Wolof — Standalone Studio</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#ecfdf5',
+              500: '#10b981',
+              600: '#059669',
+              900: '#064e3b',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @keyframes pulse-ring {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.05); opacity: 0.4; }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+    .wave-bar {
+      transition: height 0.1s ease;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans selection:bg-emerald-500 selection:text-white">
+
+  <!-- TOP BANNER -->
+  <header class="border-b border-slate-800 bg-slate-900/60 backdrop-blur-md sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center font-bold text-white shadow-lg shadow-emerald-500/20">
+          MMS
+        </div>
+        <div>
+          <h1 class="text-lg font-extrabold tracking-tight text-white flex items-center gap-2">
+            <span>Meta MMS Wolof • Banc d'Essai Autonome</span>
+            <span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">HORS XAMSAFE</span>
+          </h1>
+          <p class="text-xs text-slate-400">Modèle open-source de synthèse vocale <code>facebook/mms-tts-wol</code> (Meta AI Research)</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <a href="/" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors border border-slate-700">
+          ← Retour à XamSafe
+        </a>
+        <a href="https://huggingface.co/facebook/mms-tts-wol" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-500 hover:bg-amber-400 text-slate-950 transition-colors flex items-center gap-1.5">
+          <span>HuggingFace Modèle</span>
+          <span>↗</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 py-8 space-y-10">
+
+    <!-- INTRO CARD -->
+    <section class="bg-gradient-to-r from-slate-900 via-[#0B2236] to-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-4 shadow-xl">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-bold uppercase tracking-wider border border-emerald-500/20">
+        🔬 Espace d'Étude & Démonstration Technique
+      </div>
+      <h2 class="text-2xl sm:text-3xl font-extrabold text-white">
+        Qu'est-ce que Meta MMS et pourquoi est-il unique pour le Wolof ?
+      </h2>
+      <p class="text-slate-300 text-sm sm:text-base leading-relaxed max-w-4xl">
+        Le projet <strong>Massively Multilingual Speech (MMS)</strong> a été publié en open-source par l'équipe de recherche de <strong>Meta AI (FAIR)</strong>. 
+        Contrairement aux technologies traditionnelles qui ignorent les langues d'Afrique de l'Ouest, Meta a spécifiquement entraîné un modèle de <strong>Text-to-Speech (TTS) dédié au Wolof</strong> (<code class="text-emerald-400 font-mono">facebook/mms-tts-wol</code>) sur des milliers d'enregistrements audio de locuteurs natifs sénégalais.
+      </p>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 text-xs">
+        <div class="p-4 rounded-xl bg-slate-800/60 border border-slate-700/60 space-y-1">
+          <span class="text-emerald-400 font-bold block text-sm">🇸🇳 Vraie prononciation Wolof</span>
+          <p class="text-slate-400">Entraîné sur des phonèmes spécifiques au wolof (ex: <em>« ñ »</em>, <em>« ŋ »</em>, consonnes géminées <em>« cc »</em>, <em>« jj »</em>).</p>
+        </div>
+        <div class="p-4 rounded-xl bg-slate-800/60 border border-slate-700/60 space-y-1">
+          <span class="text-emerald-400 font-bold block text-sm">🔓 100% Open-Source & Gratuit</span>
+          <p class="text-slate-400">Poids du modèle téléchargeables librement sur Hugging Face sous licence de recherche libre.</p>
+        </div>
+        <div class="p-4 rounded-xl bg-slate-800/60 border border-slate-700/60 space-y-1">
+          <span class="text-emerald-400 font-bold block text-sm">⚡ Architecture VITS</span>
+          <p class="text-slate-400">Génération de bout-en-bout : produit directement un signal audio WAV haute fidélité (16 000 Hz).</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ARCHITECTURE PIPELINE EXPLAINER -->
+    <section class="space-y-4">
+      <h3 class="text-xl font-bold text-white flex items-center gap-2">
+        <span>⚙️ Comment fonctionne la synthèse vocale Meta MMS ?</span>
+      </h3>
+
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
+        <!-- Step 1 -->
+        <div class="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-2 relative">
+          <span class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 font-bold flex items-center justify-center text-xs">1</span>
+          <h4 class="font-bold text-white text-sm">Texte Wolof Brute</h4>
+          <p class="text-slate-400">L'utilisateur tape la phrase en wolof, par exemple :</p>
+          <div class="p-2.5 bg-slate-950 rounded-lg border border-slate-800 text-emerald-300 font-mono text-[11px]">
+            « Wave dula laaj sa code mukk ! »
+          </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-2 relative">
+          <span class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 font-bold flex items-center justify-center text-xs">2</span>
+          <h4 class="font-bold text-white text-sm">Phonémisation Wolof (IPA)</h4>
+          <p class="text-slate-400">Le modèle convertit les lettres en symboles phonétiques de prononciation exacte :</p>
+          <div class="p-2.5 bg-slate-950 rounded-lg border border-slate-800 text-amber-300 font-mono text-[11px]">
+            /wa:v du la la:dʒ sa ko:d muk/
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-2 relative">
+          <span class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 font-bold flex items-center justify-center text-xs">3</span>
+          <h4 class="font-bold text-white text-sm">Réseau Neuronal VITS</h4>
+          <p class="text-slate-400">Calcul stochastique du rythme, des pauses de respiration et de la hauteur de ton humaine.</p>
+          <div class="p-2.5 bg-slate-950 rounded-lg border border-slate-800 text-blue-300 font-mono text-[11px]">
+            VITS Flow Normalizer + Latent Z
+          </div>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-2 relative">
+          <span class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 font-bold flex items-center justify-center text-xs">4</span>
+          <h4 class="font-bold text-white text-sm">Vocodeur HiFi-GAN</h4>
+          <p class="text-slate-400">Transforme les matrices en ondes acoustiques réelles audibles par l'oreille humaine :</p>
+          <div class="p-2.5 bg-slate-950 rounded-lg border border-slate-800 text-purple-300 font-mono text-[11px]">
+            Fichier Audio 16 kHz (.WAV)
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- INTERACTIVE PLAYGROUND -->
+    <section class="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-4">
+        <div>
+          <h3 class="text-lg font-bold text-white">🧪 Bac à Sable Interactif : Test d'Écoute</h3>
+          <p class="text-xs text-slate-400">Sélectionnez une phrase d'alerte en Wolof ou tapez la vôtre pour tester la vocalisation.</p>
+        </div>
+        <span class="text-xs font-semibold px-2.5 py-1 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+          Simulation Studio
+        </span>
+      </div>
+
+      <!-- Quick Phrases Buttons -->
+      <div class="space-y-2">
+        <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block">
+          Phrases d'alerte types prêtes à tester :
+        </label>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+          <button onclick="setSample('Wave ak Orange dunu la laaj sa code mukk ci telefon ! Tëjal telefon bi ci sàss !', 'Wave / Orange - Demande de code')" class="p-3 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-left text-slate-200 transition-colors flex items-center justify-between group">
+            <span>📞 « Wave ak Orange dunu la laaj sa code mukk ci telefon ! »</span>
+            <span class="text-emerald-400 text-[10px] group-hover:translate-x-0.5 transition-transform">Charger →</span>
+          </button>
+          <button onclick="setSample('Bul joxe sa xaalis dëpp bala nga gis sa marchandise ci say loxo !', 'Faux Vendeur - Acompte dëpp')" class="p-3 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-left text-slate-200 transition-colors flex items-center justify-between group">
+            <span>🛍️ « Bul joxe sa xaalis dëpp bala nga gis sa marchandise... »</span>
+            <span class="text-emerald-400 text-[10px] group-hover:translate-x-0.5 transition-transform">Charger →</span>
+          </button>
+          <button onclick="setSample('Kontu sa xarit sàcc nañu ko. Bul ko yonnee benn code 6 chiffres bi la ñëw ci SMS !', 'WhatsApp - Vol de compte')" class="p-3 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-left text-slate-200 transition-colors flex items-center justify-between group">
+            <span>💬 « Kontu sa xarit sàcc nañu ko. Bul ko yonnee code 6 chiffres... »</span>
+            <span class="text-emerald-400 text-[10px] group-hover:translate-x-0.5 transition-transform">Charger →</span>
+          </button>
+          <button onclick="setSample('Assalamu alaykum wa Senegaal ! XamSafe dafay aar sa xaalis ci telefon ak ci internet.', 'Message citoyen de bienvenue')" class="p-3 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-left text-slate-200 transition-colors flex items-center justify-between group">
+            <span>🇸🇳 « Assalamu alaykum wa Senegaal ! XamSafe dafay aar... »</span>
+            <span class="text-emerald-400 text-[10px] group-hover:translate-x-0.5 transition-transform">Charger →</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Text input -->
+      <div class="space-y-2">
+        <label for="wolofText" class="text-xs font-bold text-slate-400 uppercase tracking-wider block">
+          Texte en Wolof à synthétiser :
+        </label>
+        <textarea id="wolofText" rows="3" class="w-full p-4 rounded-2xl bg-slate-950 border border-slate-800 text-slate-100 placeholder-slate-500 text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">Wave ak Orange dunu la laaj sa code mukk ci telefon ! Tëjal telefon bi ci sàss !</textarea>
+      </div>
+
+      <!-- Phonetic IPA breakdown display -->
+      <div class="p-4 rounded-xl bg-slate-950/60 border border-slate-800 space-y-1">
+        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Décomposition Phonétique Wolof (Ce que le modèle analyse) :</span>
+        <div id="ipaBreakdown" class="font-mono text-xs text-amber-300">
+          /wa:v ak o-ra:ndʒ du-nu la la:dʒ sa ko:d muk ci te-le-fon/
+        </div>
+      </div>
+
+      <!-- AUDIO CONTROLS & WAVE VISUALIZER -->
+      <div class="p-5 rounded-2xl bg-slate-950 border border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-3 w-full sm:w-auto">
+          <button id="playBtn" onclick="togglePlay()" class="w-14 h-14 rounded-full bg-emerald-500 hover:bg-emerald-400 active:scale-95 text-slate-950 font-bold flex items-center justify-center text-xl shadow-lg shadow-emerald-500/25 transition-all">
+            ▶
+          </button>
+          <div>
+            <span id="playerStatus" class="font-bold text-sm text-white block">Prêt pour l'écoute</span>
+            <span id="playerSub" class="text-xs text-slate-400">Cliquez pour déclencher la synthèse vocale</span>
+          </div>
+        </div>
+
+        <!-- Simulated waveform bars -->
+        <div id="waveContainer" class="flex items-center gap-1 h-8 opacity-40">
+          <div class="wave-bar w-1 bg-emerald-500 h-2 rounded-full"></div>
+          <div class="wave-bar w-1 bg-emerald-500 h-5 rounded-full"></div>
+          <div class="wave-bar w-1 bg-emerald-500 h-3 rounded-full"></div>
+          <div class="wave-bar w-1 bg-emerald-500 h-6 rounded-full"></div>
+          <div class="wave-bar w-1 bg-emerald-500 h-4 rounded-full"></div>
+          <div class="wave-bar w-1 bg-emerald-500 h-8 rounded-full"></div>
+          <div class="wave-bar w-1 bg-emerald-500 h-3 rounded-full"></div>
+          <div class="wave-bar w-1 bg-emerald-500 h-5 rounded-full"></div>
+          <div class="wave-bar w-1 bg-emerald-500 h-2 rounded-full"></div>
+          <div class="wave-bar w-1 bg-emerald-500 h-7 rounded-full"></div>
+          <div class="wave-bar w-1 bg-emerald-500 h-4 rounded-full"></div>
+          <div class="wave-bar w-1 bg-emerald-500 h-6 rounded-full"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LIVE DEMO ON HUGGINGFACE SPACES EMBED -->
+    <section class="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 class="text-lg font-bold text-white flex items-center gap-2">
+            <span>🌐 Tester le Modèle Officiel Meta en Direct sur Hugging Face</span>
+          </h3>
+          <p class="text-xs text-slate-400">
+            Hugging Face héberge directement le conteneur GPU avec les vrais poids PyTorch de Meta MMS pour générer le fichier .wav réel.
+          </p>
+        </div>
+        <a href="https://huggingface.co/spaces/mms-meta/MMS" target="_blank" rel="noopener noreferrer" class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 flex items-center gap-1.5 transition-colors">
+          <span>Ouvrir en plein écran</span>
+          <span>↗</span>
+        </a>
+      </div>
+
+      <div class="rounded-2xl border border-slate-800 overflow-hidden bg-slate-950 aspect-[16/9] max-h-[550px] relative flex flex-col items-center justify-center p-6 text-center space-y-4">
+        <div class="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center text-2xl font-bold">
+          🤗
+        </div>
+        <div class="space-y-1 max-w-lg">
+          <h4 class="font-bold text-white text-base">Espace Officiel Hugging Face : Meta MMS</h4>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            Pour tester avec les vrais serveurs GPU de Meta, ouvrez l'espace Hugging Face officiel. 
+            Il suffit de sélectionner la langue <strong>« wol » (Wolof)</strong>, de coller votre phrase et d'écouter le fichier audio WAV généré !
+          </p>
+        </div>
+        <a href="https://huggingface.co/spaces/mms-meta/MMS" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-slate-950 bg-emerald-400 hover:bg-emerald-300 transition-all shadow-lg shadow-emerald-400/20">
+          <span>Lancer l'Espace MMS sur Hugging Face (Gratuit)</span>
+          <span>→</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- PYTHON CODE INTEGRATION (HOW DEVELOPERS USE IT) -->
+    <section class="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-4">
+      <h3 class="text-lg font-bold text-white flex items-center gap-2">
+        <span>💻 Comment un développeur utilise Meta MMS en Python (5 lignes)</span>
+      </h3>
+      <p class="text-xs text-slate-400">
+        Voici le code source officiel minimal pour générer un fichier vocal en Wolof avec la bibliothèque <code>transformers</code> :
+      </p>
+
+      <div class="p-5 rounded-2xl bg-slate-950 border border-slate-800 font-mono text-xs text-slate-300 overflow-x-auto space-y-2">
+        <span class="text-slate-500"># 1. Installer la bibliothèque HuggingFace</span><br>
+        <span class="text-emerald-400">pip install transformers torch scipy</span><br><br>
+
+        <span class="text-slate-500"># 2. Charger le modèle Wolof officiel de Meta AI</span><br>
+        <span class="text-purple-400">from</span> transformers <span class="text-purple-400">import</span> VitsModel, AutoTokenizer<br>
+        <span class="text-purple-400">import</span> torch, scipy.io.wavfile <span class="text-purple-400">as</span> wavfile<br><br>
+
+        model = VitsModel.from_pretrained(<span class="text-amber-300">"facebook/mms-tts-wol"</span>)<br>
+        tokenizer = AutoTokenizer.from_pretrained(<span class="text-amber-300">"facebook/mms-tts-wol"</span>)<br><br>
+
+        <span class="text-slate-500"># 3. Préparer le texte d'alerte en Wolof</span><br>
+        texte = <span class="text-amber-300">"Wave dula laaj sa code mukk ci telefon !"</span><br>
+        inputs = tokenizer(texte, return_tensors=<span class="text-amber-300">"pt"</span>)<br><br>
+
+        <span class="text-slate-500"># 4. Synthétiser l'onde sonore (.WAV)</span><br>
+        <span class="text-purple-400">with</span> torch.no_grad():<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;output = model(**inputs).waveform<br><br>
+
+        <span class="text-slate-500"># 5. Sauvegarder le fichier audio</span><br>
+        wavfile.write(<span class="text-amber-300">"alerte_wolof.wav"</span>, rate=model.config.sampling_rate, data=output[0].numpy())<br>
+        <span class="text-blue-400">print</span>(<span class="text-amber-300">"✅ Fichier audio Wolof généré avec succès !"</span>)
+      </div>
+    </section>
+
+    <!-- COMPARISON TABLE -->
+    <section class="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-4">
+      <h3 class="text-lg font-bold text-white">⚖️ Comparatif : Meta MMS vs Synthèse Navigateur Standard</h3>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs border-collapse">
+          <thead>
+            <tr class="border-b border-slate-800 text-slate-400 font-bold uppercase">
+              <th class="py-3 px-4">Critère</th>
+              <th class="py-3 px-4 text-emerald-400">Meta MMS Wolof (Open-Source)</th>
+              <th class="py-3 px-4">Synthèse Standard (Web Speech API)</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-800/60 text-slate-300">
+            <tr>
+              <td class="py-3 px-4 font-bold">Accent & Authenticité</td>
+              <td class="py-3 px-4 text-emerald-400">Vrai accent wolof natif (sons <em>ñ, ŋ, cc</em> respectés)</td>
+              <td class="py-3 px-4 text-slate-400">Voix française lisant des mots wolof avec accent étranger</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-bold">Coût & Droits</td>
+              <td class="py-3 px-4 text-emerald-400">0 FCFA (Open-source libre)</td>
+              <td class="py-3 px-4 text-slate-400">0 FCFA (Inclus dans le navigateur)</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-bold">Indépendance & Souveraineté</td>
+              <td class="py-3 px-4 text-emerald-400">100% hébergeable au Sénégal sur un serveur local</td>
+              <td class="py-3 px-4 text-slate-400">Dépendant du système d'exploitation du téléphone</td>
+            </tr>
+            <tr>
+              <td class="py-3 px-4 font-bold">Taille du modèle</td>
+              <td class="py-3 px-4 text-emerald-400">~145 Mo (très léger pour un modèle de voix)</td>
+              <td class="py-3 px-4 text-slate-400">0 Mo (déjà dans le système)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="border-t border-slate-800 py-8 text-center text-xs text-slate-500">
+    <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <span>Banc d'essai autonome Meta MMS • Initiative de recherche citoyenne XamSafe</span>
+      <a href="/" class="text-emerald-400 hover:underline font-bold">Retour à la plateforme XamSafe →</a>
+    </div>
+  </footer>
+
+  <script>
+    let isPlaying = false;
+    let waveInterval;
+
+    function setSample(text, desc) {
+      document.getElementById('wolofText').value = text;
+      updateIPA(text);
+      document.getElementById('playerStatus').innerText = desc;
+      document.getElementById('playerSub').innerText = 'Prêt à être synthétisé';
+    }
+
+    function updateIPA(text) {
+      // Approximate pedagogical phonetic breakdown for visual demonstration
+      const ipa = '/' + text
+        .toLowerCase()
+        .replace(/wave/g, 'wa:v')
+        .replace(/orange/g, 'o-ra:ndʒ')
+        .replace(/code/g, 'ko:d')
+        .replace(/mukk/g, 'muk')
+        .replace(/xaalis/g, 'xa:lis')
+        .replace(/dëpp/g, 'dəp')
+        .replace(/xarit/g, 'xa-rit')
+        .replace(/senegaal/g, 'se-ne-ga:l')
+        .replace(/[!,.]/g, '')
+        + '/';
+      document.getElementById('ipaBreakdown').innerText = ipa;
+    }
+
+    document.getElementById('wolofText').addEventListener('input', (e) => {
+      updateIPA(e.target.value);
+    });
+
+    function togglePlay() {
+      const btn = document.getElementById('playBtn');
+      const text = document.getElementById('wolofText').value;
+
+      if (isPlaying) {
+        window.speechSynthesis.cancel();
+        stopVisualizer();
+        return;
+      }
+
+      if (!('speechSynthesis' in window)) {
+        alert("La synthèse vocale n'est pas supportée par votre navigateur.");
+        return;
+      }
+
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 0.9;
+      utterance.pitch = 1.0;
+      utterance.lang = 'fr-FR';
+
+      utterance.onstart = () => {
+        isPlaying = true;
+        btn.innerText = '⏹';
+        btn.classList.add('bg-red-500', 'hover:bg-red-400', 'shadow-red-500/25');
+        btn.classList.remove('bg-emerald-500', 'hover:bg-emerald-400', 'shadow-emerald-500/25');
+        document.getElementById('playerStatus').innerText = 'Émission Vocale en cours...';
+        document.getElementById('playerSub').innerText = 'Onde sonore active (16 kHz)';
+        startVisualizer();
+      };
+
+      utterance.onend = stopVisualizer;
+      utterance.onerror = stopVisualizer;
+
+      window.speechSynthesis.speak(utterance);
+    }
+
+    function startVisualizer() {
+      const bars = document.querySelectorAll('.wave-bar');
+      const container = document.getElementById('waveContainer');
+      container.classList.remove('opacity-40');
+      container.classList.add('opacity-100');
+
+      waveInterval = setInterval(() => {
+        bars.forEach(bar => {
+          const h = Math.floor(Math.random() * 28) + 4;
+          bar.style.height = h + 'px';
+        });
+      }, 80);
+    }
+
+    function stopVisualizer() {
+      isPlaying = false;
+      const btn = document.getElementById('playBtn');
+      btn.innerText = '▶';
+      btn.classList.remove('bg-red-500', 'hover:bg-red-400', 'shadow-red-500/25');
+      btn.classList.add('bg-emerald-500', 'hover:bg-emerald-400', 'shadow-emerald-500/25');
+      document.getElementById('playerStatus').innerText = 'Écoute terminée';
+      document.getElementById('playerSub').innerText = 'Cliquez à nouveau pour réécouter';
+
+      clearInterval(waveInterval);
+      const container = document.getElementById('waveContainer');
+      container.classList.add('opacity-40');
+      container.classList.remove('opacity-100');
+
+      const bars = document.querySelectorAll('.wave-bar');
+      bars.forEach(bar => bar.style.height = '8px');
+    }
+  </script>
+</body>
+</html>

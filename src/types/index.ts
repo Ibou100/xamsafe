@@ -22,6 +22,13 @@ export interface ScamCard {
     url: string;
   }[];
   lastVerifiedDate: string;
+  wolofTranslation?: {
+    title: string;
+    summary: string;
+    categoryLabel?: string;
+    exampleChannel?: string;
+    exampleText?: string;
+  };
 }
 
 export interface ClueItem {
@@ -61,6 +68,10 @@ export interface UrlCheckResult {
   clues: ClueItem[];
   pedagogicalNotes: string[];
   recommendation: string;
+  engineType?: 'local-heuristic' | 'ai-remote';
+  threatCategory?: string;
+  whySummary?: string;
+  sourcesCited?: string[];
 }
 
 export interface VictimScenario {

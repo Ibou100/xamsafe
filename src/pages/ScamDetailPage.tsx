@@ -1,6 +1,6 @@
 import React from 'react';
 import { useParams, Link, Navigate } from 'react-router-dom';
-import { INITIAL_SCAMS } from '../data/scams';
+import { getScamsCatalog } from '../data/scams';
 import {
   ArrowLeft,
   AlertTriangle,
@@ -11,7 +11,7 @@ import {
 
 export const ScamDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const scam = INITIAL_SCAMS.find((s) => s.id === id);
+  const scam = getScamsCatalog().find((s) => s.id === id);
 
   if (!scam) {
     return <Navigate to="/arnaques" replace />;

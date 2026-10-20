@@ -1,20 +1,43 @@
 import type { ClueItem, UrlCheckResult } from '../types';
 
-// Known Senegalese and popular financial/telecom/tech brands targeted by phishing
+// Known global, pan-African and regional financial/telecom/tech brands targeted by phishing
 const TARGET_BRANDS: Record<string, { officialDomains: string[]; label: string }> = {
+  // Mobile Money & Regional Telecoms
   wave: { officialDomains: ['wave.com', 'wave.sn'], label: 'Wave Mobile Money' },
   orange: { officialDomains: ['orange.sn', 'orange.com', 'sonatel.sn'], label: 'Orange / Sonatel' },
   sonatel: { officialDomains: ['sonatel.sn', 'sonatel.com'], label: 'Sonatel' },
-  free: { officialDomains: ['free.sn'], label: 'Free Sénégal' },
-  laposte: { officialDomains: ['laposte.sn'], label: 'La Poste Sénégal' },
+  free: { officialDomains: ['free.sn'], label: 'Free' },
+  mtn: { officialDomains: ['mtn.com', 'mtn.co.za', 'mtn.ci'], label: 'MTN Mobile Money' },
+  mpesa: { officialDomains: ['safaricom.co.ke', 'vodacom.com', 'vodacom.co.tz'], label: 'M-Pesa (Safaricom / Vodacom)' },
+  airtel: { officialDomains: ['airtel.com', 'airtel.africa', 'airtel.in'], label: 'Airtel Money' },
+  moov: { officialDomains: ['moov-africa.com'], label: 'Moov Africa' },
+
+  // Banking & International Payments
   ecobank: { officialDomains: ['ecobank.com'], label: 'Ecobank' },
-  cbao: { officialDomains: ['cbao.sn', 'attijariwafabank.com'], label: 'CBAO Attijariwafa' },
+  cbao: { officialDomains: ['cbao.sn', 'attijariwafabank.com'], label: 'CBAO Attijariwafa Bank' },
+  paypal: { officialDomains: ['paypal.com', 'paypal.me'], label: 'PayPal' },
+  binance: { officialDomains: ['binance.com', 'binance.me'], label: 'Binance Crypto' },
+
+  // Public Institutions & Postal
+  laposte: { officialDomains: ['laposte.sn', 'laposte.fr'], label: 'La Poste' },
+  dhl: { officialDomains: ['dhl.com', 'dhl.sn', 'dhl.fr'], label: 'DHL Express' },
   campusen: { officialDomains: ['campusen.sn'], label: 'Campusen' },
-  dgid: { officialDomains: ['dgid.sn'], label: 'DGID Sénégal' },
-  police: { officialDomains: ['signalementcyber.dgpn.sn', 'policenationale.gouv.sn', 'interieur.gouv.sn'], label: 'Police Nationale Sénégal' },
+  dgid: { officialDomains: ['dgid.sn'], label: 'DGID' },
+  police: { officialDomains: ['signalementcyber.dgpn.sn', 'policenationale.gouv.sn', 'interieur.gouv.sn'], label: 'Police Nationale' },
+
+  // Big Tech & Messaging
   whatsapp: { officialDomains: ['whatsapp.com', 'wa.me'], label: 'WhatsApp' },
-  facebook: { officialDomains: ['facebook.com', 'fb.me'], label: 'Facebook' },
-  google: { officialDomains: ['google.com', 'google.sn'], label: 'Google' },
+  telegram: { officialDomains: ['telegram.org', 't.me'], label: 'Telegram' },
+  facebook: { officialDomains: ['facebook.com', 'fb.me', 'meta.com'], label: 'Facebook / Meta' },
+  google: { officialDomains: ['google.com', 'google.sn', 'google.fr'], label: 'Google' },
+  apple: { officialDomains: ['apple.com', 'icloud.com'], label: 'Apple ID' },
+  microsoft: { officialDomains: ['microsoft.com', 'live.com', 'outlook.com'], label: 'Microsoft' },
+  netflix: { officialDomains: ['netflix.com'], label: 'Netflix' },
+  amazon: { officialDomains: ['amazon.com', 'amazon.fr'], label: 'Amazon' },
+  cisco: { officialDomains: ['cisco.com', 'netacad.com'], label: 'Cisco Networking Academy' },
+  netacad: { officialDomains: ['netacad.com', 'cisco.com'], label: 'Cisco Networking Academy' },
+  ucad: { officialDomains: ['ucad.sn', 'esp.sn'], label: 'Université Cheikh Anta Diop / ESP Dakar' },
+  esp: { officialDomains: ['esp.sn', 'ucad.sn'], label: 'École Supérieure Polytechnique de Dakar' },
 };
 
 const URL_SHORTENERS = [
@@ -22,7 +45,11 @@ const URL_SHORTENERS = [
 ];
 
 const SUSPICIOUS_TLDS = [
-  '.xyz', '.top', '.click', '.biz', '.info', '.site', '.online', '.tk', '.ga', '.ml', '.cf', '.gq', '.link', '.work', '.rest', '.buzz'
+  '.xyz', '.top', '.click', '.biz', '.info', '.site', '.online', '.tk', '.ga', '.ml', '.cf', '.gq', '.link', '.work', '.rest', '.buzz', '.club', '.live', '.cam', '.vip', '.icu', '.fit', '.surf', '.stream'
+];
+
+const PIRACY_STREAMING_KEYWORDS = [
+  'koora', 'yalla', 'stream', 'footy', 'hesgoal', 'crack', 'keygen', 'torrent', 'apkpure', 'modapk'
 ];
 
 /**
@@ -194,7 +221,7 @@ export function analyzeUrlLocally(rawUrl: string): UrlCheckResult {
   }
 
   // 8. Sensitive keywords in path or query
-  const sensitiveWords = ['otp', 'pin', 'password', 'code', 'token', 'login', 'compte', 'verifier', 'reclamation', 'bonus', 'gain'];
+  const sensitiveWords = ['otp', 'pin', 'password', 'code', 'token', 'login', 'compte', 'verifier', 'reclamation', 'bonus', 'gain', 'remboursement', 'deblocage', 'frais', 'bourses', 'vote', 'apk'];
   const foundKeywords: string[] = [];
   for (const word of sensitiveWords) {
     if (pathname.includes(word) || search.includes(word)) {
@@ -212,22 +239,56 @@ export function analyzeUrlLocally(rawUrl: string): UrlCheckResult {
     });
   }
 
+  // 9. Piracy / Malvertising / Illegal Streaming Domain patterns
+  const isPiracyOrStreaming = PIRACY_STREAMING_KEYWORDS.some((kw) => hostname.includes(kw));
+  if (isPiracyOrStreaming) {
+    score += 35;
+    clues.push({
+      id: 'piracy-streaming-malvertising',
+      type: 'danger',
+      title: 'Site de streaming illégal ou diffusion non licenciée (Risque de Malvertising)',
+      description: `Le domaine évoque un réseau de diffusion pirate ou de téléchargement non vérifié (${hostname}).`,
+      detail: 'Ces plateformes financent leur infrastructure via des réseaux publicitaires malveillants (malvertising) : fausses alertes d\'infection mobile, pop-ups de casino et téléchargements d\'APK piégés.',
+    });
+  }
+
+  // 10. For clean standard domains with 0 risk score, add reassuring clue
+  if (score === 0 && !clues.some((c) => c.type === 'reassuring')) {
+    clues.push({
+      id: 'clean-syntax-structure',
+      type: 'reassuring',
+      title: 'Structure d\'adresse web saine et standard',
+      description: 'Ce nom de domaine utilise une syntaxe conforme, sans caractères trompeurs ni extension à risque.',
+      detail: 'Aucune technique de dissimulation de marque (typosquatting) n\'a été détectée dans l\'adresse.',
+    });
+  }
+
   // Determine risk level
   let riskLevel: 'faible' | 'suspect' | 'dangereux' | 'indetermine';
   let recommendation: string;
+  let whySummary: string;
 
   if (score >= 40) {
     riskLevel = 'dangereux';
     recommendation = 'NE CLIQUEZ PAS et ne saisissez aucune donnée. Ce lien présente de forts indices de tentative de piratage ou de faux site clone.';
+    const dangerTitles = clues.filter((c) => c.type === 'danger').map((c) => c.title);
+    whySummary = dangerTitles.length > 0
+      ? `Ce lien est classé DANGEREUX car il présente des signaux d'attaque critiques : ${dangerTitles.join(' ; ')}.`
+      : 'Ce lien présente de multiples anomalies caractéristiques des sites de cyberescroquerie.';
   } else if (score >= 20) {
     riskLevel = 'suspect';
     recommendation = 'Soyez extrêmement prudent. Des anomalies syntaxiques ou des éléments d\'opacité ont été détectés.';
-  } else if (clues.some((c) => c.type === 'reassuring')) {
-    riskLevel = 'faible';
-    recommendation = 'Le domaine correspond aux sources officielles recensées. Assurez-vous simplement que le lien provient d\'une source légitime.';
+    const warningTitles = clues.filter((c) => c.type === 'warning').map((c) => c.title);
+    whySummary = warningTitles.length > 0
+      ? `Ce lien est classé SUSPECT en raison d'anomalies structurelles : ${warningTitles.join(' ; ')}.`
+      : 'Ce lien présente des signaux inhabituels nécessitant une vérification approfondie.';
   } else {
-    riskLevel = 'indetermine';
-    recommendation = 'L\'analyse syntaxique locale ne permet pas d\'attester de la dangerosité ni de la légitimité de ce domaine. Restez vigilant.';
+    riskLevel = 'faible';
+    recommendation = 'Ce site ne présente pas d\'anomalies techniques connues. Vous pouvez y accéder avec les précautions de navigation habituelles.';
+    const reassuringTitles = clues.filter((c) => c.type === 'reassuring').map((c) => c.title);
+    whySummary = isHttps
+      ? `Ce site est considéré comme SÛR : connexion chiffrée HTTPS active, domaine standard et absence d'indicateurs de phishing (${reassuringTitles[0] || 'Structure saine'}).`
+      : 'Ce site présente une structure saine, mais sa connexion HTTP non chiffrée impose de ne jamais y entrer de mot de passe.';
   }
 
   return {
@@ -246,5 +307,7 @@ export function analyzeUrlLocally(rawUrl: string): UrlCheckResult {
     clues,
     pedagogicalNotes: notes,
     recommendation,
+    whySummary,
+    engineType: 'local-heuristic',
   };
 }

@@ -13,16 +13,16 @@ export const OfficialResourcesPage: React.FC = () => {
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10 text-left">
       {/* Header */}
-      <div className="space-y-4 max-w-3xl">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 text-xs font-semibold">
-          <ShieldCheck className="w-3.5 h-3.5" />
-          <span>Annuaire vérifié des institutions sénégalaises</span>
+      <div className="space-y-3 max-w-3xl">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold">
+          <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+          <span>Annuaire officiel • Contacts certifiés au Sénégal</span>
         </div>
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-950 dark:text-white tracking-tight">
+        <h1 className="text-2xl sm:text-4xl font-extrabold text-slate-950 dark:text-white tracking-tight">
           Canaux officiels de signalement & d'assistance
         </h1>
-        <p className="text-slate-600 dark:text-slate-300 text-sm sm:text-base leading-relaxed">
-          Accédez directement aux services compétents de l'État du Sénégal et des opérateurs de télécommunications. Tous les liens et coordonnées ci-dessous ont été vérifiés à la source.
+        <p className="text-slate-600 dark:text-slate-400 text-sm sm:text-base leading-relaxed">
+          Accédez directement aux services compétents de l'État du Sénégal (Police DSC, STCC-SSI, CDP) et des opérateurs télécoms (Wave, Orange, Free). Tous les numéros et portails ont été vérifiés à la source.
         </p>
       </div>
 

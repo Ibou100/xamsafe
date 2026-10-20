@@ -3,6 +3,7 @@ import { LanguageProvider } from './context/LanguageContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
+import { VoiceFloatingButton } from './components/VoiceFloatingButton';
 
 // Pages
 import { Home } from './pages/Home';
@@ -55,6 +56,7 @@ export function App() {
               </Routes>
             </main>
 
+            <VoiceFloatingButton />
             <Footer />
           </div>
         </Router>

@@ -10,7 +10,6 @@ import {
   ShieldCheck,
   HelpCircle,
   Check,
-  Sparkles,
 } from 'lucide-react';
 
 export const CyberQuizPage: React.FC = () => {
@@ -90,15 +89,15 @@ export const CyberQuizPage: React.FC = () => {
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8 text-left">
       {/* Header */}
       <div className="space-y-3">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 text-xs font-semibold">
-          <Award className="w-3.5 h-3.5" />
-          <span>Évaluation pédagogique sans inscription</span>
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold">
+          <Award className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+          <span>Évaluation citoyenne • 30 questions pratiques</span>
         </div>
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-950 dark:text-white tracking-tight">
+        <h1 className="text-2xl sm:text-4xl font-extrabold text-slate-950 dark:text-white tracking-tight">
           Quiz de cybersécurité : Testez vos réflexes
         </h1>
-        <p className="text-slate-600 dark:text-slate-300 text-sm sm:text-base leading-relaxed">
-          30 questions pratiques inspirées du quotidien au Sénégal (Wave, Orange Money, WhatsApp, faux transferts, codes USSD). Vos résultats restent strictement dans la mémoire de votre session.
+        <p className="text-slate-600 dark:text-slate-400 text-sm sm:text-base leading-relaxed">
+          30 questions concrètes inspirées des situations courantes au Sénégal (Wave, Orange Money, WhatsApp, faux virements, codes USSD). Vos résultats restent strictement dans la mémoire de votre session.
         </p>
       </div>
 
@@ -226,7 +225,7 @@ export const CyberQuizPage: React.FC = () => {
                 {/* Practical prevention tip */}
                 <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-700 dark:text-slate-300 space-y-1">
                   <span className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-                    <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
                     Bon réflexe à retenir :
                   </span>
                   <p>{currentQ.preventionTip}</p>

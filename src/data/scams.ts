@@ -52,6 +52,13 @@ export const INITIAL_SCAMS: ScamCard[] = [
       { name: 'Division Spéciale de Cybersécurité (DGPN)', url: 'https://signalementcyber.dgpn.sn/' },
     ],
     lastVerifiedDate: '2026-10-10',
+    wolofTranslation: {
+      title: 'Ay sàcc yu naan « liggéeyukatu Wave / Orange Money lañu » (Woote ngir dindi tëj)',
+      summary: 'Nit day woo la naan liggéeyukatu Wave walla Orange la, ngir nax la ba nga jox ko sa kod walla nga dindi kaaraangey sa kont.',
+      categoryLabel: 'Xaalis ci telefon',
+      exampleChannel: 'Woote',
+      exampleText: '« Salam waay, service technique Wave/Orange lañu. Sa kont amna jafe-jafe. Bala 15 simili ñu tëj ko, wax ma kod 4 lim bi la ñëw ci SMS. »',
+    },
   },
   {
     id: 'faux-sms-virement-recu',
@@ -100,6 +107,13 @@ export const INITIAL_SCAMS: ScamCard[] = [
       { name: 'Guide sécurité consommateurs ARTP', url: 'https://www.artp.sn' },
     ],
     lastVerifiedDate: '2026-10-10',
+    wolofTranslation: {
+      title: 'SMS naxate naan « xaalis dugal nañu ko » (Njuumte ci transfert)',
+      summary: 'Dañu lay yonnee SMS bu ni mel ni Wave/Orange la, ba noppi woo la naan juum nañu ci yaw, ñaan la nga delloo leen xaalis bi nga xamne sax dugul.',
+      categoryLabel: 'Bataaxal SMS',
+      exampleChannel: 'SMS',
+      exampleText: '« Dugal nañu 50.000 FCFA ci Amadou D. Solde bu bees: 52.450 FCFA... » Ba noppi nit woo la di jooy naan : « Salam, juum naa delloo ma sama xaalis ! »',
+    },
   },
   {
     id: 'piratage-whatsapp-code-6-chiffres',
@@ -148,6 +162,13 @@ export const INITIAL_SCAMS: ScamCard[] = [
       { name: 'Direction générale de la Police Nationale - Cyber', url: 'https://signalementcyber.dgpn.sn/' },
     ],
     lastVerifiedDate: '2026-10-10',
+    wolofTranslation: {
+      title: 'Sàcc kont WhatsApp jaare ko ci kod bi ñu la yonnee ci SMS',
+      summary: 'Sa xarit bu ñu sàcc kontam day la bind ne dafa juum yonnee kodam ci sa telefon, te laaj la nga delloo ko ko. Bu ko joxee, sa bopp WhatsApp lay sàcc.',
+      categoryLabel: 'WhatsApp',
+      exampleChannel: 'WhatsApp',
+      exampleText: '« Salam ! Dama am jafe-jafe ci sama kont, juum naa sama kod ci sa telefon la ñëw. Yonnee ma ko ci sàss ? »',
+    },
   },
   {
     id: 'faux-recrutement-ong-dakar',
@@ -196,6 +217,13 @@ export const INITIAL_SCAMS: ScamCard[] = [
       { name: 'Plateforme officielle de signalement cyber Sénégal', url: 'https://signalementcyber.dgpn.sn/' },
     ],
     lastVerifiedDate: '2026-10-10',
+    wolofTranslation: {
+      title: 'Liggéey bu amul (Naxate ci « feyal dósiyé »)',
+      summary: 'Dañu lay wax ne am nga liggéey bu mag ci ONG walla ci këru liggéeyukaay, waaye laaj la nga fey xaalis ngir dósiyé walla tàggat.',
+      categoryLabel: 'Liggéey',
+      exampleChannel: 'Facebook',
+      exampleText: '« Ubbil liggéey ci PAM/UNICEF : Fay nañu 450.000 F/weer. Ngir tëj dósiyé bi feyal 15.000 F ci Wave. »',
+    },
   },
   {
     id: 'arnaque-mouton-tabaski-commerce',
@@ -244,6 +272,13 @@ export const INITIAL_SCAMS: ScamCard[] = [
       { name: 'Police Nationale Cyber', url: 'https://signalementcyber.dgpn.sn/' },
     ],
     lastVerifiedDate: '2026-10-10',
+    wolofTranslation: {
+      title: 'Jaaykat ci internet bu naan « jox ma dëpp bi bala ma lay yonnee »',
+      summary: 'Nit day tëral foto telefon walla yére yu rafet te yomb ci TikTok walla Facebook, laaj la nga jox ko dëpp ci Wave/OM bala mu lay yonnee mbir mi, ba noppi tëj telefonam.',
+      categoryLabel: 'Jënd ci internet',
+      exampleChannel: 'Facebook',
+      exampleText: '« iPhone 15 bu bees 190.000 FCFA rekk ! Yonnél avance 50.000 FCFA ci Wave bala livreur bi di génn. »',
+    },
   },
   {
     id: 'faux-code-ussd-piege',
@@ -290,6 +325,13 @@ export const INITIAL_SCAMS: ScamCard[] = [
       { name: 'Orange Sénégal - Sécurité codes USSD', url: 'https://www.orange.sn' },
     ],
     lastVerifiedDate: '2026-10-10',
+    wolofTranslation: {
+      title: 'Kodu USSD bu naxate (*144*... nax la ba nga yonnee sa xaalis)',
+      summary: 'Nit day la woo telefon naan la bësal kod (#, * ak lim) ngir defar sa telefon, fekk day yóbbu sa xaalis walla jox ko sa bataaxal.',
+      categoryLabel: 'Xaalis ci telefon',
+      exampleChannel: 'Woote',
+      exampleText: '« Ngir am 5G ci feyuloo dara, bësal leegi ci sa telefon : *144*2*771234567*100000*SaKod# »',
+    },
   },
   {
     id: 'faux-tirage-tombola-sonatel',
@@ -697,3 +739,39 @@ export const INITIAL_SCAMS: ScamCard[] = [
     lastVerifiedDate: '2026-10-10',
   },
 ];
+
+const SCAMS_STORAGE_KEY = 'xamsafe_admin_scams';
+
+export function getScamsCatalog(): ScamCard[] {
+  if (typeof window === 'undefined') return INITIAL_SCAMS;
+  try {
+    const raw = localStorage.getItem(SCAMS_STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed;
+      }
+    }
+  } catch {
+    // Fallback to initial seeds
+  }
+  return INITIAL_SCAMS;
+}
+
+export function saveScamsCatalog(scams: ScamCard[]): void {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(SCAMS_STORAGE_KEY, JSON.stringify(scams));
+  } catch (err) {
+    console.warn('Erreur lors de la sauvegarde du catalogue XamSafe:', err);
+  }
+}
+
+export function resetScamsCatalog(): void {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.removeItem(SCAMS_STORAGE_KEY);
+  } catch {
+    // Ignore
+  }
+}

@@ -61,4 +61,20 @@ describe('Message Analyzer — Moteur Heuristique Local & Sécurité des Donnée
     const result = analyzeMessageLocally('Test de fonctionnement hors ligne');
     expect(result.engineType).toBe('local-heuristic');
   });
+
+  it('détecte une arnaque à la fausse tâche rémunérée (Task Scam)', () => {
+    const message = 'Offre spéciale Telegram : gagnez 25.000 FCFA par jour en likant des vidéos TikTok pendant votre temps libre.';
+    const result = analyzeMessageLocally(message);
+
+    expect(result.riskLevel).toBe('eleve');
+    expect(result.detectedClues.some((c) => c.id === 'clue-task-scam')).toBe(true);
+  });
+
+  it('détecte une arnaque aux investissements crypto à rendement garanti', () => {
+    const message = 'Rejoignez notre groupe de trading crypto VIP : investissement sans risque, doublez votre capital en 24h avec notre robot bitcoin.';
+    const result = analyzeMessageLocally(message);
+
+    expect(result.riskLevel).toBe('eleve');
+    expect(result.detectedClues.some((c) => c.id === 'clue-crypto-ponzi')).toBe(true);
+  });
 });

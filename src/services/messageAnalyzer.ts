@@ -144,7 +144,88 @@ export function analyzeMessageLocally(rawText: string): AnalysisResult {
       type: 'warning',
       title: 'Présence d\'un lien web externe',
       description: 'Le message incite à cliquer sur une adresse internet pour vous connecter ou confirmer une identité.',
-      detail: 'Les opérateurs sénégalais gèrent leurs portefeuilles via leurs applications sécurisées et non via des liens web informels.',
+      detail: 'Les opérateurs mobiles et banques gèrent leurs services via leurs applications sécurisées et non via des liens web informels.',
+    });
+  }
+
+  // 7. Task Scam / Fake Remote Job ("Like & Follow" scam)
+  const taskScamPatterns = [
+    /(?:gagn|touch).*(?:\d+.*(?:fcfa|\$|€|euros?).*(?:jour|heure|tâche|video|tiktok|youtube|telegram))/i,
+    /(?:travail à domicile|job en ligne|recrutement en ligne).*(?:salaire|gain|dépôt|investir)/i,
+    /(?:like|aimer|suivre|visionn).*(?:vidéo|compte|chaine|page|tiktok|youtube).*(?:payé|rémunér|argent|fcfa|\$|€)/i,
+  ];
+  if (taskScamPatterns.some((pattern) => pattern.test(lower))) {
+    score += 45;
+    detectedClues.push({
+      id: 'clue-task-scam',
+      type: 'danger',
+      title: 'Arnaque à la fausse tâche rémunérée ou faux emploi (Task Scam)',
+      description: 'Le message promet une rémunération facile pour liker des vidéos, s\'abonner à des chaînes ou accomplir des micro-tâches.',
+      detail: 'Mécanique mondiale : les escrocs versent une petite somme au début pour inspirer confiance, puis exigent des dépôts croissants que la victime ne revoit jamais.',
+    });
+  }
+
+  // 8. Crypto / High-Yield Investment Fraud (Pig Butchering / Ponzi)
+  const cryptoPatterns = [
+    /(?:crypto|bitcoin|usdt|trading|forex).*(?:rendement|garanti|bénéfice|multiplier|x2|x3|robot)/i,
+    /(?:investir|investissement).*(?:sans risque|100% garanti|doubler en \d+|retrait immédiat)/i,
+  ];
+  if (cryptoPatterns.some((pattern) => pattern.test(lower))) {
+    score += 45;
+    detectedClues.push({
+      id: 'clue-crypto-ponzi',
+      type: 'danger',
+      title: 'Arnaque au faux investissement crypto ou trading garanti',
+      description: 'Le texte fait miroiter des rendements financiers spectaculaires et sans risque dans les cryptomonnaies ou le trading.',
+      detail: 'En finance légale, un rendement très élevé implique toujours un risque majeur. Les promesses de gains "garantis" sont des arnaques 100% avérées.',
+    });
+  }
+
+  // 9. Delivery / Parcel Hold / Customs Phishing
+  const deliveryPatterns = [
+    /(?:colis|paquet|livraison).*(?:bloqué|retenu|suspendu|adresse incomplète|frais de douane|frais de port)/i,
+    /(?:dhl|fedex|chronopost|ups|la poste).*(?:frais|payer|retrait|cliquez)/i,
+  ];
+  if (deliveryPatterns.some((pattern) => pattern.test(lower))) {
+    score += 35;
+    detectedClues.push({
+      id: 'clue-delivery-scam',
+      type: 'danger',
+      title: 'Arnaque au faux colis bloqué ou frais de douane fictifs',
+      description: 'Le message prétend qu\'un colis vous attend et réclame un règlement immédiat pour régulariser la livraison.',
+      detail: 'Les fraudeurs diffusent ces SMS par vagues massives en espérant tomber sur une personne attendant effectivement une commande.',
+    });
+  }
+
+  // 10. Family Distress / "Hi Mum" Impersonation Scam
+  const familyDistressPatterns = [
+    /(?:bonjour|salut|coucou)\s+(?:maman|papa).*mon téléphone.*(?:cassé|perdu|volé|nouveau numéro)/i,
+    /(?:sauvegarde ce numéro|écris-moi sur whatsapp).*(?:urgence|bloqué|besoin d'argent)/i,
+  ];
+  if (familyDistressPatterns.some((pattern) => pattern.test(lower))) {
+    score += 40;
+    detectedClues.push({
+      id: 'clue-family-distress',
+      type: 'danger',
+      title: 'Usurpation d\'identité d\'un proche ou détresse familiale fictive ("Hi Mum")',
+      description: 'L\'interlocuteur prétend être votre enfant ou parent ayant changé de numéro de téléphone en urgence.',
+      detail: 'Ne versez rien et ne cliquez sur rien. Appelez toujours le numéro habituel officiel de votre proche pour vérifier de vive voix.',
+    });
+  }
+
+  // 11. SIM Swap / Network Migration Urgency
+  const simSwapPatterns = [
+    /(?:mise à niveau|identification|enregistrement|migration).*(?:carte sim|puce|5g|ligne).*(?:expir|bloqu|suspension)/i,
+    /désactivation.*(?:sim|numéro|ligne).*(?:cliquez|composez|renouvelez)/i,
+  ];
+  if (simSwapPatterns.some((pattern) => pattern.test(lower))) {
+    score += 40;
+    detectedClues.push({
+      id: 'clue-sim-swap',
+      type: 'danger',
+      title: 'Tentative de SIM Swap ou faux renouvellement de ligne',
+      description: 'Le message tente de vous pousser à valider une opération de SIM Swap qui transférerait votre ligne mobile aux mains de l\'escroc.',
+      detail: 'Une fois votre SIM dupliquée, l\'attaquant intercepte tous vos SMS de double authentification et vide vos comptes.',
     });
   }
 

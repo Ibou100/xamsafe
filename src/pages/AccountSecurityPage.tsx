@@ -18,16 +18,16 @@ export const AccountSecurityPage: React.FC = () => {
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10 text-left">
       {/* Header */}
-      <div className="space-y-4 max-w-3xl">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 text-xs font-semibold">
-          <Key className="w-3.5 h-3.5" />
-          <span>Guides pratiques illustrés</span>
+      <div className="space-y-3 max-w-3xl">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold">
+          <Key className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+          <span>Guides pas-à-pas • Double authentification & Codes PIN</span>
         </div>
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-950 dark:text-white tracking-tight">
+        <h1 className="text-2xl sm:text-4xl font-extrabold text-slate-950 dark:text-white tracking-tight">
           Sécuriser mes comptes du quotidien
         </h1>
-        <p className="text-slate-600 dark:text-slate-300 text-sm sm:text-base leading-relaxed">
-          Suivez nos pas-à-pas concrets pour activer la double authentification, vérifier les appareils connectés et vous prémunir du piratage sur WhatsApp, Facebook, TikTok, Gmail et vos comptes financiers.
+        <p className="text-slate-600 dark:text-slate-400 text-sm sm:text-base leading-relaxed">
+          Suivez nos pas-à-pas concrets pour activer la double authentification, vérifier les appareils connectés et vous prémunir du piratage sur WhatsApp, Wave, Orange Money, TikTok et vos comptes e-mail.
         </p>
       </div>
 

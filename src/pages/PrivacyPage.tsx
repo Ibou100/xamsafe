@@ -10,15 +10,15 @@ export const PrivacyPage: React.FC = () => {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10 text-left">
       {/* Header */}
-      <div className="space-y-4">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 text-xs font-semibold">
-          <Lock className="w-3.5 h-3.5" />
-          <span>Protection des données & Transparence</span>
+      <div className="space-y-3">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold">
+          <Lock className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+          <span>Protection des données • Conformité CDP Sénégal</span>
         </div>
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-950 dark:text-white tracking-tight">
+        <h1 className="text-2xl sm:text-4xl font-extrabold text-slate-950 dark:text-white tracking-tight">
           Politique de confidentialité & Mentions légales
         </h1>
-        <p className="text-slate-600 dark:text-slate-300 text-sm sm:text-base leading-relaxed">
+        <p className="text-slate-600 dark:text-slate-400 text-sm sm:text-base leading-relaxed">
           XamSafe applique le principe de minimisation absolue des données personnelles, en stricte conformité avec l'esprit de la loi sénégalaise n° 2008-12 relative à la protection des données à caractère personnel.
         </p>
       </div>

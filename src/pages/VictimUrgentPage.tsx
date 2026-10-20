@@ -31,61 +31,79 @@ export const VictimUrgentPage: React.FC = () => {
       `Rappel : Ne payez jamais de faux service de récupération sur les réseaux sociaux.`;
 
     navigator.clipboard.writeText(textToCopy);
-    setCopiedProof(true);
+    setCopiedProof(false);
     setTimeout(() => setCopiedProof(false), 2500);
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10 text-left">
-      {/* Top Banner */}
-      <div className="bg-gradient-to-r from-red-600 via-rose-600 to-red-700 rounded-3xl p-6 sm:p-10 text-white shadow-lg space-y-4">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-800/70 text-red-200 text-xs font-bold uppercase tracking-wider">
-          <AlertTriangle className="w-4 h-4 text-amber-300 animate-pulse" />
-          <span>Assistance d'urgence citoyenne immédiate</span>
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8 text-left">
+      {/* Top Crisis Header - Authoritative & Calming */}
+      <div className="rounded-2xl border border-red-200 dark:border-red-950/80 bg-red-50/70 dark:bg-red-950/20 p-6 sm:p-8 space-y-4">
+        <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-red-700 dark:text-red-400">
+          <AlertTriangle className="w-4 h-4 shrink-0 text-red-600" />
+          <span>Assistance d'urgence citoyenne immédiate • Sans inscription</span>
         </div>
-        <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight">
+
+        <h1 className="text-2xl sm:text-4xl font-extrabold text-slate-950 dark:text-white tracking-tight">
           Je suis victime : que faire maintenant ?
         </h1>
-        <p className="text-red-100 text-sm sm:text-base max-w-3xl leading-relaxed">
-          Aucun compte ni mot de passe requis. Choisissez votre situation ci-dessous pour obtenir immédiatement les actions prioritaires, les numéros officiels à contacter et la liste des preuves à réunir.
+
+        <p className="text-sm sm:text-base text-slate-700 dark:text-slate-300 max-w-3xl leading-relaxed">
+          Sélectionnez votre situation ci-dessous pour obtenir immédiatement les démarches prioritaires à faire dans l'heure, les numéros officiels à contacter pour bloquer les flux et la liste des preuves à réunir.
         </p>
+
+        {/* Emergency Hotlines Strip */}
+        <div className="pt-2 flex flex-wrap items-center gap-3 text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-200 border-t border-red-200/80 dark:border-red-900/50">
+          <span className="text-slate-500 dark:text-slate-400 font-normal">Numéros d'urgence gratuits :</span>
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 border border-red-200 dark:border-red-900">
+            <Phone className="w-3.5 h-3.5 text-red-600" />
+            Wave : <strong>200600</strong>
+          </span>
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 border border-red-200 dark:border-red-900">
+            <Phone className="w-3.5 h-3.5 text-red-600" />
+            Orange Money : <strong>1441</strong>
+          </span>
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 border border-red-200 dark:border-red-900">
+            <ShieldAlert className="w-3.5 h-3.5 text-red-600" />
+            Police DSC : <strong>17</strong>
+          </span>
+        </div>
       </div>
 
-      {/* Grid of the 10 Situations (A to J) */}
-      <div className="space-y-4">
-        <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-          <span>Sélectionnez votre situation :</span>
-          <span className="text-xs font-normal text-slate-500">(10 parcours guidés)</span>
+      {/* Grid of Situations (A to J) */}
+      <div className="space-y-3">
+        <h2 className="text-sm font-bold uppercase tracking-wider text-slate-500">
+          Sélectionnez ce qui vous est arrivé :
         </h2>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3" role="tablist">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2.5" role="tablist">
           {INITIAL_EMERGENCY_PATHS.map((scen) => (
             <button
               key={scen.id}
               role="tab"
               aria-selected={scen.id === selectedScenarioId}
               onClick={() => setSelectedScenarioId(scen.id)}
-              className={`p-3.5 rounded-2xl border text-left transition-all flex flex-col justify-between gap-2 ${
+              className={`p-3.5 rounded-xl border text-left transition-all flex flex-col justify-between gap-2 cursor-pointer ${
                 scen.id === selectedScenarioId
-                  ? 'bg-red-50 dark:bg-red-950/40 border-red-500 dark:border-red-600 ring-2 ring-red-500 shadow-xs'
-                  : 'bg-white dark:bg-[#0F2B43] border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800'
+                  ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 border-slate-900 dark:border-white shadow-xs'
+                  : 'bg-white dark:bg-[#0C2438] text-slate-800 dark:text-slate-200 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
               }`}
             >
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between w-full">
                 <span
-                  className={`w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs ${
+                  className={`w-6 h-6 rounded-md flex items-center justify-center font-bold text-xs ${
                     scen.id === selectedScenarioId
-                      ? 'bg-red-600 text-white'
-                      : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
+                      ? 'bg-white/20 dark:bg-black/20 text-current'
+                      : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
                   }`}
                 >
                   {scen.letter}
                 </span>
                 {scen.id === selectedScenarioId && (
-                  <span className="w-2 h-2 rounded-full bg-red-600"></span>
+                  <span className="w-2 h-2 rounded-full bg-red-500"></span>
                 )}
               </div>
-              <span className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white line-clamp-2">
+              <span className="font-semibold text-xs leading-snug line-clamp-2">
                 {scen.title}
               </span>
             </button>
@@ -94,78 +112,72 @@ export const VictimUrgentPage: React.FC = () => {
       </div>
 
       {/* ACTIVE PATHWAY DETAILS */}
-      <div className="bg-white dark:bg-[#0C2438] rounded-3xl border border-slate-200 dark:border-slate-800 p-6 sm:p-10 space-y-8 shadow-sm">
-        {/* Scenario Header & Reassuring Greeting */}
-        <div className="space-y-4 pb-6 border-b border-slate-200 dark:border-slate-800">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="w-7 h-7 rounded-full bg-red-600 text-white font-extrabold text-sm flex items-center justify-center">
-              {activeScenario.letter}
-            </span>
-            <span className="text-xs uppercase font-bold text-red-600 dark:text-red-400 tracking-wider">
-              Procédure d'urgence guidée
-            </span>
+      <div className="bg-white dark:bg-[#0C2438] rounded-2xl border border-slate-200 dark:border-slate-800 p-6 sm:p-8 space-y-6 shadow-xs">
+        {/* Scenario Header */}
+        <div className="space-y-3 pb-5 border-b border-slate-200 dark:border-slate-800">
+          <div className="flex items-center gap-2 text-xs font-bold uppercase text-red-600 dark:text-red-400">
+            <span>Procédure {activeScenario.letter}</span>
+            <span>•</span>
+            <span>Protocole vérifié</span>
           </div>
 
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-950 dark:text-white">
+          <h2 className="text-xl sm:text-2xl font-black text-slate-950 dark:text-white">
             {activeScenario.title}
           </h2>
 
-          <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300">
+          <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
             {activeScenario.subtitle}
           </p>
 
-          {/* Reassuring greeting */}
-          <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/60 flex items-start gap-3">
-            <HeartHandshake className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
-            <p className="text-xs sm:text-sm text-emerald-950 dark:text-emerald-200 leading-relaxed font-medium">
+          {/* Reassurance */}
+          <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 flex items-start gap-2.5 text-xs text-slate-700 dark:text-slate-300 font-medium">
+            <HeartHandshake className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+            <p className="leading-relaxed">
               {activeScenario.reassuringGreeting}
             </p>
           </div>
         </div>
 
         {/* 1. Actions prioritaires immédiates */}
-        <section className="p-5 sm:p-6 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/50 rounded-2xl space-y-3">
-          <h3 className="text-base sm:text-lg font-bold text-red-950 dark:text-red-300 flex items-center gap-2">
-            <AlertTriangle className="w-5 h-5 text-red-600" />
-            <span>Actions prioritaires immédiates (dans l'heure) :</span>
+        <section className="p-4 sm:p-5 bg-red-50/70 dark:bg-red-950/20 border border-red-200 dark:border-red-900/40 rounded-xl space-y-2.5">
+          <h3 className="text-sm font-bold text-red-950 dark:text-red-300 flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-red-600 shrink-0" />
+            <span>À faire immédiatement (dans l'heure) :</span>
           </h3>
-          <ul className="space-y-2">
+          <ul className="space-y-1.5 text-xs sm:text-sm text-red-900 dark:text-red-200">
             {activeScenario.immediatePriorityActions.map((act, idx) => (
-              <li
-                key={idx}
-                className="flex items-start gap-2.5 text-xs sm:text-sm text-red-900 dark:text-red-200 font-medium"
-              >
+              <li key={idx} className="flex items-start gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-red-600 shrink-0 mt-2"></span>
-                <span>{act}</span>
+                <span className="leading-relaxed">{act}</span>
               </li>
             ))}
           </ul>
         </section>
 
         {/* 2. Instructions numérotées */}
-        <section className="space-y-4">
-          <h3 className="text-xl font-bold text-slate-900 dark:text-white">
-            Instructions détaillées pas-à-pas :
+        <section className="space-y-3">
+          <h3 className="text-sm font-bold uppercase tracking-wider text-slate-500">
+            Démarches détaillées pas-à-pas :
           </h3>
-          <div className="space-y-4">
+          <div className="space-y-3">
             {activeScenario.numberedSteps.map((step) => (
               <div
                 key={step.step}
-                className="p-5 rounded-2xl bg-slate-50 dark:bg-[#0F2B43] border border-slate-200 dark:border-slate-800 space-y-2"
+                className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 space-y-1.5"
               >
-                <div className="flex items-center gap-3">
-                  <span className="w-7 h-7 rounded-full bg-slate-900 dark:bg-emerald-600 text-white font-bold text-xs flex items-center justify-center shrink-0">
+                <div className="flex items-center gap-2.5">
+                  <span className="w-6 h-6 rounded-full bg-slate-900 dark:bg-emerald-600 text-white font-bold text-xs flex items-center justify-center shrink-0">
                     {step.step}
                   </span>
-                  <h4 className="font-bold text-slate-900 dark:text-white text-base">
+                  <h4 className="font-bold text-slate-900 dark:text-white text-sm">
                     {step.title}
                   </h4>
                 </div>
-                <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed pl-10">
+                <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed pl-8">
                   {step.action}
                 </p>
                 {step.details && (
-                  <p className="text-xs text-slate-500 dark:text-slate-400 italic pl-10">
+                  <p className="text-[11px] text-slate-500 italic pl-8">
                     💡 {step.details}
                   </p>
                 )}
@@ -174,43 +186,39 @@ export const VictimUrgentPage: React.FC = () => {
           </div>
         </section>
 
-        {/* 3. Fiche de preuves à réunir (avec bouton Copier) */}
-        <section className="p-6 rounded-2xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-              <FileText className="w-5 h-5 text-emerald-500" />
-              <span>Fiche des preuves à conserver pour la police & l'opérateur</span>
+        {/* 3. Fiche de preuves à réunir */}
+        <section className="p-5 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 space-y-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center gap-2">
+              <FileText className="w-4 h-4 text-emerald-600" />
+              <span>Preuves à conserver pour l'opérateur et la police</span>
             </h3>
             <button
               type="button"
               onClick={handleCopyProofChecklist}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-700 hover:bg-slate-50 transition-colors shadow-xs"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
             >
               {copiedProof ? (
                 <>
                   <Check className="w-3.5 h-3.5 text-emerald-500" />
-                  <span>Checklist copiée !</span>
+                  <span>Copié dans le presse-papier !</span>
                 </>
               ) : (
                 <>
                   <Copy className="w-3.5 h-3.5" />
-                  <span>Copier la fiche de preuves</span>
+                  <span>Copier la liste</span>
                 </>
               )}
             </button>
           </div>
 
-          <p className="text-xs text-slate-500 dark:text-slate-400">
-            Rassemblez ces documents avant d'appeler ou de vous déplacer au commissariat :
-          </p>
-
-          <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
             {activeScenario.evidenceToKeep.map((item, idx) => (
               <li
                 key={idx}
-                className="p-3 rounded-xl bg-white dark:bg-[#0C2438] border border-slate-200/80 dark:border-slate-800 text-xs text-slate-800 dark:text-slate-200 flex items-start gap-2"
+                className="p-2.5 rounded-lg bg-white dark:bg-[#0C2438] border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 flex items-start gap-2"
               >
-                <span className="text-emerald-500 font-bold shrink-0">✓</span>
+                <span className="text-emerald-600 font-bold">✓</span>
                 <span>{item}</span>
               </li>
             ))}
@@ -218,69 +226,54 @@ export const VictimUrgentPage: React.FC = () => {
         </section>
 
         {/* 4. Canaux officiels à contacter */}
-        <section className="space-y-4">
-          <h3 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-            <Phone className="w-5 h-5 text-emerald-600" />
-            <span>Canaux officiels vérifiés pour ce cas</span>
+        <section className="space-y-3">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-2">
+            <Phone className="w-3.5 h-3.5 text-emerald-600" />
+            <span>Contacts officiels pour cette situation</span>
           </h3>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             {activeScenario.officialChannels.map((channel, idx) => (
               <div
                 key={idx}
-                className="p-4 rounded-2xl bg-white dark:bg-[#0F2B43] border border-slate-200 dark:border-slate-800 shadow-xs space-y-2 flex flex-col justify-between"
+                className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1.5 flex flex-col justify-between"
               >
-                <div className="space-y-1">
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">
-                    Contact officiel
-                  </span>
-                  <div className="font-bold text-slate-900 dark:text-white text-sm">
+                <div>
+                  <div className="font-bold text-slate-900 dark:text-white text-xs">
                     {channel.name}
                   </div>
-                  <div className="text-xs font-mono text-emerald-600 dark:text-emerald-400 font-semibold break-all">
+                  <div className="text-xs font-mono text-emerald-600 dark:text-emerald-400 font-bold pt-1 break-all">
                     {channel.contact}
                   </div>
                 </div>
 
-                <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-400">
-                  <span>Vérifié {channel.verifiedDate}</span>
-                  {channel.officialUrl && (
+                {channel.officialUrl && (
+                  <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
                     <a
                       href={channel.officialUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-emerald-600 hover:underline inline-flex items-center gap-0.5"
+                      className="text-[11px] text-emerald-600 hover:underline inline-flex items-center gap-1 font-semibold"
                     >
-                      Portail
+                      <span>Accéder au portail officiel</span>
                       <ExternalLink className="w-3 h-3" />
                     </a>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
             ))}
           </div>
         </section>
 
-        {/* 5. Avertissement anti-recovery scams & non-garantie */}
-        <div className="space-y-4">
-          <div className="p-5 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-300 dark:border-amber-800/60 space-y-2 text-xs sm:text-sm text-amber-950 dark:text-amber-200">
-            <div className="font-bold flex items-center gap-2 text-amber-900 dark:text-amber-300">
-              <ShieldAlert className="w-4 h-4 text-amber-600" />
-              <span>Mise en garde capitale contre les fausses récupérations d'argent :</span>
-            </div>
-            <p className="leading-relaxed">
-              {activeScenario.recoveryScamWarning}
-            </p>
+        {/* 5. Avertissement anti-recovery scams */}
+        <div className="p-4 rounded-xl bg-amber-50/70 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/40 text-xs text-amber-950 dark:text-amber-200 space-y-1">
+          <div className="font-bold flex items-center gap-1.5 text-amber-900 dark:text-amber-300">
+            <ShieldAlert className="w-4 h-4 text-amber-600 shrink-0" />
+            <span>Mise en garde contre les faux experts de récupération sur les réseaux :</span>
           </div>
-
-          <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 text-xs text-slate-500 space-y-1">
-            <span className="font-bold text-slate-700 dark:text-slate-300">
-              Rappel d'honnêteté et de transparence :
-            </span>
-            <p>
-              La récupération de fonds envoyés à un escroc n'est jamais garantie et dépend de la rapidité de la réaction et de la présence ou non de solde sur le compte récepteur. XamSafe ne facture aucun service et ne promet aucun résultat magique.
-            </p>
-          </div>
+          <p className="leading-relaxed">
+            {activeScenario.recoveryScamWarning}
+          </p>
         </div>
       </div>
     </div>
