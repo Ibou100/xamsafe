@@ -7,12 +7,30 @@
 import { analyzeMessageLocally, sanitizeUserMessage } from './messageAnalyzer';
 import type { AnalysisResult, RiskLevel, ClueItem } from '../types';
 
-export const API_BASE_URL = (
-  import.meta.env.VITE_API_URL ||
-  (typeof window !== 'undefined' && window.location.hostname === 'localhost'
-    ? 'http://localhost:8000'
-    : 'https://xam-safe.vercel.app')
-).replace(/\/$/, '');
+const isDev = import.meta.env.DEV;
+const rawEnvUrl = import.meta.env.VITE_API_URL;
+
+/**
+ * URL de base de l'API.
+ * RÈGLE DE DÉPLOIEMENT :
+ * - En développement local (DEV), fallback sur http://localhost:8000 si non renseigné.
+ * - En production, si VITE_API_URL est absente, AUCUN fallback vers localhost:8000.
+ *   Le client bascule directement en mode hors ligne et consigne un avertissement console.
+ */
+export const API_BASE_URL: string | null = (() => {
+  if (rawEnvUrl && typeof rawEnvUrl === 'string' && rawEnvUrl.trim().length > 0) {
+    return rawEnvUrl.trim().replace(/\/$/, '');
+  }
+  if (isDev) {
+    return 'http://localhost:8000';
+  }
+  if (typeof console !== 'undefined' && console.warn) {
+    console.warn(
+      '[XamSafe] VITE_API_URL non configurée en production. Le client bascule automatiquement en mode hors ligne strict (heuristique souveraine).'
+    );
+  }
+  return null;
+})();
 
 export interface UnifiedApiResponse {
   risk_level: 'FAIBLE' | 'MODERE' | 'ELEVE' | 'CRITIQUE';
@@ -58,8 +76,11 @@ export interface UnifiedAnalysisClientResult {
 
 /**
  * Silent background wake-up ping for sleeping free-tier backends (Render / Railway).
+ * Ne tente aucune requête si API_BASE_URL n'est pas définie (évite toute erreur console).
  */
 export async function wakeUpBackend(): Promise<void> {
+  if (!API_BASE_URL) return;
+
   try {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 4000);
@@ -76,13 +97,28 @@ export async function wakeUpBackend(): Promise<void> {
 /**
  * Analyzes a text message by calling the backend API /api/v1/analyze.
  * Strictly respects the 15-second client-side timeout.
- * Automatically falls back to local heuristic analysis if the API fails or times out.
+ * Automatically falls back to local heuristic analysis if the API fails, times out,
+ * or if VITE_API_URL is unconfigured in production.
  */
 export async function analyzeUnifiedMessage(
   rawText: string,
   onWaitingLong?: (seconds: number) => void
 ): Promise<UnifiedAnalysisClientResult> {
   const sanitized = sanitizeUserMessage(rawText);
+
+  // If no backend is configured in production, switch immediately to sovereign local heuristic
+  if (!API_BASE_URL) {
+    const localResult = analyzeMessageLocally(sanitized);
+    return {
+      result: {
+        ...localResult,
+        engineType: 'local-heuristic',
+      },
+      isOfflineFallback: true,
+      offlineMessage: 'Analyse simplifiée (mode hors ligne). Le résultat peut être moins précis.',
+    };
+  }
+
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 15000);
 

@@ -23,6 +23,7 @@ import httpx
 
 # Path to configuration file
 CONFIG_PATH = os.path.join(os.path.dirname(__file__), "official_domains.json")
+SHORTENERS_PATH = os.path.join(os.path.dirname(__file__), "shorteners.json")
 
 
 def load_official_targets(path: Optional[str] = None) -> Dict[str, Any]:
@@ -35,6 +36,20 @@ def load_official_targets(path: Optional[str] = None) -> Dict[str, Any]:
         except Exception:
             pass
     return {}
+
+
+def load_known_shorteners(path: Optional[str] = None) -> Set[str]:
+    """Loads known URL shortener domains."""
+    target_path = path or SHORTENERS_PATH
+    if os.path.exists(target_path):
+        try:
+            with open(target_path, "r", encoding="utf-8") as f:
+                items = json.load(f)
+                return {d.lower().strip() for d in items if d}
+        except Exception:
+            pass
+    return {"bit.ly", "tinyurl.com", "t.co", "cutt.ly", "is.gd", "rb.gy"}
+
 
 
 # Common everyday words that must not be falsely flagged as typosquatting
@@ -224,12 +239,16 @@ class DomainInfrastructureScanner:
         rdap_timeout_sec: float = 3.5,
         cache_max_size: int = 1000,
         cache_ttl_sec: float = 86400.0,
-        config_path: Optional[str] = None
+        config_path: Optional[str] = None,
+        shorteners_path: Optional[str] = None
     ):
         self.timeout = rdap_timeout_sec
         self.cache = RdapCache(max_size=cache_max_size, ttl_seconds=cache_ttl_sec)
         self.config_path = config_path or CONFIG_PATH
+        self.shorteners_path = shorteners_path or SHORTENERS_PATH
         self.targets = load_official_targets(self.config_path)
+        self.shorteners = load_known_shorteners(self.shorteners_path)
+
 
     @property
     def _rdap_cache(self):
@@ -506,6 +525,29 @@ class DomainInfrastructureScanner:
                 "secondary_signal_hosting": "Infrastructure officielle"
             }
 
+        # 2b. Known URL Shorteners
+        # Shortened URLs hide their final destination. The engine never visits the link (anti-SSRF/privacy).
+        # Risk level is at minimum MODERE with explicit caution warning.
+        hostname_clean = hostname.lower()
+        is_shortener = (
+            hostname_clean in self.shorteners or
+            any(hostname_clean.endswith("." + s) for s in self.shorteners)
+        )
+        if is_shortener:
+            return {
+                "risk_level": "MODERE",
+                "risk_label": "Lien raccourci (destination masquée)",
+                "hostname": hostname,
+                "domain_age_days": None,
+                "domain_age_status": "inconnu",
+                "creation_date": None,
+                "target_brand_spoofed": None,
+                "explanations": ["Lien raccourci : la destination réelle est inconnue. Ne cliquez pas avant de vérifier."],
+                "recommendation": "Ne cliquez pas avant de vérifier la destination exacte auprès de l'expéditeur.",
+                "secondary_signal_hosting": "Service de raccourcissement d'URL"
+            }
+
+
         # 3. Domain Age Check (Priority 1)
         rdap = custom_rdap_result if custom_rdap_result else self.fetch_domain_age_rdap(hostname)
         domain_age_status = rdap.get("domain_age_status", "inconnu")
@@ -583,7 +625,7 @@ class DomainInfrastructureScanner:
             "domain_age_days": age_days,
             "domain_age_status": domain_age_status,
             "creation_date": rdap.get("creation_date"),
-            "target_brand_spoofed": spoofing.get("target_brand"),
+            "target_brand_spoofed": spoofing.get("target_brand") if spoofing.get("is_spoofing") else None,
             "explanations": explanations,
             "recommendation": recommendation,
             "secondary_signal_hosting": rdap.get("hosting_info")

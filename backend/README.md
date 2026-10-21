@@ -9,10 +9,11 @@ Moteur d'ingénierie défensive pour l'analyse de messages (Brique 1 NLP) et d'i
 * **Brique 1 — Modèle ML Sobre & Rapide (Baseline) :**  
   Vectorisation **TF-IDF (n-grams 1-3)** combinée à une **Régression Logistique régularisée** (`class_weight='balanced'`). Temps d'inférence moyen : **< 5 ms sur CPU**.
 * **Brique 2 — Hiérarchisation des Signaux d'Infrastructure :**
-  1. **Âge du domaine (Priorité 1 - RDAP RFC 7480) :** Signalement des domaines créés il y a moins de 48 heures ou moins de 7 jours. Les domaines très récents sont fréquemment utilisés dans les campagnes de phishing. Gestion explicite de l'incertitude (`domain_age_status: "inconnu"` quand l'extension ou le registre ne répond pas).
-  2. **Typosquatting & Usurpation de Marque (Priorité 2) :** Distance de Levenshtein calibrée (distance max 1 pour les marques de 5 lettres ou moins, max 2 pour les marques plus longues) avec **condition de confirmation obligatoire** (TLD à risque, mot-clé d'authentification, homoglyphe) pour éviter les fausses alertes sur des mots courants (`cave`, `save`, `tree`).
-  3. **Extensions à risque (Priorité 3) :** Détection des TLDs à bas coût surreprésentés dans les abus (`.xyz`, `.top`, `.click`, `.buzz`, etc.).
-  4. **Hébergement / Registre (Signal secondaire) :** Conservé comme signal d'appui informatif.
+  1. **Liens Raccourcis (Priorité Haute) :** Les services de raccourcissement connus (`shorteners.json` : `bit.ly`, `tinyurl.com`, `t.co`, `cutt.ly`, `is.gd`, etc.) masquent leur destination réelle. Ils sont automatiquement classés au minimum au niveau **MODERE** avec recommandation explicite. **Le scanner ne visite jamais le lien sortant** (protection stricte anti-SSRF).
+  2. **Âge du domaine (Priorité 1 - RDAP RFC 7480) :** Signalement des domaines créés il y a moins de 48 heures ou moins de 7 jours. Les domaines très récents sont fréquemment utilisés dans les campagnes de phishing. Gestion explicite de l'incertitude (`domain_age_status: "inconnu"` quand l'extension ou le registre ne répond pas).
+  3. **Typosquatting & Usurpation de Marque (Priorité 2) :** Distance de Levenshtein calibrée (distance max 1 pour les marques de 5 lettres ou moins, max 2 pour les marques plus longues) avec **condition de confirmation obligatoire** (TLD à risque, mot-clé d'authentification, homoglyphe) pour éviter les fausses alertes sur des mots courants (`cave`, `save`, `tree`).
+  4. **Extensions à risque (Priorité 3) :** Détection des TLDs à bas coût surreprésentés dans les abus (`.xyz`, `.top`, `.click`, `.buzz`, etc.).
+  5. **Hébergement / Registre (Signal secondaire) :** Conservé comme signal d'appui informatif.
 * **Protection des données personnelles :**  
   Anonymisation automatique et préalable (`anonymizer.py`) des numéros de téléphone sénégalais (formats variés : espaces, tirets, points, +221, 00221), montants en FCFA, codes secrets/OTP, noms de personnes et liens web avant vectorisation.
 * **Restitution en Niveaux de Risque Déterministes (Pas de pourcentages bruts) :**  
@@ -23,32 +24,33 @@ Moteur d'ingénierie défensive pour l'analyse de messages (Brique 1 NLP) et d'i
 ## 2. Liste Blanche des Domaines Officiels Reconnus
 
 > [!IMPORTANT]
-> **Validation Requise :** La comparaison s'effectue sur le nom de domaine enregistrable exact (`hostname == domain` ou `hostname.endswith('.' + domain)`). Les sous-chaînes partielles sont rejetées. Merci de valider manuellement cette liste :
+> **Validation Requise :** La comparaison s'effectue sur le nom de domaine enregistrable exact (`hostname == domain` ou `hostname.endswith('.' + domain)`). Les sous-chaînes partielles sont rejetées.
+> Par défaut, chaque domaine de la configuration [`official_domains.json`](official_domains.json) porte la mention `"verified": false`. Tant qu'il n'est pas validé manuellement, un domaine officiel n'est ni présenté comme officiellement certifié, ni sur-alerté à tort.
 
-| Marque / Institution | Domaines Officiels Autorisés | Statut |
+| Marque / Institution | Domaines Officiels Autorisés | Statut par défaut |
 | :--- | :--- | :---: |
-| **Wave Mobile Money** | `wave.com`, `wave.sn` | À valider |
-| **Orange / Sonatel** | `orange.sn`, `orange.com`, `sonatel.sn` | À valider |
-| **Free Sénégal** | `free.sn` | À valider |
-| **Campusen (Bourses / État)** | `campusen.sn` | À valider |
-| **CBAO Attijariwafa Bank** | `cbao.sn`, `attijariwafabank.com` | À valider |
-| **Ecobank** | `ecobank.com` | À valider |
-| **Senelec** | `senelec.sn` | À valider |
-| **Sen'Eau** | `seneau.sn` | À valider |
-| **Police Nationale (DSC)** | `signalementcyber.dgpn.sn`, `policenationale.gouv.sn` | À valider |
-
-*Message retourné lors d'une correspondance :* `« Correspond à un domaine officiel connu »`.
+| **Wave Mobile Money** | `wave.com`, `wave.sn` | `verified: false` |
+| **Orange / Sonatel** | `orange.sn`, `orange.com`, `sonatel.sn` | `verified: false` |
+| **Free Sénégal** | `free.sn` | `verified: false` |
+| **Campusen (Bourses / État)** | `campusen.sn` | `verified: false` |
+| **CBAO Attijariwafa Bank** | `cbao.sn`, `attijariwafabank.com` | `verified: false` |
+| **Ecobank** | `ecobank.com` | `verified: false` |
+| **Senelec** | `senelec.sn` | `verified: false` |
+| **Sen'Eau** | `seneau.sn` | `verified: false` |
+| **Police Nationale (DSC)** | `signalementcyber.dgpn.sn`, `policenationale.gouv.sn` | `verified: false` |
 
 ---
 
 ## 3. Limites et Avertissements Scientifiques
 
-1. **Représentativité du Corpus :**  
-   Le jeu de données actuel ([`dataset/corpus.json`](dataset/corpus.json)) est un échantillon de prototypage représentatif mais rédigé et calibré manuellement. **Il ne constitue pas une preuve de généralisation sur des millions de flux réels non vus.**
+1. **Représentativité du Corpus & Données Écrites à la Main :**  
+   Le jeu d'entraînement actuel ([`dataset/corpus.json`](dataset/corpus.json)) ainsi que le jeu de test gelé ([`dataset/frozen_test_set.json`](dataset/frozen_test_set.json)) sont des échantillons synthétiques rédigés et calibrés à la main. **Les métriques rapportées portent exclusivement sur ces données artisanales et ne constituent pas une preuve de généralisation sur des flux réels non supervisés.**
 2. **Collecte Éthique & Pipeline d'Enrichissement :**  
-   Le script [`import_data.py`](import_data.py) est prévu pour intégrer de futurs messages réels. Il impose obligatoirement un indicateur explicite de consentement (`consent_obtained: True`) et applique l'anonymisation avant tout archivage.
+   Le script [`import_data.py`](import_data.py) est prévu pour intégrer de futurs messages réels. Il impose obligatoirement un indicateur explicite de consentement (`consent_verified: True`) et applique l'anonymisation avant tout archivage.
 3. **Incertitude RDAP :**  
    Certaines extensions territoriales (notamment certains registres `.sn`) ou des coupures réseau ne permettent pas de récupérer la date de création. Dans ce cas, le statut est explicitement marqué comme `"inconnu"` et n'est pas utilisé seul pour sur-évaluer le risque.
+4. **Limitation du Rate Limiter en Mémoire :**  
+   Le compteur de requêtes (20 req/min) fonctionne en mémoire vive locale du serveur. **Il est réinitialisé à chaque redémarrage de processus ou nouveau déploiement de conteneur.** Pour un cluster multi-instances, un cache Redis partagé sera requis.
 
 ---
 
@@ -56,32 +58,42 @@ Moteur d'ingénierie défensive pour l'analyse de messages (Brique 1 NLP) et d'i
 
 ```text
 backend/
-├── anonymizer.py          # Module d'anonymisation multi-formats & détection de noms
-├── classifier.py          # Modèle TF-IDF + Logistic Regression, Split Train/Test & Explications
-├── domain_scanner.py      # Scanner RDAP (cache & incertitude), Levenshtein calibré & Whitelist
-├── import_data.py         # Pipeline d'ingestion de messages réels avec consentement
-├── main.py                # Microservice FastAPI (Points de terminaison REST & OpenAPI)
+├── anonymizer.py              # Anonymisation multi-formats & détection de noms
+├── classifier.py              # Modèle TF-IDF + Logistic Regression, Split Train/Test
+├── domain_scanner.py          # Scanner RDAP (cache LRU+TTL), Levenshtein calibré, Whitelist
+├── rate_limiter.py            # Limiteur de débit avec gestion sécurisée de TRUST_PROXY
+├── shorteners.json            # Liste des noms de domaine de raccourcisseurs d'URL connus
+├── official_domains.json      # Liste blanche isolée avec drapeaux 'verified'
+├── import_data.py             # Pipeline d'ingestion de messages réels avec consentement
+├── main.py                    # Microservice FastAPI (Points de terminaison REST & OpenAPI)
 ├── dataset/
-│   ├── corpus.json        # Jeu de données de référence
-│   └── corpus_imported.json # Données réelles anonymisées avec consentement
+│   ├── corpus.json            # Jeu de données d'entraînement de référence
+│   ├── corpus_imported.json   # Données réelles anonymisées avec consentement
+│   └── frozen_test_set.json   # Jeu d'évaluation gelé indépendant (24 cas FR/WO)
 ├── tests/
-│   ├── test_model.py          # Tests unitaires ML, formats de numéros & train/test metrics
-│   ├── test_domain_scanner.py # Tests RDAP simulés (succès, 404, timeout), whitelist & exceptions
-│   └── test_api.py            # Tests d'intégration des endpoints FastAPI
+│   ├── test_model.py              # Tests unitaires ML & anonymisation
+│   ├── test_domain_scanner.py     # Tests RDAP, shorteners, whitelist 'verified: false'
+│   ├── test_api.py                # Tests API, sécurité headers, SSRF, proxy rate limit
+│   ├── test_unified_analysis.py   # Tests fusion brique 1 & brique 2 (4 cas obligatoires)
+│   └── test_frozen_evaluation.py  # Évaluation indépendante sur le jeu de test gelé
 └── README.md
 ```
 
 ---
 
-## 5. Déploiement en Production (Render / Railway)
+## 5. Configuration Vercel & Déploiement en Production
 
-Le microservice est conçu pour être hébergé facilement sur un hébergeur cloud gratuit ou managé (Render, Railway, Fly.io) :
+### Variable d'environnement Frontend (Vercel) :
+Pour connecter le frontend hébergé sur Vercel à votre backend, configurez la variable suivante dans le tableau de bord Vercel (**Settings > Environment Variables**) :
 
-> [!NOTE]
-> **Démarrage à froid (Cold Start) :**
-> Sur les offres gratuites (Render Free Tier notamment), le serveur entre en veille après 15 minutes d'inactivité. Le premier appel API peut nécessiter un délai de démarrage à froid de **30 à 60 secondes**. L'interface XamSafe intègre une sonde d'éveil automatique en arrière-plan (`/health`) pour réveiller le service.
+- **Nom :** `VITE_API_URL`
+- **Valeur :** `https://votre-backend.onrender.com` (doit impérativement être en `https://`)
+- **Environnements :** Production, Preview, Development
 
-### Déploiement sur Render (Web Service) :
+> [!WARNING]
+> Si `VITE_API_URL` n'est pas configurée lors d'un build de production, le frontend bascule automatiquement et de manière transparente en mode **hors ligne strict** (moteur heuristique local embarqué dans le navigateur) sans jamais tenter de se connecter à localhost.
+
+### Déploiement du Backend sur Render (Web Service) :
 1. Créez un nouveau **Web Service** sur [Render.com](https://render.com).
 2. Connectez le dépôt GitHub `XamSafe`.
 3. Configurez les paramètres :
@@ -89,14 +101,10 @@ Le microservice est conçu pour être hébergé facilement sur un hébergeur clo
    - **Environment :** `Python 3`
    - **Build Command :** `pip install -r requirements.txt`
    - **Start Command :** `uvicorn main:app --host 0.0.0.0 --port $PORT`
-4. Ajoutez la variable d'environnement :
+4. Ajoutez les variables d'environnement dans l'onglet **Environment** :
    - `CORS_ORIGINS` = `https://xam-safe.vercel.app,http://localhost:5173`
-5. L'URL générée (ex : `https://xamsafe-api.onrender.com`) servira de `VITE_API_URL` pour le frontend.
-
-### Déploiement sur Railway :
-1. Créez un projet sur [Railway.app](https://railway.app).
-2. Déployez à partir du sous-dossier `backend` (Railway détecte automatiquement `requirements.txt` et `Procfile`).
-3. Ajoutez la variable `CORS_ORIGINS` dans l'onglet **Variables**.
+   - `TRUST_PROXY` = `true` (nécessaire derrière le proxy de Render pour lire correctement les adresses IP)
+5. L'URL générée (ex : `https://xamsafe-api.onrender.com`) sera la valeur à renseigner dans `VITE_API_URL` sur Vercel.
 
 ---
 
@@ -108,7 +116,12 @@ cd backend
 python -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-### Lancer la suite de tests complète :
+### Lancer la suite de tests complète (Python / pytest) :
 ```bash
 python -m pytest backend/tests/ -v
+```
+
+### Évaluer le modèle sur le jeu gelé :
+```bash
+python -m pytest backend/tests/test_frozen_evaluation.py -s
 ```

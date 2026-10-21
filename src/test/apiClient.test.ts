@@ -113,5 +113,17 @@ describe('API Client & Offline Resilience (D1, D2)', () => {
     globalThis.fetch = vi.fn().mockRejectedValue(new Error('Network offline'));
     await expect(wakeUpBackend()).resolves.toBeUndefined();
   });
+
+  it('bascule en mode hors ligne sans appeler fetch si le serveur est injoignable', async () => {
+    globalThis.fetch = vi.fn().mockRejectedValue(new Error('Network offline'));
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    const res = await analyzeUnifiedMessage('Bonjour, voici le reçu de 10.000 FCFA');
+    expect(res.isOfflineFallback).toBe(true);
+    expect(res.result.engineType).toBe('local-heuristic');
+
+    warnSpy.mockRestore();
+  });
 });
+
 

@@ -1,0 +1,170 @@
+[
+  {
+    "id": "frozen-scam-fr-01",
+    "text": "URGENT DÉBLOCAGE WAVE : Votre compte a été temporairement suspendu suite à une anomalie. Veuillez transmettre le code secret à 4 chiffres pour réactiver votre solde sous 15 minutes.",
+    "label": 1,
+    "language": "fr",
+    "category": "vol-code-secret"
+  },
+  {
+    "id": "frozen-scam-fr-02",
+    "text": "Félicitations cher client Orange, votre numéro a été tiré au sort pour recevoir 2.500.000 FCFA. Envoyez 15.000 FCFA de frais d'huissier par Wave pour débloquer votre lot.",
+    "label": 1,
+    "language": "fr",
+    "category": "loterie-fictive"
+  },
+  {
+    "id": "frozen-scam-fr-03",
+    "text": "Recrutement immédiat ONG Dakar : salaire 350.000 FCFA/mois sans expérience requise. Envoyez 5.000 FCFA de frais de dossier par Orange Money pour confirmer votre badge.",
+    "label": 1,
+    "language": "fr",
+    "category": "faux-emploi"
+  },
+  {
+    "id": "frozen-scam-fr-04",
+    "text": "Maman c'est moi j'ai eu un grave accident avec un taxi la police me retient au commissariat envoie vite 40.000 FCFA sur ce numéro Wave sinon ils m'enferment d'urgence.",
+    "label": 1,
+    "language": "fr",
+    "category": "fausse-urgence-famille"
+  },
+  {
+    "id": "frozen-scam-fr-05",
+    "text": "Service Sécurité Wari : Tentative d'intrusion sur votre compte. Cliquez immédiatement pour confirmer vos identifiants secrets avant résiliation définitive de la ligne.",
+    "label": 1,
+    "language": "fr",
+    "category": "phishing-bancaire"
+  },
+  {
+    "id": "frozen-scam-fr-06",
+    "text": "Erreur de transfert : Bonjour monsieur, je me suis trompé de numéro en envoyant 50.000 FCFA pour l'opération de ma mère, s'il vous plaît renvoyez-moi l'argent par Wave en urgence.",
+    "label": 1,
+    "language": "fr",
+    "category": "faux-virement"
+  },
+  {
+    "id": "frozen-scam-wo-01",
+    "text": "ALERTE WAVE : Sa compte dafa tëju ndax amna ku bëgg duggu. Jox ma sa code secret bi ñu la yonnee léegi ci SMS ngir ñu ubbil la ko ci 10 minutes.",
+    "label": 1,
+    "language": "wo",
+    "category": "vol-code-secret"
+  },
+  {
+    "id": "frozen-scam-wo-02",
+    "text": "Yéeneekaay Orange Money : Sa numéro bi jël na 1.000.000 FCFA ci promo bi. Yónneel 10.000 FCFA frais de dossier ci numéro 771234567 bala ngi jot sa xaalis.",
+    "label": 1,
+    "language": "wo",
+    "category": "loterie-fictive"
+  },
+  {
+    "id": "frozen-scam-wo-03",
+    "text": "Salam alaykoum, sa xarit la ci WhatsApp. Nièce bi dafa am concours de récitation, jox ma code bi nga jot ci sa SMS ngir ma voter ko barakallahoufik.",
+    "label": 1,
+    "language": "wo",
+    "category": "piratage-whatsapp"
+  },
+  {
+    "id": "frozen-scam-wo-04",
+    "text": "Bourses Campusen : Am nga bourse 45.000 FCFA weer wu nekk. Yónneel 3.500 FCFA frais de timbre ci trésorier bi par Wave bala suba.",
+    "label": 1,
+    "language": "wo",
+    "category": "fausse-bourse"
+  },
+  {
+    "id": "frozen-scam-wo-05",
+    "text": "Papa man la sama téléphone dafa fay sama moto dafa daan police daf ma tëj yónneel gaaw 25.000 FCFA ci Wave bi ñu bàyyi ma.",
+    "label": 1,
+    "language": "wo",
+    "category": "fausse-urgence-famille"
+  },
+  {
+    "id": "frozen-scam-wo-06",
+    "text": "Njoor bi joxe na xibaar : Dangay liggéey ci kër gi 30.000 FCFA par bés. Fayal 5.000 FCFA ngir am badge liggéey bi ci Wave bala ñuy tëj.",
+    "label": 1,
+    "language": "wo",
+    "category": "faux-emploi"
+  },
+  {
+    "id": "frozen-legit-fr-01",
+    "text": "Wave : Vous avez payé 2.500F CFA à Pharmacie de la Corniche. Nouveau solde : 21.000F CFA. Frais : 0F CFA. Réf : TX-129845.",
+    "label": 0,
+    "language": "fr",
+    "category": "recu-officiel"
+  },
+  {
+    "id": "frozen-legit-fr-02",
+    "text": "Orange Money : Votre transfert de 15.000 FCFA vers le 771234567 a été effectué avec succès. Solde restant : 42.100 FCFA. Service client disponible au 1441.",
+    "label": 0,
+    "language": "fr",
+    "category": "recu-officiel"
+  },
+  {
+    "id": "frozen-legit-fr-03",
+    "text": "CBAO : Votre virement de salaire a bien été crédité sur votre compte. Solde disponible : 285.000 FCFA.",
+    "label": 0,
+    "language": "fr",
+    "category": "notification-bancaire"
+  },
+  {
+    "id": "frozen-legit-fr-04",
+    "text": "Bonjour monsieur Diop, n'oubliez pas notre réunion de chantier demain matin à 10h à Diamniadio. Bonne soirée.",
+    "label": 0,
+    "language": "fr",
+    "category": "message-personnel"
+  },
+  {
+    "id": "frozen-legit-fr-05",
+    "text": "Université Cheikh Anta Diop : Les inscriptions pédagogiques pour le semestre 2 sont ouvertes jusqu'au 30 novembre sur le portail de votre faculté.",
+    "label": 0,
+    "language": "fr",
+    "category": "annonce-officielle"
+  },
+  {
+    "id": "frozen-legit-fr-06",
+    "text": "Senelec Info : Travaux de maintenance prévus dans votre quartier ce samedi de 8h à 12h. Veuillez excuser la gêne occasionnée.",
+    "label": 0,
+    "language": "fr",
+    "category": "alerte-utilite-publique"
+  },
+  {
+    "id": "frozen-legit-wo-01",
+    "text": "Jàmm nga am waay, ndax jënd nga ceeb bi ak diwlin ji ci marse bi ? Yónneel ma facture bi ci WhatsApp bu la neexee.",
+    "label": 0,
+    "language": "wo",
+    "category": "discussion-quotidienne"
+  },
+  {
+    "id": "frozen-legit-wo-02",
+    "text": "Waaw xarit, jote naa 5.000 FCFA yi nga ma yónne ci Wave sank. Jërëjëf, Yàlla na la Yàlla fay ci barke aljuma.",
+    "label": 0,
+    "language": "wo",
+    "category": "remerciement-transfert"
+  },
+  {
+    "id": "frozen-legit-wo-03",
+    "text": "Dinaa ñëw Dakar suba ci alxames ci kër baye Fall ngir gise ak yaw. Nanga fa baax ci jàmm.",
+    "label": 0,
+    "language": "wo",
+    "category": "nouvelles-famille"
+  },
+  {
+    "id": "frozen-legit-wo-04",
+    "text": "Wave : Jote nga 10.000F CFA jóge ci Modou Sow (776543210). Sa solde léegi : 35.000F CFA. Frais : 0F CFA.",
+    "label": 0,
+    "language": "wo",
+    "category": "recu-officiel-wo"
+  },
+  {
+    "id": "frozen-legit-wo-05",
+    "text": "As-salamu alaykum, magal gi dafa jege, ndax pare nga ci dalal gan yi ? Nu ngi lay ziar bu baax.",
+    "label": 0,
+    "language": "wo",
+    "category": "salutations-religieuses"
+  },
+  {
+    "id": "frozen-legit-wo-06",
+    "text": "Orange Info : Sa forfait internet Pass Waw jéex na. Bësël #123# ngir defaat forfait bu bees.",
+    "label": 0,
+    "language": "wo",
+    "category": "notification-operateur"
+  }
+]

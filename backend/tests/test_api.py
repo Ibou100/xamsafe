@@ -70,7 +70,7 @@ def test_empty_inputs_rejected_400():
 
 
 # =========================================================================
-# A1. TEST DE LIMITATION DE DEBIT (RATE LIMITING 429)
+# A1. TEST DE LIMITATION DE DEBIT (RATE LIMITING 429) & PROXY TRUST
 # =========================================================================
 
 def test_rate_limiting_429_french_message():
@@ -89,6 +89,93 @@ def test_rate_limiting_429_french_message():
     assert "Limite de requêtes atteinte" in detail
     assert "20 requêtes/minute" in detail
     assert "patienter" in detail.lower()
+
+
+def test_rate_limiting_direct_ip_without_proxy(monkeypatch):
+    """
+    Sans TRUST_PROXY, l'en-tête X-Forwarded-For est STRICTEMENT ignoré.
+    Un attaquant envoyant des en-têtes X-Forwarded-For variables ne peut pas contourner la limite.
+    """
+    monkeypatch.delenv("TRUST_PROXY", raising=False)
+    payload = {"text": "Test contournement IP directe"}
+
+    # 20 requêtes avec des faux X-Forwarded-For différents
+    for i in range(20):
+        res = client.post(
+            "/api/v1/analyze-message",
+            json=payload,
+            headers={"X-Forwarded-For": f"198.51.100.{i}"}
+        )
+        assert res.status_code == 200
+
+    # La 21ème requête doit être bloquée (car toutes attribuées à l'IP réelle du client de test)
+    res_blocked = client.post(
+        "/api/v1/analyze-message",
+        json=payload,
+        headers={"X-Forwarded-For": "198.51.100.99"}
+    )
+    assert res_blocked.status_code == 429
+
+
+def test_rate_limiting_behind_proxy_with_trust_proxy(monkeypatch):
+    """
+    Avec TRUST_PROXY=true, l'IP client est extraite de X-Forwarded-For (dernière entrée).
+    Des clients avec des IPs différentes ont des quotas séparés.
+    """
+    monkeypatch.setenv("TRUST_PROXY", "true")
+    payload = {"text": "Test derrière proxy"}
+
+    # IP A consomme son quota de 20 requêtes
+    for _ in range(20):
+        res = client.post(
+            "/api/v1/analyze-message",
+            json=payload,
+            headers={"X-Forwarded-For": "203.0.113.10"}
+        )
+        assert res.status_code == 200
+
+    # IP A est désormais bloquée
+    res_blocked = client.post(
+        "/api/v1/analyze-message",
+        json=payload,
+        headers={"X-Forwarded-For": "203.0.113.10"}
+    )
+    assert res_blocked.status_code == 429
+
+    # IP B derrière le même proxy a son propre quota et n'est pas bloquée
+    res_ip_b = client.post(
+        "/api/v1/analyze-message",
+        json=payload,
+        headers={"X-Forwarded-For": "203.0.113.20"}
+    )
+    assert res_ip_b.status_code == 200
+
+
+def test_rate_limiting_spoofed_chain_behind_proxy(monkeypatch):
+    """
+    Avec TRUST_PROXY=true, si le client forge 'X-Forwarded-For: fake_client, real_client',
+    le système prend la dernière entrée (real_client ajoutée par le proxy).
+    """
+    monkeypatch.setenv("TRUST_PROXY", "true")
+    payload = {"text": "Test chaîne proxy falsifiée"}
+
+    # L'attaquant essaie de varier le premier IP mais l'IP ajoutée par le proxy est 198.51.100.55
+    for i in range(20):
+        res = client.post(
+            "/api/v1/analyze-message",
+            json=payload,
+            headers={"X-Forwarded-For": f"1.2.3.{i}, 198.51.100.55"}
+        )
+        assert res.status_code == 200
+
+    # La 21ème est bloquée car 198.51.100.55 a atteint son quota
+    res_blocked = client.post(
+        "/api/v1/analyze-message",
+        json=payload,
+        headers={"X-Forwarded-For": "1.2.3.99, 198.51.100.55"}
+    )
+    assert res_blocked.status_code == 429
+
 
 
 # =========================================================================

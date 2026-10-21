@@ -300,3 +300,67 @@ def test_rdap_simulated_timeout(scanner):
     res = scanner.scan_url("https://site-lent.org", custom_rdap_result=mock_timeout)
     assert res["domain_age_status"] == "inconnu"
     assert any("Âge du domaine non vérifiable" in exp for exp in res["explanations"])
+
+
+# =========================================================================
+# 7. TESTS LIENS RACCOURCIS (SHORTENERS)
+# =========================================================================
+
+@pytest.mark.parametrize("shortener_url", [
+    "https://bit.ly/3xYzaBc",
+    "http://tinyurl.com/wave-promo",
+    "https://t.co/xyz1234",
+    "https://cutt.ly/urgent-om",
+    "https://is.gd/deblocage",
+    "https://rb.gy/98213",
+])
+def test_shortened_urls_flagged_moderate(scanner, shortener_url):
+    """
+    Les liens raccourcis masquent leur destination réelle.
+    Ils doivent être classés au minimum MODERE avec une explication claire,
+    sans JAMAIS visiter le lien ni effectuer de requête HTTP sortante.
+    """
+    res = scanner.scan_url(shortener_url)
+    assert res["risk_level"] == "MODERE"
+    assert res["risk_label"] == "Lien raccourci (destination masquée)"
+    assert any("Lien raccourci : la destination réelle est inconnue. Ne cliquez pas avant de vérifier." in exp for exp in res["explanations"])
+    assert "Ne cliquez pas avant de vérifier" in res["recommendation"]
+    # No domain age lookup attempted for shorteners
+    assert res["domain_age_days"] is None
+
+
+# =========================================================================
+# 8. TESTS LISTE BLANCHE : DOMAINES AVEC 'verified: false'
+# =========================================================================
+
+def test_unverified_whitelist_domain_not_official_and_not_overalerted(scanner):
+    """
+    Pour un domaine listé dans official_domains.json avec 'verified: false' :
+    1. Il ne doit PAS être présenté comme officiel certifié.
+    2. Il ne doit PAS être sur-alerté à tort (reste FAIBLE si aucun signal malveillant).
+    3. Il ne doit PAS être accusé de typosquatter sa propre marque.
+    """
+    # wave.com est configuré avec verified: false par défaut
+    target_wave = scanner.targets.get("wave", {})
+    domains_wave = [d for d in target_wave.get("domains", []) if d["domain"] == "wave.com"]
+    assert len(domains_wave) == 1
+    assert domains_wave[0]["verified"] is False
+
+    mock_rdap_old = {
+        "status": "RESOLVED",
+        "domain_age_status": "connu",
+        "age_days": 1500,
+        "age_category": "ANCIEN_STABLE",
+        "creation_date": "2020-01-01",
+        "hosting_info": "Cloudflare"
+    }
+
+    res = scanner.scan_url("https://wave.com", custom_rdap_result=mock_rdap_old)
+
+    # 1. Non présenté comme officiel
+    assert res["risk_label"] != "Correspond à un domaine officiel connu"
+    # 2. Non sur-alerté
+    assert res["risk_level"] == "FAIBLE"
+    # 3. Pas de spoofing inventé sur lui-même
+    assert res["target_brand_spoofed"] is None
+
