@@ -178,6 +178,13 @@ RANK_TO_RECOMMENDATION = {
 }
 
 
+@app.get("/")
+@app.get("/health")
+def root_health():
+    """Vérification ultra-légère pour les sondes de santé Render/Railway."""
+    return {"status": "ok", "service": "XamSafe Defensive AI Core"}
+
+
 @app.get("/api/v1/health")
 def health_check() -> Dict[str, Any]:
     """
@@ -380,4 +387,10 @@ def analyze_unified(req: MessageAnalysisRequest, request: Request) -> UnifiedAna
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Erreur interne lors de l'analyse unifiée : {str(e)}")
+
+
+if __name__ == "__main__":
+    import uvicorn
+    port = int(os.getenv("PORT", 8000))
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=False)
 

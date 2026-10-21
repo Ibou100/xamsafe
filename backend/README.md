@@ -73,10 +73,38 @@ backend/
 
 ---
 
-## 5. Exécution des Tests & Démarrage
+## 5. Déploiement en Production (Render / Railway)
 
-### Démarrage de l'API :
+Le microservice est conçu pour être hébergé facilement sur un hébergeur cloud gratuit ou managé (Render, Railway, Fly.io) :
+
+> [!NOTE]
+> **Démarrage à froid (Cold Start) :**
+> Sur les offres gratuites (Render Free Tier notamment), le serveur entre en veille après 15 minutes d'inactivité. Le premier appel API peut nécessiter un délai de démarrage à froid de **30 à 60 secondes**. L'interface XamSafe intègre une sonde d'éveil automatique en arrière-plan (`/health`) pour réveiller le service.
+
+### Déploiement sur Render (Web Service) :
+1. Créez un nouveau **Web Service** sur [Render.com](https://render.com).
+2. Connectez le dépôt GitHub `XamSafe`.
+3. Configurez les paramètres :
+   - **Root Directory :** `backend`
+   - **Environment :** `Python 3`
+   - **Build Command :** `pip install -r requirements.txt`
+   - **Start Command :** `uvicorn main:app --host 0.0.0.0 --port $PORT`
+4. Ajoutez la variable d'environnement :
+   - `CORS_ORIGINS` = `https://xam-safe.vercel.app,http://localhost:5173`
+5. L'URL générée (ex : `https://xamsafe-api.onrender.com`) servira de `VITE_API_URL` pour le frontend.
+
+### Déploiement sur Railway :
+1. Créez un projet sur [Railway.app](https://railway.app).
+2. Déployez à partir du sous-dossier `backend` (Railway détecte automatiquement `requirements.txt` et `Procfile`).
+3. Ajoutez la variable `CORS_ORIGINS` dans l'onglet **Variables**.
+
+---
+
+## 6. Exécution des Tests & Démarrage Local
+
+### Démarrage de l'API en local :
 ```bash
+cd backend
 python -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 ```
 

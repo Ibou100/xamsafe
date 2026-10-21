@@ -134,5 +134,22 @@
       "names": 1
     },
     "notes": ""
+  },
+  {
+    "id": "imported-20261021200325-dae9",
+    "text": "Bonjour, tentative de phishing reçue sur le <TOKEN_PHONE> de la part de <TOKEN_PERSON>",
+    "label": 1,
+    "source": "contribution-citoyenne",
+    "language": "fr",
+    "consent_verified": true,
+    "imported_at": "2026-10-21T20:03:25.713350Z",
+    "redacted_counts": {
+      "phones": 1,
+      "amounts": 0,
+      "urls": 0,
+      "codes": 0,
+      "names": 1
+    },
+    "notes": ""
   }
 ]
