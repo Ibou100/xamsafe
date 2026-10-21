@@ -1,0 +1,282 @@
+[
+  {
+    "id": "fraud-001",
+    "text": "Alerte Wave : Vous avez reçu 75.000 FCFA par erreur de Mamadou Sow 771234567. Veuillez renvoyer la somme immédiatement sur ce même numéro sous peine de poursuites.",
+    "label": 1,
+    "language": "fr",
+    "category": "faux-transfert"
+  },
+  {
+    "id": "fraud-002",
+    "text": "Alerte Wave : Vous avez reçu 50.000 FCFA par erreur de Cheikh Diop. Renvoyez immédiatement l'argent sur le 773334455 sous peine de blocage.",
+    "label": 1,
+    "language": "fr",
+    "category": "faux-transfert"
+  },
+  {
+    "id": "fraud-003",
+    "text": "Orange Money : Erreur de dépôt de 30.000 FCFA. Veuillez retourner le montant sans délai sur le 781112233 pour débloquer votre ligne.",
+    "label": 1,
+    "language": "fr",
+    "category": "faux-transfert"
+  },
+  {
+    "id": "fraud-004",
+    "text": "Service Client Wave : Votre compte est temporairement bloqué pour vérification de conformité. Veuillez nous dicter le code OTP reçu par SMS pour réactiver vos services.",
+    "label": 1,
+    "language": "fr",
+    "category": "extorsion-otp"
+  },
+  {
+    "id": "fraud-005",
+    "text": "Wave Info : Sa compte Wave dafa tëj. Yoonal ma sa code secret ak code OTP bi nga jot léegi ngir nu mën ko ubbilate.",
+    "label": 1,
+    "language": "wo",
+    "category": "extorsion-otp"
+  },
+  {
+    "id": "fraud-006",
+    "text": "Wave Sénégal : Sa compte dafa tëj. Yoonal ma sa code OTP bi léegi bala sa xaalis di réer.",
+    "label": 1,
+    "language": "wo",
+    "category": "extorsion-otp"
+  },
+  {
+    "id": "fraud-007",
+    "text": "Orange Money Félicitations ! Votre numéro a été tiré au sort pour la grande tombola Tabaski. Vous gagnez 500.000 F CFA. Contactez vite le 789998877 pour réclamer votre lot.",
+    "label": 1,
+    "language": "fr",
+    "category": "fausse-loterie"
+  },
+  {
+    "id": "fraud-008",
+    "text": "Campusen URGENT : Votre bourse d'excellence a été validée. Pour débloquer les 180.000 FCFA, payez les frais de dossier de 12.500 FCFA sur ce lien : http://campusen-bourse-sn.xyz",
+    "label": 1,
+    "language": "fr",
+    "category": "faux-recrutement"
+  },
+  {
+    "id": "fraud-009",
+    "text": "Campusen Bourse : Votre virement de 180.000 FCFA est en attente. Payez 10.000 FCFA de frais sur http://campusen-bourse-dakar.top",
+    "label": 1,
+    "language": "fr",
+    "category": "faux-recrutement"
+  },
+  {
+    "id": "fraud-010",
+    "text": "Salam danga gagné 1.000.000 FCFA ci tirage au sort Sonatel. Bësal ci lien bi ngir jël sa xaalis : http://sonatel-gain-promo.site",
+    "label": 1,
+    "language": "wo",
+    "category": "fausse-loterie"
+  },
+  {
+    "id": "fraud-011",
+    "text": "Urgent Police Cyber : Vous êtes accusé de fraude en ligne. Pour régler à l'amiable et éviter l'arrestation dans les 2 heures, contactez le commandant Diallo au 701112233 et envoyez 50.000 FCFA.",
+    "label": 1,
+    "language": "fr",
+    "category": "extorsion-police"
+  },
+  {
+    "id": "fraud-012",
+    "text": "Free Money : Annulation de transfert requise. Le client a commis une faute de frappe de 45.000 F CFA. Veuillez taper le code #150# suivi de votre code secret pour valider le retour.",
+    "label": 1,
+    "language": "fr",
+    "category": "faux-transfert"
+  },
+  {
+    "id": "fraud-013",
+    "text": "Kiosque Wave : Dafa am jumte ci sa compte bi. Wol ma ci numéro bi léegi bala sa xaalis di réer 765554433.",
+    "label": 1,
+    "language": "wo",
+    "category": "faux-support"
+  },
+  {
+    "id": "fraud-014",
+    "text": "Recrutement ONU Sénégal : Postulez pour 50 postes d'assistants administratifs. Salaire 450.000 FCFA. Envoyez 15.000 F CFA de frais médicaux d'urgence sur le compte Wave 778889900.",
+    "label": 1,
+    "language": "fr",
+    "category": "faux-emploi"
+  },
+  {
+    "id": "fraud-015",
+    "text": "Avis Orange Money : Votre solde va expirer ce soir à minuit. Pour prolonger la validité, cliquez sur http://om-securite-senegal.top et confirmez votre code confidentiel.",
+    "label": 1,
+    "language": "fr",
+    "category": "phishing"
+  },
+  {
+    "id": "fraud-016",
+    "text": "Bataaxal bu gaaw : sa xarit dafa am accident ci kaw yoon bi, dafa soxla 30.000 FCFA léegi ci Wave ngir ñu faj ko hopital. Yabal ko ci 774443322.",
+    "label": 1,
+    "language": "wo",
+    "category": "urgence-familiale"
+  },
+  {
+    "id": "fraud-017",
+    "text": "Investissement Crypto Sénégal : Multipliez vos économies par 5 en 48 heures. Déposez 20.000 FCFA et recevez 100.000 FCFA garantis sans risque. Rejoignez vite le canal Telegram : t.me/gain_rapide_dakar",
+    "label": 1,
+    "language": "fr",
+    "category": "fausse-crypto"
+  },
+  {
+    "id": "fraud-018",
+    "text": "Support Technique CBAO : Activité inhabituelle détectée sur votre carte bancaire. Connectez-vous sur http://cbao-attijari-connexion.click pour débloquer votre accès.",
+    "label": 1,
+    "language": "fr",
+    "category": "phishing"
+  },
+  {
+    "id": "fraud-019",
+    "text": "Alerte : Vous avez reçu un virement de 150.000 FCFA via Western Union. Pour valider l'encaissement, donnez votre code OTP reçu au 763332211.",
+    "label": 1,
+    "language": "fr",
+    "category": "extorsion-otp"
+  },
+  {
+    "id": "fraud-020",
+    "text": "Orange Money Sécurité : Tentative d'intrusion sur votre compte. Appelez vite le 771298374 pour sécuriser vos fonds et donner votre code secret.",
+    "label": 1,
+    "language": "fr",
+    "category": "faux-support"
+  },
+  {
+    "id": "legit-001",
+    "text": "Wave : Vous avez transféré 5.000F CFA à Fatou Diop (771112233). Nouveau solde : 14.500F CFA. Frais : 50F CFA. Réf : TX-982173.",
+    "label": 0,
+    "language": "fr",
+    "category": "recu-officiel"
+  },
+  {
+    "id": "legit-002",
+    "text": "Wave : Vous avez transféré 10.000F CFA à Aminata Diallo (775556677). Nouveau solde : 23.450F CFA. Frais : 100F CFA. Réf : TX-778899.",
+    "label": 0,
+    "language": "fr",
+    "category": "recu-officiel"
+  },
+  {
+    "id": "legit-003",
+    "text": "Orange Money : Paiement de votre facture Senelec N° 458921 d'un montant de 24.300 F CFA effectué avec succès le 20/10 à 14:15. Transaction N° OM-887123.",
+    "label": 0,
+    "language": "fr",
+    "category": "recu-officiel"
+  },
+  {
+    "id": "legit-004",
+    "text": "Orange Money : Paiement de votre facture Sen'Eau N° 998822 de 12.400 F CFA effectué avec succès le 21/10. Réf OM-9912.",
+    "label": 0,
+    "language": "fr",
+    "category": "recu-officiel"
+  },
+  {
+    "id": "legit-005",
+    "text": "Salam Mamadou, nanga def ? Ndax mën nga ma yabal 10.000 FCFA bu subaa ngir ma jënd dëtt bi ? Jërejëf.",
+    "label": 0,
+    "language": "wo",
+    "category": "conversation-legitime"
+  },
+  {
+    "id": "legit-006",
+    "text": "Salam yaay, nanga def ? Ndax mën nga ma yabal 5.000 FCFA ci Wave ngir ma jënd livre yi ?",
+    "label": 0,
+    "language": "wo",
+    "category": "conversation-legitime"
+  },
+  {
+    "id": "legit-007",
+    "text": "Wave : Dépôt de 50.000F CFA réussi auprès de l'agent Kiosque Médina. Nouveau solde : 52.100F CFA. Ne partagez jamais votre code secret avec qui que ce soit.",
+    "label": 0,
+    "language": "fr",
+    "category": "recu-officiel"
+  },
+  {
+    "id": "legit-008",
+    "text": "Orange Money : Vous avez reçu 15.000 F CFA de Babacar Ndiaye (772223344). Nouveau solde : 18.250 F CFA. Réf de transaction : CI241020.1234.",
+    "label": 0,
+    "language": "fr",
+    "category": "recu-officiel"
+  },
+  {
+    "id": "legit-009",
+    "text": "Bonjour Monsieur Ndiaye, votre commande de fournitures est prête à notre magasin de Colobane. Vous pouvez passer la récupérer aux heures ouvrables.",
+    "label": 0,
+    "language": "fr",
+    "category": "commerce-legitime"
+  },
+  {
+    "id": "legit-010",
+    "text": "Bonjour Monsieur Sow, nous vous confirmons la réunion de chantier demain matin à 09h00 à Diamniadio.",
+    "label": 0,
+    "language": "fr",
+    "category": "professionnel"
+  },
+  {
+    "id": "legit-011",
+    "text": "CBAO Attijariwafa : Votre relevé de compte mensuel pour le mois de Septembre est disponible dans votre espace en ligne sécurisé www.cbao.sn.",
+    "label": 0,
+    "language": "fr",
+    "category": "banque-officiel"
+  },
+  {
+    "id": "legit-012",
+    "text": "CBAO : Votre compte a été crédité du salaire mensuel. Consultez votre solde sur www.cbao.sn.",
+    "label": 0,
+    "language": "fr",
+    "category": "banque-officiel"
+  },
+  {
+    "id": "legit-013",
+    "text": "Salam Aminata, jot naa xaalis bi ci Wave léegi. Jërëjëf bu baax, ci jam ak salam.",
+    "label": 0,
+    "language": "wo",
+    "category": "conversation-legitime"
+  },
+  {
+    "id": "legit-014",
+    "text": "Sonatel : Votre forfait Internet Illimix 4.5 Go expire le 28/10 à 23h59. Pour renouveler votre passe, tapez #123#.",
+    "label": 0,
+    "language": "fr",
+    "category": "telecom-officiel"
+  },
+  {
+    "id": "legit-015",
+    "text": "Bonjour, je vous confirme notre rendez-vous professionnel demain à 10h au bureau de Dakar Plateau. Merci d'apporter votre pièce d'identité.",
+    "label": 0,
+    "language": "fr",
+    "category": "professionnel"
+  },
+  {
+    "id": "legit-016",
+    "text": "Sen'Eau : Votre paiement de facture d'eau de 8.400 FCFA a bien été enregistré. Réf de quittance : SEN-9921.",
+    "label": 0,
+    "language": "fr",
+    "category": "recu-officiel"
+  },
+  {
+    "id": "legit-017",
+    "text": "Wave : Votre code de vérification est 829141. Ce code est strictement personnel. Les employés de Wave ne vous le demanderont JAMAIS.",
+    "label": 0,
+    "language": "fr",
+    "category": "recu-officiel"
+  },
+  {
+    "id": "legit-018",
+    "text": "Wave : Votre code de connexion est 918234. Ne partagez JAMAIS ce code avec personne, même un agent Wave.",
+    "label": 0,
+    "language": "fr",
+    "category": "recu-officiel"
+  },
+  {
+    "id": "legit-019",
+    "text": "Salam Cheikh, ndax dinañu gise ci aljuma ngir liggéey bi ? Wax ma heure bi la arrange.",
+    "label": 0,
+    "language": "wo",
+    "category": "conversation-legitime"
+  },
+  {
+    "id": "legit-020",
+    "text": "Free Money : Transfert de 12.000 F CFA vers le 761112233 réussi. Solde restant : 3.500 F CFA. Service client gratuit au 2121.",
+    "label": 0,
+    "language": "fr",
+    "category": "recu-officiel"
+  }
+]
