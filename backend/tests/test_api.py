@@ -20,7 +20,8 @@ def test_health_endpoint():
     data = response.json()
     assert data["status"] == "healthy"
     assert data["features_count"] > 0
-    assert "Zero-Knowledge" in data["compliance"]
+    assert "evaluation_metrics" in data
+    assert "privacy" in data
 
 
 def test_analyze_message_scam():
@@ -68,7 +69,9 @@ def test_scan_url_official_domain():
     assert response.status_code == 200
     data = response.json()
     assert data["risk_level"] == "FAIBLE"
+    assert data["risk_label"] == "Correspond à un domaine officiel connu"
     assert "Wave Mobile Money" in data["target_brand_spoofed"]
+    assert data["domain_age_status"] == "connu"
 
 
 def test_scan_url_subdomain_abuse():
@@ -78,6 +81,5 @@ def test_scan_url_subdomain_abuse():
     data = response.json()
     assert data["risk_level"] in ["ELEVE", "CRITIQUE"]
     assert len(data["explanations"]) > 0
-    # Guarantee no probability percentages
     assert "probability" not in data
     assert "percentage" not in data

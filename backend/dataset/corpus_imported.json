@@ -1,0 +1,36 @@
+[
+  {
+    "id": "imported-20261021160106-bfbc",
+    "text": "Bonjour, tentative de phishing reçue sur le <TOKEN_PHONE> de la part de <TOKEN_PERSON>",
+    "label": 1,
+    "source": "contribution-citoyenne",
+    "language": "fr",
+    "consent_verified": true,
+    "imported_at": "2026-10-21T16:01:06.944140Z",
+    "redacted_counts": {
+      "phones": 1,
+      "amounts": 0,
+      "urls": 0,
+      "codes": 0,
+      "names": 1
+    },
+    "notes": ""
+  },
+  {
+    "id": "imported-20261021160521-25f8",
+    "text": "Bonjour, tentative de phishing reçue sur le <TOKEN_PHONE> de la part de <TOKEN_PERSON>",
+    "label": 1,
+    "source": "contribution-citoyenne",
+    "language": "fr",
+    "consent_verified": true,
+    "imported_at": "2026-10-21T16:05:21.660427Z",
+    "redacted_counts": {
+      "phones": 1,
+      "amounts": 0,
+      "urls": 0,
+      "codes": 0,
+      "names": 1
+    },
+    "notes": ""
+  }
+]

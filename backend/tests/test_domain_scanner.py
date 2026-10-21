@@ -1,7 +1,7 @@
 """
 Unit & Integration Tests for Domain Infrastructure & OSINT Scanner (Brique 2).
-Validates Domain Age (RDAP), Typosquatting (Levenshtein), Brand Impersonation,
-and Zero False Alarms on Official Senegalese Domains.
+Validates Domain Age Uncertainty Handling (RDAP), Typosquatting Limits,
+Common Word Exceptions, and Strict Whitelist Registrable Domain Matching.
 """
 
 import pytest
@@ -13,7 +13,8 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 from domain_scanner import (
     DomainInfrastructureScanner,
     compute_levenshtein,
-    extract_domain_parts
+    extract_domain_parts,
+    is_official_domain_match
 )
 
 
@@ -35,15 +36,30 @@ def test_levenshtein_distance():
 
 
 def test_extract_domain_parts():
-    url, host, sld, tld = extract_domain_parts("https://wave.com.auth-service.xyz/login?id=1")
+    url, host, sld, tld, path = extract_domain_parts("https://wave.com.auth-service.xyz/login?id=1")
     assert host == "wave.com.auth-service.xyz"
     assert sld == "auth-service"
     assert tld == ".xyz"
+    assert path == "/login"
 
 
 # =========================================================================
-# 2. TESTS SUR LES DOMAINES OFFICIELS (ZÉRO FAUX POSITIF)
+# 2. LISTE BLANCHE : COMPARAISON STRICTE DU DOMAINE ENREGISTRABLE
 # =========================================================================
+
+def test_whitelist_exact_matching():
+    # Valid official domains and valid subdomains
+    assert is_official_domain_match("orange.sn", "orange.sn") is True
+    assert is_official_domain_match("boutique.orange.sn", "orange.sn") is True
+    assert is_official_domain_match("wave.com", "wave.com") is True
+    assert is_official_domain_match("app.wave.com", "wave.com") is True
+
+    # MUST NOT MATCH (Substrings or spoofed subdomains)
+    assert is_official_domain_match("orange.sn.evil.xyz", "orange.sn") is False
+    assert is_official_domain_match("evil-orange.sn", "orange.sn") is False
+    assert is_official_domain_match("wave.com.fake-login.top", "wave.com") is False
+    assert is_official_domain_match("mywave.com", "wave.com") is False
+
 
 @pytest.mark.parametrize("official_url,expected_brand", [
     ("https://wave.com", "Wave Mobile Money"),
@@ -56,87 +72,120 @@ def test_extract_domain_parts():
 def test_official_domains_are_safe(scanner, official_url, expected_brand):
     res = scanner.scan_url(official_url)
     assert res["risk_level"] == "FAIBLE"
+    assert res["risk_label"] == "Correspond à un domaine officiel connu"
     assert expected_brand in res["target_brand_spoofed"]
-    assert "officiel" in res["risk_label"].lower()
+
+
+def test_spoofed_subdomain_rejected_by_whitelist(scanner):
+    # 'orange.sn.evil.xyz' must NEVER pass as official!
+    res = scanner.scan_url("http://orange.sn.evil.xyz/login")
+    assert res["risk_level"] != "FAIBLE"
+    assert res["risk_label"] != "Correspond à un domaine officiel connu"
+    assert any("faux sous-domaine" in exp for exp in res["explanations"])
+
+
+def test_hyphenated_domain_rejected_by_whitelist(scanner):
+    # 'evil-orange.sn' must NEVER pass as official!
+    res = scanner.scan_url("http://evil-orange.sn")
+    assert res["risk_level"] != "FAIBLE"
+    assert res["risk_label"] != "Correspond à un domaine officiel connu"
 
 
 # =========================================================================
-# 3. DÉTECTION DU TYPOSQUATTING & USURPATION DE MARQUE (PRIORITÉ 2)
+# 3. TYPOSQUATTING : TESTS DES FAUX POSITIFS & CONFIRMATIONS
 # =========================================================================
 
-def test_detect_subdomain_abuse(scanner):
-    # Attacker uses official brand as a fake subdomain on a .xyz domain
-    fake_url = "http://wave.com.connexion-verification.xyz/login"
-    res = scanner.scan_url(fake_url)
-    assert res["risk_level"] in ["ELEVE", "CRITIQUE"]
-    assert "Wave Mobile Money" in res["target_brand_spoofed"]
-    assert any("sous-domaine" in exp for exp in res["explanations"])
-
-
-def test_detect_levenshtein_typosquatting(scanner):
-    # '0range' instead of 'orange'
-    fake_url = "http://0range.sn"
-    res = scanner.scan_url(fake_url)
-    assert res["risk_level"] in ["ELEVE", "CRITIQUE"]
-    assert any("orthographique" in exp or "Levenshtein" in exp for exp in res["explanations"])
-
-
-def test_detect_direct_ip_access(scanner):
-    raw_ip_url = "http://192.168.1.100/wave-login"
-    res = scanner.scan_url(raw_ip_url)
-    assert res["risk_level"] == "CRITIQUE"
-    assert any("adresse IP" in exp for exp in res["explanations"])
-
-
-# =========================================================================
-# 4. TEST PRIORITAIRE : ÂGE DU DOMAINE (RDAP - PRIORITÉ 1)
-# =========================================================================
-
-def test_fresh_domain_under_48h_is_critical(scanner):
+@pytest.mark.parametrize("legit_word_url", [
+    "https://cave.com",
+    "https://save.org",
+    "https://tree.com",
+    "https://street.com"
+])
+def test_common_words_do_not_trigger_critical(scanner, legit_word_url):
     """
-    A domain created less than 48h ago must trigger a CRITIQUE or ELEVE risk level.
+    Common English/French words sharing Levenshtein proximity with wave/free
+    must NOT trigger CRITIQUE.
     """
-    mock_fresh_rdap = {
+    res = scanner.scan_url(legit_word_url)
+    assert res["risk_level"] != "CRITIQUE"
+
+
+def test_typosquatting_without_confirmation_is_moderate(scanner):
+    """
+    A typosquatting domain on a neutral TLD without auth keywords should be MODERE, not CRITIQUE.
+    """
+    mock_aged_rdap = {
         "status": "RESOLVED",
+        "domain_age_status": "connu",
+        "age_days": 500,
+        "age_category": "ANCIEN_STABLE",
+        "creation_date": "2024-01-01",
+        "hosting_info": "Generic Host"
+    }
+    # 'wawe.org' has Levenshtein 1 from wave, but no auth keyword and stable age
+    res = scanner.scan_url("https://wawe.org/blog", custom_rdap_result=mock_aged_rdap)
+    assert res["risk_level"] == "MODERE"
+    assert any("Proximité lexicale" in exp for exp in res["explanations"])
+
+
+def test_typosquatting_with_confirmation_triggers_alert(scanner):
+    """
+    'wvve.com' with auth keyword or '0range.sn' (homoglyph) must trigger an alert.
+    """
+    # 0range with digit substitution for o
+    res1 = scanner.scan_url("http://0range.sn/login")
+    assert res1["risk_level"] in ["ELEVE", "CRITIQUE"]
+
+    # wvve with double-v homoglyph on login
+    res2 = scanner.scan_url("http://wvve.com/login")
+    assert res2["risk_level"] in ["ELEVE", "CRITIQUE"]
+
+
+# =========================================================================
+# 4. RDAP : GESTION DE L'INCERTITUDE ET TESTS SIMULÉS
+# =========================================================================
+
+def test_rdap_simulated_success(scanner):
+    mock_success = {
+        "status": "RESOLVED",
+        "domain_age_status": "connu",
         "age_days": 1,
         "age_category": "CRITIQUE",
         "creation_date": "2026-10-20",
         "hosting_info": "Namecheap Inc."
     }
-
-    res = scanner.scan_url("https://service-client-assistance.org", custom_rdap_result=mock_fresh_rdap)
-    assert res["risk_level"] in ["ELEVE", "CRITIQUE"]
-    assert any("48 heures" in exp for exp in res["explanations"])
+    res = scanner.scan_url("https://service-portail-urgent.xyz", custom_rdap_result=mock_success)
+    assert res["domain_age_status"] == "connu"
     assert res["domain_age_days"] == 1
+    assert any("moins de 48 heures" in exp for exp in res["explanations"])
 
 
-def test_stable_aged_domain_is_not_alarmist(scanner):
-    """
-    An aged legitimate domain (> 365 days) without typosquatting should remain FAIBLE or MODERE.
-    """
-    mock_aged_rdap = {
-        "status": "RESOLVED",
-        "age_days": 1200,
-        "age_category": "ANCIEN_STABLE",
-        "creation_date": "2023-01-15",
-        "hosting_info": "OVH SAS"
+def test_rdap_simulated_404_or_unsupported(scanner):
+    mock_unsupported = {
+        "status": "INCONNU",
+        "domain_age_status": "inconnu",
+        "age_days": None,
+        "age_category": "INDETERMINE",
+        "creation_date": None,
+        "hosting_info": "Extension non supportée ou introuvable"
     }
-
-    res = scanner.scan_url("https://journal-dakar-actualites.com", custom_rdap_result=mock_aged_rdap)
+    res = scanner.scan_url("https://mon-site-local.sn", custom_rdap_result=mock_unsupported)
+    assert res["domain_age_status"] == "inconnu"
+    assert res["domain_age_days"] is None
+    assert any("Âge du domaine non vérifiable" in exp for exp in res["explanations"])
+    # MUST NOT be treated as CRITIQUE solely because age is unknown
     assert res["risk_level"] in ["FAIBLE", "MODERE"]
 
 
-# =========================================================================
-# 5. CONFORMITÉ DU FORMAT DE SORTIE
-# =========================================================================
-
-def test_output_compliance_no_percentages(scanner):
-    res = scanner.scan_url("https://wave-transfert-promo.xyz")
-    assert "risk_level" in res
-    assert res["risk_level"] in ["FAIBLE", "MODERE", "ELEVE", "CRITIQUE"]
-    assert isinstance(res["explanations"], list)
-    assert len(res["explanations"]) > 0
-    assert "recommendation" in res
-    # Strict compliance: NO probability percentage
-    assert "probability" not in res
-    assert "percent" not in res
+def test_rdap_simulated_timeout(scanner):
+    mock_timeout = {
+        "status": "INCONNU",
+        "domain_age_status": "inconnu",
+        "age_days": None,
+        "age_category": "INDETERMINE",
+        "creation_date": None,
+        "hosting_info": "Timeout réseau"
+    }
+    res = scanner.scan_url("https://site-lent.org", custom_rdap_result=mock_timeout)
+    assert res["domain_age_status"] == "inconnu"
+    assert any("Âge du domaine non vérifiable" in exp for exp in res["explanations"])

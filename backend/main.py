@@ -1,8 +1,8 @@
 """
-Sovereign Shield - Defensive AI Microservice.
-FastAPI Application for Real-Time Social Engineering & Scam Detection.
-Complies with Zero-Knowledge (PII stripped before ML inference).
-Outputs qualitative Risk Levels and explainability indicators.
+Sovereign Shield - Defensive AI & OSINT Microservice.
+FastAPI Application for Real-Time Social Engineering & Telecom Threat Detection.
+Applies automated PII anonymization prior to inference.
+Outputs qualitative Risk Levels and explainability indicators (no raw percentages).
 """
 
 from fastapi import FastAPI, HTTPException
@@ -17,7 +17,7 @@ from domain_scanner import DomainInfrastructureScanner
 app = FastAPI(
     title="XamSafe Sovereign Shield - Defensive AI Engine",
     description="Microservice d'analyse d'ingénierie sociale (Brique 1) et d'infrastructure réseau OSINT (Brique 2) au Sénégal.",
-    version="1.0.0"
+    version="1.1.0"
 )
 
 # Enable CORS for local dev or web frontend integration
@@ -66,8 +66,9 @@ class UrlScanResponse(BaseModel):
     risk_level: str = Field(..., description="Niveau de risque qualitatif (FAIBLE, MODERE, ELEVE, CRITIQUE)")
     risk_label: str = Field(..., description="Libellé explicite de la menace d'infrastructure")
     hostname: str = Field(..., description="Nom d'hôte normalisé extrait de l'URL")
-    domain_age_days: Optional[Any] = Field(None, description="Ancienneté du domaine en jours via RDAP")
-    creation_date: Optional[str] = Field(None, description="Date exacte de création du domaine")
+    domain_age_days: Optional[Any] = Field(None, description="Ancienneté du domaine en jours via RDAP si disponible")
+    domain_age_status: str = Field(..., description="Statut de vérification de l'âge : 'connu' ou 'inconnu'")
+    creation_date: Optional[str] = Field(None, description="Date exacte de création du domaine si disponible")
     target_brand_spoofed: Optional[str] = Field(None, description="Marque sénégalaise ciblée par l'usurpation")
     explanations: List[str] = Field(..., description="Explications forensiques détaillées")
     recommendation: str = Field(..., description="Directive de sécurité immédiate")
@@ -84,8 +85,9 @@ def health_check() -> Dict[str, Any]:
         "service": "XamSafe Defensive AI Core",
         "engine": "TF-IDF + Regularized Logistic Regression (Brique 1) & RDAP Domain Scanner (Brique 2)",
         "features_count": len(classifier.feature_names) if classifier.feature_names is not None else 0,
+        "evaluation_metrics": classifier.eval_metrics,
         "supported_languages": ["fr", "wo"],
-        "compliance": "Zero-Knowledge / Loi CDP Sénégal 2008-12"
+        "privacy": "Anonymisation automatique des PII avant inférence"
     }
 
 
@@ -93,7 +95,7 @@ def health_check() -> Dict[str, Any]:
 def analyze_message(request: MessageAnalysisRequest) -> MessageAnalysisResponse:
     """
     Point d'entrée Brique 1 : analyse un message en appliquant la chaîne de traitement complète :
-    1. Anonymisation stricte des numéros, montants, noms et codes OTP.
+    1. Anonymisation des numéros, montants, noms et codes OTP.
     2. Inférence TF-IDF + Régression Logistique.
     3. Sortie en niveau de risque discret et explications transparentes (aucun pourcentage brut).
     """
@@ -112,8 +114,8 @@ def analyze_message(request: MessageAnalysisRequest) -> MessageAnalysisResponse:
 def scan_url(request: UrlScanRequest) -> UrlScanResponse:
     """
     Point d'entrée Brique 2 : Scanner d'infrastructure & OSINT défensif :
-    1. Vérification d'ancienneté du domaine (RDAP)
-    2. Détection du typosquatting (Levenshtein) & usurpation de marques locales
+    1. Vérification d'ancienneté du domaine (RDAP) avec gestion de l'incertitude
+    2. Détection du typosquatting (Levenshtein calibré + confirmation) & liste blanche officielle
     3. Sortie en niveau de risque qualitatif et explications
     """
     raw_url = request.url.strip()
@@ -130,8 +132,7 @@ def scan_url(request: UrlScanRequest) -> UrlScanResponse:
 @app.post("/api/v1/anonymize")
 def test_anonymization(request: MessageAnalysisRequest) -> Dict[str, Any]:
     """
-    Point de contrôle : visualise comment un message est purgé de ses données nominatives
-    avant d'être injecté dans les vecteurs mathématiques.
+    Visualise comment un message est purgé de ses données nominatives avant traitement.
     """
     clean_text, counts = anonymize_text(request.text)
     return {

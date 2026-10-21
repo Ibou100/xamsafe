@@ -1,8 +1,8 @@
 """
 Defensive Machine Learning Model for Telecom & Social Engineering Fraud Detection.
 Architecture: TF-IDF (n-grams 1-3) + Regularized Logistic Regression Baseline.
-Complies with Zero-Knowledge (PII stripped before vectorization) and outputs
-calibrated Risk Levels with explainability (no raw percentages).
+Applies automated pseudonymization before vectorization.
+Outputs calibrated Risk Levels with explainability (no raw percentages).
 """
 
 import json
@@ -11,7 +11,8 @@ from typing import Dict, List, Any, Optional
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
-from sklearn.pipeline import Pipeline
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import classification_report, confusion_matrix
 
 from anonymizer import anonymize_text
 
@@ -33,14 +34,15 @@ class SocialEngineeringClassifier:
         self.corpus_path = corpus_path or os.path.join(
             os.path.dirname(__file__), "dataset", "corpus.json"
         )
-        self.pipeline: Optional[Pipeline] = None
         self.vectorizer: Optional[TfidfVectorizer] = None
         self.model: Optional[LogisticRegression] = None
         self.feature_names: List[str] = []
+        self.eval_metrics: Dict[str, Any] = {}
 
-    def train(self) -> Dict[str, Any]:
+    def train(self, test_size: float = 0.25, random_state: int = 42) -> Dict[str, Any]:
         """
-        Loads the balanced corpus, anonymizes all samples, and trains the TF-IDF + LogReg model.
+        Loads the balanced corpus, anonymizes all samples, splits into Train/Test sets,
+        and trains the TF-IDF + LogReg model with performance evaluation.
         """
         if not os.path.exists(self.corpus_path):
             raise FileNotFoundError(f"Corpus file not found at: {self.corpus_path}")
@@ -51,10 +53,19 @@ class SocialEngineeringClassifier:
         raw_texts = [item["text"] for item in data]
         labels = [item["label"] for item in data]
 
-        # 1. Anonymize all training data (Loi CDP compliance)
+        # 1. Anonymize all training data (PII redaction)
         clean_texts = [anonymize_text(t)[0] for t in raw_texts]
 
-        # 2. Build TF-IDF Pipeline with character & word n-grams
+        # 2. Train / Test Split
+        X_train_raw, X_test_raw, y_train, y_test = train_test_split(
+            clean_texts,
+            labels,
+            test_size=test_size,
+            random_state=random_state,
+            stratify=labels
+        )
+
+        # 3. Build TF-IDF Vectorizer
         self.vectorizer = TfidfVectorizer(
             ngram_range=(1, 3),
             min_df=1,
@@ -64,26 +75,43 @@ class SocialEngineeringClassifier:
             lowercase=True
         )
 
+        X_train = self.vectorizer.fit_transform(X_train_raw)
+        X_test = self.vectorizer.transform(X_test_raw)
+        self.feature_names = self.vectorizer.get_feature_names_out()
+
+        # 4. Fit Model
         self.model = LogisticRegression(
             C=2.0,
             class_weight='balanced',
             solver='liblinear',
-            random_state=42
+            random_state=random_state
         )
+        self.model.fit(X_train, y_train)
 
-        # Transform and fit
-        X_train = self.vectorizer.fit_transform(clean_texts)
-        self.model.fit(X_train, labels)
+        # 5. Evaluate on Holdout Test Set
+        y_pred = self.model.predict(X_test)
+        report_dict = classification_report(y_test, y_pred, output_dict=True, zero_division=0)
+        c_matrix = confusion_matrix(y_test, y_pred).tolist()
+
+        self.eval_metrics = {
+            "test_samples": len(y_test),
+            "precision_fraud": report_dict.get("1", {}).get("precision", 0.0),
+            "recall_fraud": report_dict.get("1", {}).get("recall", 0.0),
+            "f1_fraud": report_dict.get("1", {}).get("f1-score", 0.0),
+            "accuracy": report_dict.get("accuracy", 0.0),
+            "confusion_matrix": c_matrix
+        }
+
+        # Refit on all data to maximize feature coverage for production inference
+        X_all = self.vectorizer.fit_transform(clean_texts)
+        self.model.fit(X_all, labels)
         self.feature_names = self.vectorizer.get_feature_names_out()
-
-        # Training metrics
-        train_accuracy = float(self.model.score(X_train, labels))
 
         return {
             "status": "trained",
             "samples_count": len(clean_texts),
             "features_extracted": len(self.feature_names),
-            "train_accuracy": train_accuracy
+            "evaluation_metrics": self.eval_metrics
         }
 
     def predict(self, raw_text: str) -> Dict[str, Any]:
@@ -169,13 +197,13 @@ class SocialEngineeringClassifier:
 
         # Actionable Recommendation
         if risk_level == "CRITIQUE":
-            recommendation = "Ne répondez pas et ne tapez aucun code secret. Les opérateurs officiels (Wave, Orange, Free) ne demandent JAMAIS vos codes par SMS."
+            recommendation = "Ne répondez pas et ne tapez aucun code secret. Les opérateurs officiels ne demandent JAMAIS vos codes par SMS."
         elif risk_level == "ELEVE":
             recommendation = "Vérifiez directement le solde de votre application officielle sans utiliser les liens ou numéros figurant dans ce message."
         elif risk_level == "MODERE":
             recommendation = "Conservez le message et vérifiez l'identité de l'expéditeur avant d'effectuer toute démarche financière."
         else:
-            recommendation = "Message réputé légitime selon les critères d'hygiène numérique."
+            recommendation = "Message réputé conforme aux critères usuels de communication."
 
         return {
             "risk_level": risk_level,

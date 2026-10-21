@@ -1,18 +1,18 @@
 """
-Defensive ML Test Suite & False Positive Rate (FPR) Evaluation.
-Validates accuracy on scams while ensuring zero false alarms on real
-transactional receipts from Wave, Orange Money, banks, and citizen chats.
+Defensive ML Test Suite & Model Evaluation.
+Validates PII Anonymization, Train/Test Split Metrics, Scam Detection,
+and checks for false alarms on legitimate communications.
 """
 
 import pytest
 import os
 import sys
 
-# Ensure backend root is in sys.path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from anonymizer import anonymize_text
 from classifier import SocialEngineeringClassifier
+from import_data import import_sample
 
 
 @pytest.fixture(scope="module")
@@ -23,22 +23,41 @@ def classifier():
 
 
 # =========================================================================
-# 1. TESTS D'ANONYMISATION & CONFORMITÉ CDP SÉNÉGAL (ZERO-KNOWLEDGE)
+# 1. TESTS D'ANONYMISATION MULTI-FORMATS
 # =========================================================================
 
-def test_anonymize_senegalese_phone_numbers():
-    text = "Envoyez la somme sur le 77 123 45 67 ou au +221789998877 immédiatement."
+@pytest.mark.parametrize("raw_phone", [
+    "+221 77 123 45 67",
+    "00221-78-999-88-77",
+    "77.123.45.67",
+    "761234567",
+    "+221701234567",
+    "33 821 12 34",
+    "75-111-22-33"
+])
+def test_anonymize_varied_phone_formats(raw_phone):
+    text = f"Contactez immédiatement le {raw_phone} pour votre compte."
     clean, meta = anonymize_text(text)
-    assert "77 123 45 67" not in clean
-    assert "+221789998877" not in clean
+    assert raw_phone not in clean
     assert "<TOKEN_PHONE>" in clean
-    assert meta["phones"] >= 2
+    assert meta["phones"] >= 1
+
+
+def test_anonymize_names_without_civility():
+    text = "Mamadou et Fatou ont transmis le dossier à Cheikh Ndiaye."
+    clean, meta = anonymize_text(text)
+    assert "Mamadou" not in clean
+    assert "Fatou" not in clean
+    assert "Cheikh" not in clean
+    assert "<TOKEN_PERSON>" in clean
+    assert meta["names"] >= 3
 
 
 def test_anonymize_monetary_amounts():
-    text = "Vous avez reçu 75.000 FCFA et un bonus de 15000 F CFA."
+    text = "Vous avez reçu 75.000 FCFA et un bonus de 15000 F CFA ou 25000 XOF."
     clean, meta = anonymize_text(text)
     assert "75.000" not in clean
+    assert "15000" not in clean
     assert "<TOKEN_AMOUNT>" in clean
     assert meta["amounts"] >= 2
 
@@ -52,7 +71,22 @@ def test_anonymize_otp_codes():
 
 
 # =========================================================================
-# 2. DÉTECTION DES ARNAQUES RÉELLES (VRAIS POSITIFS)
+# 2. MÉTRIQUES DU MODÈLE SUR ENSEMBLE DE TEST INDÉPENDANT
+# =========================================================================
+
+def test_classifier_train_test_evaluation(classifier):
+    metrics = classifier.eval_metrics
+    assert "precision_fraud" in metrics
+    assert "recall_fraud" in metrics
+    assert "f1_fraud" in metrics
+    assert "confusion_matrix" in metrics
+    assert metrics["test_samples"] > 0
+    # On holdout test set, baseline should achieve solid metrics
+    assert metrics["f1_fraud"] >= 0.70
+
+
+# =========================================================================
+# 3. DÉTECTION DES ARNAQUES RÉELLES (VRAIS POSITIFS)
 # =========================================================================
 
 def test_detect_wave_fake_refund_french(classifier):
@@ -60,7 +94,6 @@ def test_detect_wave_fake_refund_french(classifier):
     res = classifier.predict(sample)
     assert res["risk_level"] in ["ELEVE", "CRITIQUE"]
     assert len(res["explanations"]) > 0
-    # Guarantee no raw probability percentage is exposed
     assert "probability" not in res
     assert "percent" not in res
 
@@ -79,58 +112,46 @@ def test_detect_fake_campusen_scholarship(classifier):
 
 
 # =========================================================================
-# 3. MESURE DU TAUX DE FAUX POSITIFS (FALSE POSITIVE RATE - FPR)
-# Crucial en milieu bancaire/télécom : un vrai reçu ne doit JAMAIS être bloqué !
+# 4. TEST DES REÇUS ET MESSAGES LÉGITIMES
 # =========================================================================
 
 REAL_LEGITIMATE_TEST_CASES = [
-    # Vrai reçu Wave standard
     "Wave : Vous avez transféré 10.000F CFA à Aminata Diallo (775556677). Nouveau solde : 23.450F CFA. Frais : 100F CFA. Réf : TX-778899.",
-    # Vrai reçu Orange Money facture
     "Orange Money : Paiement de votre facture Sen'Eau N° 998822 de 12.400 F CFA effectué avec succès le 21/10. Réf OM-9912.",
-    # Vraie conversation familiale en wolof
     "Salam yaay, nanga def ? Ndax mën nga ma yabal 5.000 FCFA ci Wave ngir ma jënd livre yi ?",
-    # Vraie conversation professionnelle en français
     "Bonjour Monsieur Sow, nous vous confirmons la réunion de chantier demain matin à 09h00 à Diamniadio.",
-    # Vraie notification bancaire CBAO
     "CBAO : Votre compte a été crédité du salaire mensuel. Consultez votre solde sur www.cbao.sn.",
-    # Vrai SMS de sécurité Wave officiel
     "Wave : Votre code de connexion est 918234. Ne partagez JAMAIS ce code avec personne, même un agent Wave."
 ]
 
 
-def test_zero_false_positive_on_legitimate_traffic(classifier):
-    """
-    Ensures that 0% of legitimate transactional or citizen messages
-    are flagged as CRITIQUE or ELEVE.
-    """
-    false_positives = []
-
-    for idx, message in enumerate(REAL_LEGITIMATE_TEST_CASES):
+def test_legitimate_traffic_not_critical(classifier):
+    for message in REAL_LEGITIMATE_TEST_CASES:
         result = classifier.predict(message)
-        # Legitimate traffic must be classified as FAIBLE or at most MODERE
-        if result["risk_level"] in ["ELEVE", "CRITIQUE"]:
-            false_positives.append({
-                "index": idx,
-                "message": message,
-                "assigned_risk": result["risk_level"],
-                "clues": result["detected_clues"]
-            })
-
-    # Assert FPR is strictly 0% on this benchmark
-    assert len(false_positives) == 0, f"False positives detected: {false_positives}"
+        assert result["risk_level"] in ["FAIBLE", "MODERE"]
+        assert result["risk_level"] not in ["ELEVE", "CRITIQUE"]
 
 
 # =========================================================================
-# 4. CONFORMITÉ DU FORMAT DE SORTIE
+# 5. SCRIPT D'IMPORT ET VÉRIFICATION DE CONSENTEMENT
 # =========================================================================
 
-def test_response_structure_compliance(classifier):
-    res = classifier.predict("Message de test quelconque.")
-    assert "risk_level" in res
-    assert res["risk_level"] in ["FAIBLE", "MODERE", "ELEVE", "CRITIQUE"]
-    assert "risk_label" in res
-    assert isinstance(res["explanations"], list)
-    assert isinstance(res["detected_clues"], list)
-    assert "recommendation" in res
-    assert "pii_redacted" in res
+def test_import_with_consent():
+    res = import_sample(
+        text="Bonjour, tentative de phishing reçue sur le 771234567 de la part de Cheikh.",
+        label=1,
+        source="contribution-citoyenne",
+        consent_obtained=True
+    )
+    assert res["status"] == "success"
+    assert res["redacted_counts"]["phones"] >= 1
+
+
+def test_import_without_consent_rejected():
+    with pytest.raises(ValueError, match="Consentement non accordé"):
+        import_sample(
+            text="Message confidentiel sans accord.",
+            label=1,
+            source="fuite",
+            consent_obtained=False
+        )
