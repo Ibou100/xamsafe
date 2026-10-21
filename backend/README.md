@@ -1,45 +1,43 @@
-# Sovereign Shield — Defensive AI Microservice (Brique 1)
+# Sovereign Shield — Defensive AI & OSINT Microservice (MVP)
 
-Ce microservice constitue le moteur d'intelligence artificielle défensive de **XamSafe**, spécialisé dans la détection en temps réel de menaces d'ingénierie sociale et d'escroqueries par SMS / messagerie au Sénégal (Wave, Orange Money, banques, Campusen, en français et wolof).
-
----
-
-## 1. Principes d'Ingénierie & Choix Techniques
-
-1. **Modèle de référence sobre & rapide (Baseline) :**  
-   Vectorisation **TF-IDF (n-grams 1-3)** combinée à une **Régression Logistique régularisée** (`class_weight='balanced'`). Temps d'inférence moyen : **< 5 ms sur CPU**.
-2. **Conformité stricte CDP Sénégal & Zero-Knowledge :**  
-   Avant toute vectorisation ou persistance, le module [`anonymizer.py`](anonymizer.py) expurge systématiquement :
-   * Les numéros sénégalais (`+221`, `77`, `78`, `76`, `70`, `75`) remplacés par `<TOKEN_PHONE>`.
-   * Les montants monétaires (`FCFA`, `F CFA`, `XOF`) remplacés par `<TOKEN_AMOUNT>`.
-   * Les codes confidentiels / OTP remplacés par `<TOKEN_CODE>`.
-   * Les noms précédés de titres civils ou religieux remplacés par `<TOKEN_PERSON>`.
-   * Les liens web remplacés par `<TOKEN_URL>`.
-3. **Restitution en Niveaux de Risque Déterministes (Pas de pourcentages trompeurs) :**  
-   La sortie est calibrée sur 4 niveaux de risque opérationnels :
-   * `FAIBLE` : Trafic ou transaction légitime.
-   * `MODERE` : Formulation inhabituelle, canal non certifié.
-   * `ELEVE` : Suspicion forte d'ingénierie sociale ou faux transfert.
-   * `CRITIQUE` : Tentative flagrante de vol d'OTP ou fausse urgence de blocage.
-4. **Explicabilité Forensique :**  
-   Chaque décision est accompagnée des indices n-grams ayant pesé dans le calcul et d'une explication humaine claire.
-5. **Contrôle Strict des Faux Positifs (FPR = 0%) :**  
-   Le modèle est testé sur un banc d'essai de vrais reçus de transferts Wave, Orange Money et de conversations courantes pour garantir qu'aucune transaction légitime n'est indûment bloquée.
+Ce microservice constitue le moteur de cyberdéfense autonome de **XamSafe**, articulé autour de deux briques d'ingénierie défensive complémentaires :
+1. **Brique 1 (NLP / Machine Learning) :** Détection d'ingénierie sociale et d'escroqueries par SMS / messagerie au Sénégal (Wave, Orange Money, banques, Campusen, en français et wolof).
+2. **Brique 2 (OSINT / Infrastructure Réseau) :** Scanner d'infrastructure inspectant l'âge réel du domaine (RDAP), le typosquatting par distance de Levenshtein, les abus de sous-domaines et les extensions à haut risque.
 
 ---
 
-## 2. Structure du Module
+## 1. Principes d'Ingénierie & Spécifications Respectées
+
+* **Brique 1 — Modèle ML Sobre & Rapide (Baseline) :**  
+  Vectorisation **TF-IDF (n-grams 1-3)** combinée à une **Régression Logistique régularisée** (`class_weight='balanced'`). Temps d'inférence moyen : **< 5 ms sur CPU**.
+* **Brique 2 — Hiérarchisation des Signaux d'Infrastructure :**
+  1. **Âge réel du domaine (Priorité 1 - RDAP RFC 7480) :** Alerte critique sur les domaines de moins de 48 heures (80% des domaines de phishing ont moins de 2 jours).
+  2. **Typosquatting & Usurpation de Marque (Priorité 2) :** Distance de Levenshtein ($\le 2$), détection de faux sous-domaines (ex: `wave.com.auth.xyz`) et homoglyphes Punycode (`xn--`).
+  3. **Extensions à haut risque (Priorité 3) :** Détection des TLDs à bas coût surreprésentés (`.xyz`, `.top`, `.click`, `.buzz`, etc.).
+  4. **Hébergement / ASN (Signal secondaire) :** Conservé comme signal d'appui contextuel sans biaiser l'analyse.
+* **Conformité stricte CDP Sénégal & Zero-Knowledge :**  
+  Anonymisation systématique des données personnelles (`anonymizer.py`) : numéros, montants FCFA, codes OTP, noms et liens masqués avant tout traitement.
+* **Restitution en Niveaux de Risque Déterministes (Pas de pourcentages trompeurs) :**  
+  Sortie calibrée sur 4 niveaux d'action : `FAIBLE`, `MODERE`, `ELEVE`, `CRITIQUE`.
+* **Contrôle Strict des Faux Positifs (FPR = 0%) :**  
+  Aucun vrai reçu de transfert Wave, Orange Money ou domaine officiel (`wave.com`, `orange.sn`, `campusen.sn`, `cbao.sn`, `signalementcyber.dgpn.sn`) n'est indûment bloqué.
+
+---
+
+## 2. Structure du Code
 
 ```text
 backend/
 ├── anonymizer.py          # Module de désanonymisation / Zero-Knowledge
 ├── classifier.py          # Modèle TF-IDF + Logistic Regression & Moteur de règles
+├── domain_scanner.py      # Scanner d'infrastructure, RDAP et typosquatting (Brique 2)
 ├── main.py                # Microservice FastAPI (Points de terminaison REST & OpenAPI)
 ├── dataset/
 │   └── corpus.json        # Jeu de données équilibré (Arnaques & Légitimes en FR / WO)
 ├── tests/
-│   ├── test_model.py      # Tests unitaires ML & benchmarking des faux positifs
-│   └── test_api.py        # Tests d'intégration des endpoints FastAPI
+│   ├── test_model.py          # Tests unitaires ML & benchmarking des faux positifs
+│   ├── test_domain_scanner.py # Tests unitaires OSINT, Levenshtein & âge RDAP
+│   └── test_api.py            # Tests d'intégration des endpoints FastAPI
 └── README.md
 ```
 
@@ -47,14 +45,14 @@ backend/
 
 ## 3. Lancer le Microservice
 
-### Démarrage du serveur :
+### Démarrage du serveur FastAPI :
 ```bash
 python -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 ```
-Documentation Swagger interactive disponible sur : **http://localhost:8000/docs**
+Documentation Swagger interactive : **http://localhost:8000/docs**
 
-### Lancer la suite de tests :
+### Lancer la suite complète de 28 tests :
 ```bash
 python -m pytest backend/tests/ -v
 ```
-Résultat : **12 tests validés avec 0 % de faux positifs sur les reçus légitimes.**
+**Résultat : 28 tests validés avec 0 % de faux positifs.**

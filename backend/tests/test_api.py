@@ -60,3 +60,24 @@ def test_anonymize_endpoint():
     assert "50000" not in data["anonymized_text"]
     assert "<TOKEN_PHONE>" in data["anonymized_text"]
     assert "<TOKEN_AMOUNT>" in data["anonymized_text"]
+
+
+def test_scan_url_official_domain():
+    payload = {"url": "https://wave.com/fr/"}
+    response = client.post("/api/v1/scan-url", json=payload)
+    assert response.status_code == 200
+    data = response.json()
+    assert data["risk_level"] == "FAIBLE"
+    assert "Wave Mobile Money" in data["target_brand_spoofed"]
+
+
+def test_scan_url_subdomain_abuse():
+    payload = {"url": "http://wave.com.connexion-verification.xyz/auth"}
+    response = client.post("/api/v1/scan-url", json=payload)
+    assert response.status_code == 200
+    data = response.json()
+    assert data["risk_level"] in ["ELEVE", "CRITIQUE"]
+    assert len(data["explanations"]) > 0
+    # Guarantee no probability percentages
+    assert "probability" not in data
+    assert "percentage" not in data

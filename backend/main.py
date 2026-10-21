@@ -12,10 +12,11 @@ from typing import List, Dict, Any, Optional
 
 from anonymizer import anonymize_text
 from classifier import SocialEngineeringClassifier
+from domain_scanner import DomainInfrastructureScanner
 
 app = FastAPI(
     title="XamSafe Sovereign Shield - Defensive AI Engine",
-    description="Microservice d'analyse d'ingénierie sociale et de détection de menaces télécoms au Sénégal.",
+    description="Microservice d'analyse d'ingénierie sociale (Brique 1) et d'infrastructure réseau OSINT (Brique 2) au Sénégal.",
     version="1.0.0"
 )
 
@@ -28,10 +29,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Singleton ML Classifier instance
+# Singleton ML Classifier instance (Brique 1)
 classifier = SocialEngineeringClassifier()
-# Train on startup
 classifier.train()
+
+# Singleton Domain Scanner instance (Brique 2)
+domain_scanner = DomainInfrastructureScanner()
 
 
 class MessageAnalysisRequest(BaseModel):
@@ -55,6 +58,22 @@ class MessageAnalysisResponse(BaseModel):
     pii_redacted: AnonymizationInfo = Field(..., description="Compteurs d'éléments confidentiels anonymisés avant inférence")
 
 
+class UrlScanRequest(BaseModel):
+    url: str = Field(..., min_length=3, max_length=2000, description="Adresse URL ou nom de domaine à analyser")
+
+
+class UrlScanResponse(BaseModel):
+    risk_level: str = Field(..., description="Niveau de risque qualitatif (FAIBLE, MODERE, ELEVE, CRITIQUE)")
+    risk_label: str = Field(..., description="Libellé explicite de la menace d'infrastructure")
+    hostname: str = Field(..., description="Nom d'hôte normalisé extrait de l'URL")
+    domain_age_days: Optional[Any] = Field(None, description="Ancienneté du domaine en jours via RDAP")
+    creation_date: Optional[str] = Field(None, description="Date exacte de création du domaine")
+    target_brand_spoofed: Optional[str] = Field(None, description="Marque sénégalaise ciblée par l'usurpation")
+    explanations: List[str] = Field(..., description="Explications forensiques détaillées")
+    recommendation: str = Field(..., description="Directive de sécurité immédiate")
+    secondary_signal_hosting: Optional[str] = Field(None, description="Information d'hébergement ou de registre (signal secondaire)")
+
+
 @app.get("/api/v1/health")
 def health_check() -> Dict[str, Any]:
     """
@@ -63,7 +82,7 @@ def health_check() -> Dict[str, Any]:
     return {
         "status": "healthy",
         "service": "XamSafe Defensive AI Core",
-        "engine": "TF-IDF + Regularized Logistic Regression Baseline",
+        "engine": "TF-IDF + Regularized Logistic Regression (Brique 1) & RDAP Domain Scanner (Brique 2)",
         "features_count": len(classifier.feature_names) if classifier.feature_names is not None else 0,
         "supported_languages": ["fr", "wo"],
         "compliance": "Zero-Knowledge / Loi CDP Sénégal 2008-12"
@@ -73,7 +92,7 @@ def health_check() -> Dict[str, Any]:
 @app.post("/api/v1/analyze-message", response_model=MessageAnalysisResponse)
 def analyze_message(request: MessageAnalysisRequest) -> MessageAnalysisResponse:
     """
-    Point d'entrée principal : analyse un message en appliquant la chaîne de traitement complète :
+    Point d'entrée Brique 1 : analyse un message en appliquant la chaîne de traitement complète :
     1. Anonymisation stricte des numéros, montants, noms et codes OTP.
     2. Inférence TF-IDF + Régression Logistique.
     3. Sortie en niveau de risque discret et explications transparentes (aucun pourcentage brut).
@@ -87,6 +106,25 @@ def analyze_message(request: MessageAnalysisRequest) -> MessageAnalysisResponse:
         return MessageAnalysisResponse(**result)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Erreur interne lors de l'inférence : {str(e)}")
+
+
+@app.post("/api/v1/scan-url", response_model=UrlScanResponse)
+def scan_url(request: UrlScanRequest) -> UrlScanResponse:
+    """
+    Point d'entrée Brique 2 : Scanner d'infrastructure & OSINT défensif :
+    1. Vérification d'ancienneté du domaine (RDAP)
+    2. Détection du typosquatting (Levenshtein) & usurpation de marques locales
+    3. Sortie en niveau de risque qualitatif et explications
+    """
+    raw_url = request.url.strip()
+    if not raw_url:
+        raise HTTPException(status_code=400, detail="L'URL fournie ne peut être vide.")
+
+    try:
+        result = domain_scanner.scan_url(raw_url)
+        return UrlScanResponse(**result)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erreur lors du scan d'infrastructure : {str(e)}")
 
 
 @app.post("/api/v1/anonymize")
