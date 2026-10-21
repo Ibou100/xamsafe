@@ -163,11 +163,11 @@ class SocialEngineeringClassifier:
         top_legit_clues.sort(key=lambda x: x[1])
 
         # Qualitative Risk Mapping (Calibrated thresholds without exposing percentages)
-        if prob_fraud >= 0.70 or decision_margin >= 0.8:
+        if (prob_fraud >= 0.65 or decision_margin >= 0.60) and top_scam_clues:
             risk_level = "CRITIQUE"
-        elif prob_fraud >= 0.45 or decision_margin >= -0.2:
+        elif (prob_fraud >= 0.50 or decision_margin >= 0.0) and top_scam_clues:
             risk_level = "ELEVE"
-        elif prob_fraud >= 0.30 or decision_margin >= -0.8:
+        elif prob_fraud >= 0.40 and top_scam_clues:
             risk_level = "MODERE"
         else:
             risk_level = "FAIBLE"

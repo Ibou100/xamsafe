@@ -119,6 +119,24 @@ def is_private_or_restricted_target(hostname: str) -> bool:
     return False
 
 
+def extract_urls(text: str) -> List[str]:
+    """
+    Finds and extracts web addresses, domains, and URLs embedded in a text message.
+    Avoids trailing punctuation.
+    """
+    url_pattern = re.compile(
+        r'(?:https?://|www\.)[^\s<>"\'`()]+|'
+        r'\b(?:[a-zA-Z0-9-]+\.)+(?:com|sn|net|org|xyz|top|site|online|buzz|click|info|biz|cc|app|dev|io|mobi|tech)(?:/[^\s<>"\'`()]*)?',
+        re.IGNORECASE
+    )
+    urls = []
+    for match in url_pattern.finditer(text):
+        cleaned = match.group(0).rstrip('.,;!?:)"\'')
+        if cleaned and cleaned not in urls:
+            urls.append(cleaned)
+    return urls
+
+
 def compute_levenshtein(s1: str, s2: str) -> int:
     """Computes Levenshtein edit distance between two strings."""
     if len(s1) < len(s2):

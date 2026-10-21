@@ -23,7 +23,7 @@ from pydantic import BaseModel, Field
 
 from anonymizer import anonymize_text
 from classifier import SocialEngineeringClassifier
-from domain_scanner import DomainInfrastructureScanner
+from domain_scanner import DomainInfrastructureScanner, extract_urls
 from rate_limiter import global_rate_limiter
 
 # Configure confidential structured logging
@@ -125,6 +125,59 @@ class UrlScanResponse(BaseModel):
     secondary_signal_hosting: Optional[str] = Field(None, description="Information d'hébergement ou de registre (signal secondaire)")
 
 
+# Part B: Unified Analysis Schemas
+class ComponentNlpDetail(BaseModel):
+    risk_level: str
+    risk_label: str
+    detected_clues: List[str]
+    explanations: List[str]
+    recommendation: str
+
+
+class ComponentUrlDetail(BaseModel):
+    url: str
+    hostname: str
+    risk_level: str
+    risk_label: str
+    domain_age_days: Optional[Any] = None
+    domain_age_status: str
+    creation_date: Optional[str] = None
+    target_brand_spoofed: Optional[str] = None
+    explanations: List[str]
+    recommendation: str
+
+
+class UnifiedAnalysisDetails(BaseModel):
+    nlp: ComponentNlpDetail
+    urls: List[ComponentUrlDetail]
+    pii_redacted: AnonymizationInfo
+
+
+class UnifiedAnalysisResponse(BaseModel):
+    risk_level: str = Field(..., description="Niveau de risque qualitatif final (le plus élevé entre texte et URLs)")
+    risk_label: str = Field(..., description="Libellé explicite du niveau de menace final")
+    explanations: List[str] = Field(..., description="Explications fusionnées en français simple")
+    recommendation: str = Field(..., description="Directive de sécurité prioritaire")
+    details: UnifiedAnalysisDetails = Field(..., description="Détail complet par composant (NLP et URLs)")
+
+
+# Risk Level Hierarchies (Part B)
+RISK_RANKS = {"FAIBLE": 1, "MODERE": 2, "ELEVE": 3, "CRITIQUE": 4}
+RANK_TO_LEVEL = {1: "FAIBLE", 2: "MODERE", 3: "ELEVE", 4: "CRITIQUE"}
+RANK_TO_LABEL = {
+    1: "Aucune menace apparente identifiée",
+    2: "Vigilance recommandée",
+    3: "Menace ou usurpation probable",
+    4: "Tentative d'escroquerie ou phishing critique"
+}
+RANK_TO_RECOMMENDATION = {
+    1: "Restez vigilant : ne communiquez jamais vos codes secrets ni de code de validation par SMS.",
+    2: "Vérifiez attentivement l'authenticité du message auprès de votre opérateur officiel.",
+    3: "Méfiance absolue : ne cliquez sur aucun lien et ne validez aucun transfert d'argent.",
+    4: "DANGER : Ne cliquez sur aucun lien, ne partagez aucun code secret et bloquez l'expéditeur immédiatement."
+}
+
+
 @app.get("/api/v1/health")
 def health_check() -> Dict[str, Any]:
     """
@@ -221,3 +274,110 @@ def test_anonymization(req: MessageAnalysisRequest, request: Request) -> Dict[st
         "anonymized_text": clean_text,
         "pii_redacted": counts
     }
+
+
+@app.post("/api/v1/analyze", response_model=UnifiedAnalysisResponse)
+def analyze_unified(req: MessageAnalysisRequest, request: Request) -> UnifiedAnalysisResponse:
+    """
+    Point d'entrée unifié (Partie B) combinant l'analyse NLP du texte et le scan d'infrastructure des URLs :
+    1. Contrôle du débit (Rate limiting) & taille maximale (2000 caractères max).
+    2. Analyse NLP du message (anonymisation PII automatique + TF-IDF Logistic Regression).
+    3. Détection et analyse de chaque URL / domaine présent dans le message.
+    4. Consolidation au niveau le plus élevé : un lien officiel n'annule JAMAIS une alerte NLP.
+    5. Restitution unifiée avec explications claires et détail complet par composant.
+    """
+    global_rate_limiter.check(request)
+
+    if len(req.text) > 2000:
+        raise HTTPException(
+            status_code=413,
+            detail="La taille du message dépasse la limite maximale autorisée (2000 caractères)."
+        )
+
+    raw_text = req.text.strip()
+    if not raw_text:
+        raise HTTPException(status_code=400, detail="Le texte fourni ne peut être vide.")
+
+    try:
+        # 1. NLP Analysis
+        nlp_res = classifier.predict(raw_text)
+        nlp_level = nlp_res["risk_level"]
+        nlp_rank = RISK_RANKS.get(nlp_level, 1)
+
+        # 2. Extract & scan URLs
+        detected_urls = extract_urls(raw_text)
+        url_details: List[ComponentUrlDetail] = []
+        max_url_rank = 1
+
+        for u in detected_urls:
+            u_res = domain_scanner.scan_url(u)
+            u_rank = RISK_RANKS.get(u_res["risk_level"], 1)
+            if u_rank > max_url_rank:
+                max_url_rank = u_rank
+
+            url_details.append(ComponentUrlDetail(
+                url=u,
+                hostname=u_res["hostname"],
+                risk_level=u_res["risk_level"],
+                risk_label=u_res["risk_label"],
+                domain_age_days=u_res["domain_age_days"],
+                domain_age_status=u_res["domain_age_status"],
+                creation_date=u_res.get("creation_date"),
+                target_brand_spoofed=u_res.get("target_brand_spoofed"),
+                explanations=u_res["explanations"],
+                recommendation=u_res["recommendation"]
+            ))
+
+        # 3. Consolidate risk: Highest of both.
+        # An official domain will NEVER lower an NLP threat alert.
+        final_rank = max(nlp_rank, max_url_rank)
+        final_level = RANK_TO_LEVEL[final_rank]
+        final_label = RANK_TO_LABEL[final_rank]
+        final_recommendation = RANK_TO_RECOMMENDATION[final_rank]
+
+        # 4. Merge explanations concisely (2 to 4 short sentences)
+        merged_explanations: List[str] = []
+
+        # Add NLP explanations if any risk detected or relevant
+        for exp in nlp_res["explanations"]:
+            if exp not in merged_explanations:
+                merged_explanations.append(exp)
+
+        # Add URL explanations
+        for ud in url_details:
+            for exp in ud.explanations:
+                formatted_exp = f"[{ud.hostname}] {exp}"
+                if formatted_exp not in merged_explanations and exp not in merged_explanations:
+                    merged_explanations.append(formatted_exp)
+
+        if not merged_explanations:
+            merged_explanations.append("Aucun indicateur suspect identifié dans le message ou les liens.")
+
+        # Limit to 4 sentences maximum for clarity
+        merged_explanations = merged_explanations[:4]
+
+        # 5. Build component details
+        details = UnifiedAnalysisDetails(
+            nlp=ComponentNlpDetail(
+                risk_level=nlp_res["risk_level"],
+                risk_label=nlp_res["risk_label"],
+                detected_clues=nlp_res["detected_clues"],
+                explanations=nlp_res["explanations"],
+                recommendation=nlp_res["recommendation"]
+            ),
+            urls=url_details,
+            pii_redacted=AnonymizationInfo(**nlp_res["pii_redacted"])
+        )
+
+        logger.info(f"Unified analysis complete | NLP: {nlp_level} | URLs: {len(detected_urls)} | Final Risk: {final_level}")
+
+        return UnifiedAnalysisResponse(
+            risk_level=final_level,
+            risk_label=final_label,
+            explanations=merged_explanations,
+            recommendation=final_recommendation,
+            details=details
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erreur interne lors de l'analyse unifiée : {str(e)}")
+
