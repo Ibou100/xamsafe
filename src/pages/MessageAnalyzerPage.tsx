@@ -1,5 +1,10 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import {
+  analyzeUnifiedMessage,
+  wakeUpBackend,
+  type UnifiedApiResponse,
+} from '../services/apiClient';
 import { analyzeMessageLocally, sanitizeUserMessage } from '../services/messageAnalyzer';
 import { AIVoiceService } from '../services/aiVoiceService';
 import type { AnalysisResult } from '../types';
@@ -23,6 +28,11 @@ import {
   ChevronDown,
   Loader2,
   ShieldCheck,
+  Copy,
+  Check,
+  Globe,
+  Clock,
+  ArrowRight,
 } from 'lucide-react';
 
 export interface MessageAttackSample {
@@ -178,13 +188,24 @@ export const MessageAnalyzerPage: React.FC = () => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageMime, setImageMime] = useState<string>('image/jpeg');
   const [result, setResult] = useState<AnalysisResult | null>(null);
+  const [unifiedData, setUnifiedData] = useState<UnifiedApiResponse | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [waitingNotice, setWaitingNotice] = useState<string | null>(null);
+  const [offlineBanner, setOfflineBanner] = useState<string | null>(null);
+  const [copiedSummary, setCopiedSummary] = useState(false);
   const [visionError, setVisionError] = useState<string | null>(null);
   const [apiKeyInput, setApiKeyInput] = useState('');
   const [showApiKeyInput, setShowApiKeyInput] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [showGallery, setShowGallery] = useState(false);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const resultRef = useRef<HTMLDivElement>(null);
+
+  // D2. Silent ping wake-up when opening the analyzer page
+  useEffect(() => {
+    wakeUpBackend();
+  }, []);
 
   const quickChips = [
     { label: 'Faux agent Wave (Code secret)', text: 'ALERTE WAVE : Votre compte présente une tentative de connexion inhabituelle. Pour éviter le blocage immédiat de votre solde sous 15 minutes, veuillez dicter le code de vérification à 4 chiffres envoyé par SMS.' },
@@ -208,18 +229,121 @@ export const MessageAnalyzerPage: React.FC = () => {
       ? MESSAGE_ATTACK_SAMPLES
       : MESSAGE_ATTACK_SAMPLES.filter((s) => s.category === selectedCategory);
 
-  const handleAnalyzeText = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!inputText.trim()) return;
+  const handleAnalyzeText = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!inputText.trim() || isAnalyzing) return;
 
     setIsAnalyzing(true);
     setVisionError(null);
-    setTimeout(() => {
-      const sanitized = sanitizeUserMessage(inputText);
-      const analysis = analyzeMessageLocally(sanitized);
-      setResult(analysis);
+    setOfflineBanner(null);
+    setWaitingNotice(null);
+    setCopiedSummary(false);
+
+    try {
+      const clientRes = await analyzeUnifiedMessage(inputText, () => {
+        setWaitingNotice('Le service se réveille, quelques secondes encore...');
+      });
+
+      setResult(clientRes.result);
+      setUnifiedData(clientRes.apiData || null);
+
+      if (clientRes.isOfflineFallback && clientRes.offlineMessage) {
+        setOfflineBanner(clientRes.offlineMessage);
+      } else {
+        setOfflineBanner(null);
+      }
+
+      // Smooth scroll to result without sudden jumps
+      setTimeout(() => {
+        resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 100);
+    } catch {
+      const local = analyzeMessageLocally(sanitizeUserMessage(inputText));
+      setResult(local);
+      setUnifiedData(null);
+      setOfflineBanner('Analyse simplifiée (mode hors ligne). Le résultat peut être moins précis.');
+    } finally {
       setIsAnalyzing(false);
-    }, 200);
+      setWaitingNotice(null);
+    }
+  };
+
+  const handleSampleClick = async (sampleText: string) => {
+    setActiveTab('text');
+    setInputText(sampleText);
+    setIsAnalyzing(true);
+    setVisionError(null);
+    setOfflineBanner(null);
+    setWaitingNotice(null);
+    setCopiedSummary(false);
+
+    try {
+      const clientRes = await analyzeUnifiedMessage(sampleText, () => {
+        setWaitingNotice('Le service se réveille, quelques secondes encore...');
+      });
+
+      setResult(clientRes.result);
+      setUnifiedData(clientRes.apiData || null);
+
+      if (clientRes.isOfflineFallback && clientRes.offlineMessage) {
+        setOfflineBanner(clientRes.offlineMessage);
+      } else {
+        setOfflineBanner(null);
+      }
+
+      setTimeout(() => {
+        resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 100);
+    } catch {
+      const local = analyzeMessageLocally(sanitizeUserMessage(sampleText));
+      setResult(local);
+      setUnifiedData(null);
+      setOfflineBanner('Analyse simplifiée (mode hors ligne). Le résultat peut être moins précis.');
+    } finally {
+      setIsAnalyzing(false);
+      setWaitingNotice(null);
+    }
+  };
+
+  const handleCopySummary = async () => {
+    if (!result) return;
+    const levelLabel =
+      result.riskLevel === 'eleve'
+        ? '⚠️ RISQUE ÉLEVÉ (Arnaque très probable)'
+        : result.riskLevel === 'moyen'
+        ? '⚠️ VIGILANCE REQUISE (Éléments suspects)'
+        : '✅ RISQUE FAIBLE (Aucun piège détecté)';
+
+    const textSnippet =
+      inputText.length > 90 ? `${inputText.slice(0, 87)}...` : inputText;
+
+    const lines: string[] = [
+      '🛡️ XamSafe - Diagnostic de sécurité',
+      `Niveau : ${levelLabel}`,
+      `Message : "${textSnippet}"`,
+      `Constat : ${result.summary}`,
+    ];
+
+    if (result.detectedClues.length > 0) {
+      lines.push('Indices relevés :');
+      result.detectedClues.slice(0, 3).forEach((c) => {
+        lines.push(`• ${c.title}`);
+      });
+    }
+
+    if (result.recommendedActions.length > 0) {
+      lines.push(`Conseil : ${result.recommendedActions[0]}`);
+    }
+
+    lines.push('\nAnalyse d\'aide à la vigilance réalisée sur https://xam-safe.vercel.app');
+
+    try {
+      await navigator.clipboard.writeText(lines.join('\n'));
+      setCopiedSummary(true);
+      setTimeout(() => setCopiedSummary(false), 2500);
+    } catch {
+      // Fallback
+    }
   };
 
   const handleImageUpload = (file: File) => {
@@ -233,6 +357,7 @@ export const MessageAnalyzerPage: React.FC = () => {
       const base64 = e.target?.result as string;
       setImagePreview(base64);
       setResult(null);
+      setUnifiedData(null);
       setVisionError(null);
     };
     reader.readAsDataURL(file);
@@ -263,6 +388,8 @@ export const MessageAnalyzerPage: React.FC = () => {
     try {
       const res = await AIVoiceService.analyzeScreenshot(imagePreview, imageMime);
       setResult(res);
+      setUnifiedData(null);
+      setOfflineBanner(null);
     } catch (err: any) {
       if (err.message === 'NO_API_KEY') {
         setShowApiKeyInput(true);
@@ -283,42 +410,29 @@ export const MessageAnalyzerPage: React.FC = () => {
     }
   };
 
-  const handleSampleClick = (sampleText: string) => {
-    setActiveTab('text');
-    setInputText(sampleText);
-    setIsAnalyzing(true);
-    setVisionError(null);
-    setTimeout(() => {
-      const sanitized = sanitizeUserMessage(sampleText);
-      const analysis = analyzeMessageLocally(sanitized);
-      setResult(analysis);
-      setIsAnalyzing(false);
-      if (typeof window !== 'undefined') {
-        window.scrollTo({ top: 120, behavior: 'smooth' });
-      }
-    }, 150);
-  };
-
   const handleReset = () => {
     setInputText('');
     setImagePreview(null);
     setResult(null);
+    setUnifiedData(null);
     setVisionError(null);
+    setOfflineBanner(null);
+    setWaitingNotice(null);
   };
 
   return (
-    <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8 text-left">
-      {/* Page Header - Clean, Focused */}
-      <div className="space-y-3">
+    <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 space-y-6 sm:space-y-8 text-left">
+      {/* Page Header - Mobile-first, calm, reassuring */}
+      <div className="space-y-2.5">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold">
           <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-          <span>Diagnostic confidentiel • Zéro conservation de données</span>
+          <span>Diagnostic confidentiel • Anonymisation automatique</span>
         </div>
         <h1 className="text-2xl sm:text-4xl font-extrabold text-slate-950 dark:text-white tracking-tight">
           Analyser un message suspect
         </h1>
         <p className="text-slate-600 dark:text-slate-400 text-sm sm:text-base leading-relaxed">
-          Collez le texte d'un SMS, d'un message WhatsApp ou déposez une capture d'écran. XamSafe détecte les pièges d'ingénierie sociale (fausse urgence, vol de code secret, rançon) en préservant strictement votre anonymat.
+          Collez le texte d'un SMS, d'un message WhatsApp ou déposez une capture d'écran. XamSafe détecte les pièges d'ingénierie sociale (fausse urgence, vol de code secret, rançon) et vérifie les liens suspects en préservant strictement votre anonymat.
         </p>
       </div>
 
@@ -326,7 +440,7 @@ export const MessageAnalyzerPage: React.FC = () => {
       <div className="flex border-b border-slate-200 dark:border-slate-800 gap-6 text-sm">
         <button
           type="button"
-          onClick={() => { setActiveTab('text'); setResult(null); }}
+          onClick={() => { setActiveTab('text'); setResult(null); setUnifiedData(null); }}
           className={`pb-3 font-semibold flex items-center gap-2 border-b-2 transition-colors cursor-pointer ${
             activeTab === 'text'
               ? 'border-emerald-600 text-emerald-600 dark:text-emerald-400'
@@ -338,7 +452,7 @@ export const MessageAnalyzerPage: React.FC = () => {
         </button>
         <button
           type="button"
-          onClick={() => { setActiveTab('screenshot'); setResult(null); }}
+          onClick={() => { setActiveTab('screenshot'); setResult(null); setUnifiedData(null); }}
           className={`pb-3 font-semibold flex items-center gap-2 border-b-2 transition-colors cursor-pointer ${
             activeTab === 'screenshot'
               ? 'border-emerald-600 text-emerald-600 dark:text-emerald-400'
@@ -366,11 +480,12 @@ export const MessageAnalyzerPage: React.FC = () => {
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               placeholder="Collez ici le message suspect... (Ex : « Alerte Wave : votre compte est bloqué, veuillez me dicter le code... »)"
+              style={{ fontSize: '16px' }}
               className="w-full p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0C2438] text-slate-900 dark:text-white placeholder-slate-400 focus:ring-2 focus:ring-emerald-500 text-base shadow-2xs transition-colors"
             />
           </div>
 
-          {/* Quick sample chips - Touch friendly with minimum target size */}
+          {/* Quick sample chips - Touch-friendly target size >= 40px */}
           <div className="space-y-2">
             <span className="text-xs text-slate-500 dark:text-slate-400 block font-semibold uppercase tracking-wider">
               Suggestions rapides à tester :
@@ -389,7 +504,15 @@ export const MessageAnalyzerPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Submit Actions - Ergonomic bottom-thumb zone */}
+          {/* Reassurance banner if analysis takes > 5s (D2) */}
+          {waitingNotice && (
+            <div className="p-3.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-xs text-amber-900 dark:text-amber-200 flex items-center gap-2.5">
+              <Loader2 className="w-4 h-4 animate-spin shrink-0 text-amber-600 dark:text-amber-400" />
+              <span>{waitingNotice}</span>
+            </div>
+          )}
+
+          {/* Submit Actions - Ergonomic bottom-thumb zone, min 48px height (D4) */}
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 pt-2">
             <button
               type="submit"
@@ -398,7 +521,7 @@ export const MessageAnalyzerPage: React.FC = () => {
             >
               {isAnalyzing ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <Loader2 className="w-5 h-5 animate-spin" />
                   <span>Analyse en cours...</span>
                 </>
               ) : (
@@ -463,7 +586,7 @@ export const MessageAnalyzerPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={handleReset}
-                  className="p-1 rounded-lg text-slate-400 hover:text-red-500 transition-colors"
+                  className="p-1 rounded-lg text-slate-400 hover:text-red-500 transition-colors cursor-pointer"
                   title="Supprimer l'image"
                 >
                   <X className="w-4 h-4" />
@@ -483,7 +606,7 @@ export const MessageAnalyzerPage: React.FC = () => {
                   type="button"
                   onClick={handleAnalyzeScreenshot}
                   disabled={isAnalyzing}
-                  className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold text-sm text-white bg-emerald-600 hover:bg-emerald-700 active:scale-98 disabled:opacity-50 transition-all cursor-pointer"
+                  className="inline-flex items-center justify-center gap-2 px-6 py-3 min-h-[48px] rounded-xl font-bold text-sm text-white bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 disabled:opacity-50 transition-colors cursor-pointer"
                 >
                   {isAnalyzing ? (
                     <>
@@ -498,7 +621,7 @@ export const MessageAnalyzerPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="px-3 py-3 rounded-xl text-xs font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-white transition-colors cursor-pointer"
+                  className="px-3 py-3 min-h-[44px] rounded-xl text-xs font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-white transition-colors cursor-pointer"
                 >
                   Changer d'image
                 </button>
@@ -542,112 +665,203 @@ export const MessageAnalyzerPage: React.FC = () => {
         </div>
       )}
 
-      {/* ANALYSIS RESULT */}
-      {result && (
-        <section
-          aria-live="polite"
-          className="bg-white dark:bg-[#0C2438] rounded-2xl border border-slate-200 dark:border-slate-800 p-6 space-y-5 shadow-xs"
-        >
-          {/* Header result badge & title */}
-          <div className="space-y-3 pb-5 border-b border-slate-200 dark:border-slate-800">
-            <div className="flex items-center justify-between gap-3">
-              {result.riskLevel === 'eleve' && (
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-100 dark:bg-red-950 text-red-800 dark:text-red-300 text-xs font-bold">
-                  <ShieldAlert className="w-4 h-4 text-red-600 shrink-0" />
-                  <span>Risque élevé : Arnaque très probable</span>
-                </div>
-              )}
-              {result.riskLevel === 'moyen' && (
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 text-xs font-bold">
-                  <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
-                  <span>Vigilance requise : Éléments suspects</span>
-                </div>
-              )}
-              {result.riskLevel === 'faible' && (
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-xs font-bold">
-                  <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>Risque faible : Aucun piège détecté</span>
-                </div>
-              )}
-              {result.riskLevel === 'indetermine' && (
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-300 text-xs font-bold">
-                  <HelpCircle className="w-4 h-4 text-slate-500 shrink-0" />
-                  <span>Indéterminé : Prudence recommandée</span>
-                </div>
-              )}
-            </div>
-
-            <h2 className="text-xl font-bold text-slate-950 dark:text-white">
-              {result.title}
-            </h2>
-
-            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-              {result.summary}
-            </p>
-          </div>
-
-          {/* Indices suspects détectés */}
-          {result.detectedClues.length > 0 && (
-            <div className="space-y-2.5">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
-                <AlertTriangle className="w-3.5 h-3.5 text-red-500" />
-                <span>Indices relevés ({result.detectedClues.length})</span>
-              </h3>
-              <div className="space-y-2">
-                {result.detectedClues.map((clue) => (
-                  <div
-                    key={clue.id}
-                    className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/40 text-xs sm:text-sm space-y-1"
-                  >
-                    <div className="font-bold text-slate-900 dark:text-white">
-                      {clue.title}
-                    </div>
-                    <p className="text-slate-600 dark:text-slate-300 text-xs">
-                      {clue.description}
-                    </p>
-                    {clue.detail && (
-                      <p className="text-[11px] text-slate-400 italic pt-0.5">
-                        💡 {clue.detail}
-                      </p>
-                    )}
-                  </div>
-                ))}
+      {/* ANALYSIS RESULT SECTION */}
+      <div ref={resultRef}>
+        {result && (
+          <section
+            aria-live="polite"
+            className="bg-white dark:bg-[#0C2438] rounded-2xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 space-y-5 shadow-xs"
+          >
+            {/* D2. Discrete Offline Fallback Notice */}
+            {offlineBanner && (
+              <div className="p-3 rounded-xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-xs text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                <Info className="w-4 h-4 text-slate-500 shrink-0" />
+                <span>{offlineBanner}</span>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Recommandations immédiates */}
-          <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 space-y-2 text-xs">
-            <div className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-              <Info className="w-3.5 h-3.5 text-emerald-500" />
-              <span>Que devez-vous faire maintenant ?</span>
-            </div>
-            <ul className="list-disc pl-4 space-y-1 text-slate-600 dark:text-slate-400">
-              {result.complementaryChecks.map((check, idx) => (
-                <li key={idx}>{check}</li>
-              ))}
-            </ul>
-          </div>
+            {/* D3. Accessible Risk Header (Icon + Explicit Text + Color) */}
+            <div className="space-y-3 pb-5 border-b border-slate-200 dark:border-slate-800">
+              <div className="flex items-center justify-between gap-3 flex-wrap">
+                {result.riskLevel === 'eleve' && (
+                  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-100 dark:bg-red-950 text-red-800 dark:text-red-300 text-xs font-bold">
+                    <ShieldAlert className="w-4 h-4 text-red-600 shrink-0" />
+                    <span>Risque élevé : Arnaque très probable</span>
+                  </div>
+                )}
+                {result.riskLevel === 'moyen' && (
+                  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 text-xs font-bold">
+                    <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+                    <span>Vigilance requise : Éléments suspects</span>
+                  </div>
+                )}
+                {result.riskLevel === 'faible' && (
+                  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-xs font-bold">
+                    <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span>Risque faible : Aucun piège détecté</span>
+                  </div>
+                )}
+                {result.riskLevel === 'indetermine' && (
+                  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-300 text-xs font-bold">
+                    <HelpCircle className="w-4 h-4 text-slate-500 shrink-0" />
+                    <span>Indéterminé : Prudence recommandée</span>
+                  </div>
+                )}
 
-          {/* Next steps CTA banner if danger */}
-          {result.riskLevel === 'eleve' && (
-            <div className="pt-3 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
-              <span className="text-slate-500">
-                Vous avez déjà envoyé de l'argent ou donné votre code secret ?
-              </span>
-              <Link
-                to="/urgence-victime"
-                className="font-bold text-white bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg transition-colors"
-              >
-                Suivre la procédure d'urgence
-              </Link>
+                {/* D3. Copier le résumé button */}
+                <button
+                  type="button"
+                  onClick={handleCopySummary}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 min-h-[36px] rounded-lg text-xs font-semibold bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors cursor-pointer"
+                >
+                  {copiedSummary ? (
+                    <>
+                      <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                      <span className="text-emerald-700 dark:text-emerald-300 font-bold">Résumé copié !</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-3.5 h-3.5 text-slate-500" />
+                      <span>Copier le résumé</span>
+                    </>
+                  )}
+                </button>
+              </div>
+
+              <h2 className="text-xl font-bold text-slate-950 dark:text-white">
+                {result.title}
+              </h2>
+
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                {result.summary}
+              </p>
             </div>
-          )}
-        </section>
-      )}
+
+            {/* D3. Detected Clues (Clear & Accessible) */}
+            {result.detectedClues.length > 0 && (
+              <div className="space-y-2.5">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                  <AlertTriangle className="w-3.5 h-3.5 text-red-500" />
+                  <span>Indices relevés ({result.detectedClues.length})</span>
+                </h3>
+                <div className="space-y-2">
+                  {result.detectedClues.map((clue) => (
+                    <div
+                      key={clue.id}
+                      className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/40 text-xs sm:text-sm space-y-1"
+                    >
+                      <div className="font-bold text-slate-900 dark:text-white">
+                        {clue.title}
+                      </div>
+                      <p className="text-slate-600 dark:text-slate-300 text-xs">
+                        {clue.description}
+                      </p>
+                      {clue.detail && (
+                        <p className="text-[11px] text-slate-400 italic pt-0.5">
+                          💡 {clue.detail}
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* D3. Analyzed URLs (Domain Age + Brand Spoofing) */}
+            {unifiedData && unifiedData.details.urls.length > 0 && (
+              <div className="space-y-2.5 pt-1">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                  <Globe className="w-3.5 h-3.5 text-blue-500" />
+                  <span>Adresses web analysées ({unifiedData.details.urls.length})</span>
+                </h3>
+                <div className="space-y-2">
+                  {unifiedData.details.urls.map((u, idx) => (
+                    <div
+                      key={idx}
+                      className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/40 text-xs sm:text-sm space-y-1.5"
+                    >
+                      <div className="flex items-center justify-between gap-2 flex-wrap">
+                        <span className="font-mono font-bold text-slate-900 dark:text-white break-all">
+                          {u.hostname}
+                        </span>
+                        <span
+                          className={`px-2 py-0.5 rounded text-[11px] font-bold ${
+                            u.risk_level === 'CRITIQUE' || u.risk_level === 'ELEVE'
+                              ? 'bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300'
+                              : u.risk_level === 'MODERE'
+                              ? 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300'
+                              : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
+                          }`}
+                        >
+                          {u.risk_label}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                        <Clock className="w-3.5 h-3.5 shrink-0" />
+                        <span>
+                          {u.domain_age_days
+                            ? `Domaine créé il y a ${u.domain_age_days} jour(s)`
+                            : 'Âge du domaine non vérifiable'}
+                        </span>
+                      </div>
+
+                      {u.target_brand_spoofed && (
+                        <div className="text-xs font-semibold text-red-600 dark:text-red-400">
+                          ⚠️ Suspicion d'imitation de la marque : {u.target_brand_spoofed}
+                        </div>
+                      )}
+
+                      {u.explanations.map((exp, eIdx) => (
+                        <p key={eIdx} className="text-xs text-slate-600 dark:text-slate-300">
+                          {exp}
+                        </p>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Recommandations immédiates */}
+            <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 space-y-2 text-xs">
+              <div className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                <Info className="w-3.5 h-3.5 text-emerald-500" />
+                <span>Que devez-vous faire maintenant ?</span>
+              </div>
+              <ul className="list-disc pl-4 space-y-1 text-slate-600 dark:text-slate-400">
+                {result.complementaryChecks.map((check, idx) => (
+                  <li key={idx}>{check}</li>
+                ))}
+              </ul>
+            </div>
+
+            {/* D3. Next steps CTA banner towards Urgence Victime if high danger */}
+            {result.riskLevel === 'eleve' && (
+              <div className="pt-3 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 text-xs">
+                <span className="text-slate-600 dark:text-slate-400">
+                  Vous avez déjà envoyé de l'argent ou donné votre code secret ?
+                </span>
+                <Link
+                  to="/urgence-victime"
+                  className="font-bold text-white bg-red-600 hover:bg-red-700 active:bg-red-800 px-4 py-2.5 min-h-[44px] rounded-xl inline-flex items-center justify-center gap-1.5 transition-colors cursor-pointer text-center"
+                >
+                  <span>Suivre la procédure d'urgence</span>
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
+            )}
+
+            {/* D3. Mention de sobriété */}
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 italic text-center pt-1">
+              Cette analyse automatique est une aide à la vigilance et ne constitue pas une certitude absolue.
+            </p>
+          </section>
+        )}
+      </div>
 
       {/* TRAINING REPOSITORY (Collapsible Drawer) */}
-      <section className="pt-6 border-t border-slate-200 dark:border-slate-800 space-y-4">
+      <section className="pt-4 border-t border-slate-200 dark:border-slate-800 space-y-4">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-base font-bold text-slate-950 dark:text-white flex items-center gap-2">
@@ -662,7 +876,7 @@ export const MessageAnalyzerPage: React.FC = () => {
           <button
             type="button"
             onClick={() => setShowGallery(!showGallery)}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-300 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 min-h-[36px] rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-300 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 transition-colors cursor-pointer"
           >
             <span>{showGallery ? 'Masquer' : 'Explorer les cas'}</span>
             <ChevronDown className={`w-3.5 h-3.5 transition-transform ${showGallery ? 'rotate-180' : ''}`} />
@@ -679,7 +893,7 @@ export const MessageAnalyzerPage: React.FC = () => {
                   key={cat.id}
                   type="button"
                   onClick={() => setSelectedCategory(cat.id)}
-                  className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                  className={`px-3 py-1.5 min-h-[36px] rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                     selectedCategory === cat.id
                       ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900'
                       : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300'
@@ -735,7 +949,7 @@ export const MessageAnalyzerPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => handleSampleClick(sample.text)}
-                    className="w-full inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-xs font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 transition-colors cursor-pointer"
+                    className="w-full inline-flex items-center justify-center gap-1.5 py-2.5 px-3 min-h-[40px] rounded-lg text-xs font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 transition-colors cursor-pointer"
                   >
                     <Zap className="w-3 h-3" />
                     <span>Tester ce message</span>
@@ -745,6 +959,62 @@ export const MessageAnalyzerPage: React.FC = () => {
             </div>
           </div>
         )}
+      </section>
+
+      {/* PARTIE E1 : COMMENT ÇA MARCHE ET LIMITES (Pédagogie & Transparence) */}
+      <section className="pt-6 border-t border-slate-200 dark:border-slate-800 space-y-4">
+        <div className="p-5 sm:p-6 rounded-2xl bg-slate-50/80 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 space-y-4">
+          <div className="flex items-center gap-2">
+            <Info className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+            <h2 className="text-sm sm:text-base font-bold text-slate-950 dark:text-white">
+              Comment ça marche et limites du diagnostic
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+            <div className="space-y-1.5 p-3.5 rounded-xl bg-white dark:bg-[#0C2438] border border-slate-200 dark:border-slate-800">
+              <h3 className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                <CheckCircle className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                <span>Ce que l'outil fait</span>
+              </h3>
+              <p>
+                Il détecte les motifs récurrents d'ingénierie sociale (fausse urgence, menace de blocage, promesse de gain, demande de code secret) et examine l'infrastructure des adresses web (ancienneté du domaine, ressemblance orthographique avec les marques officielles). Les données sensibles sont préalablement anonymisées.
+              </p>
+            </div>
+
+            <div className="space-y-1.5 p-3.5 rounded-xl bg-white dark:bg-[#0C2438] border border-slate-200 dark:border-slate-800">
+              <h3 className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                <AlertTriangle className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                <span>Ce que l'outil ne fait pas</span>
+              </h3>
+              <p>
+                Il ne lit pas dans les pensées de l'expéditeur, ne garantit jamais à 100 % qu'un message est inoffensif ou frauduleux, et ne remplace pas votre vigilance personnelle ni une vérification directe auprès du service officiel.
+              </p>
+            </div>
+
+            <div className="space-y-1.5 p-3.5 rounded-xl bg-white dark:bg-[#0C2438] border border-slate-200 dark:border-slate-800">
+              <h3 className="font-bold text-slate-900 dark:text-white">
+                Pourquoi une arnaque peut passer inaperçue
+              </h3>
+              <p>
+                Une nouvelle tactique encore inconnue, des formulations très courtoises sans mots d'alerte, ou l'utilisation d'un vieux domaine web légitime piraté peuvent échapper au radar.
+              </p>
+            </div>
+
+            <div className="space-y-1.5 p-3.5 rounded-xl bg-white dark:bg-[#0C2438] border border-slate-200 dark:border-slate-800">
+              <h3 className="font-bold text-slate-900 dark:text-white">
+                Pourquoi un message officiel peut être signalé
+              </h3>
+              <p>
+                Une véritable alerte administrative rédigée avec insistance (« sous 24h ») ou un nouveau site officiel récemment lancé sans historique peuvent déclencher un signal d'attention par précaution.
+              </p>
+            </div>
+          </div>
+
+          <div className="p-3.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/50 text-xs text-emerald-900 dark:text-emerald-200 leading-relaxed">
+            <strong>Que faire en cas de doute ?</strong> Ne cliquez sur aucun lien, ne dictez jamais de code reçu par SMS, et contactez l'organisme officiel par un canal connu (ex : 1441 pour Orange, support dans l'application Wave, guichet de votre banque).
+          </div>
+        </div>
       </section>
     </div>
   );

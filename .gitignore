@@ -36,3 +36,7 @@ __pycache__/
 .venv/
 venv/
 ENV/
+
+# Audits
+lighthouse_*.json
+

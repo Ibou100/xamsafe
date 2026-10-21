@@ -1,9 +1,11 @@
+import { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { LanguageProvider } from './context/LanguageContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { VoiceFloatingButton } from './components/VoiceFloatingButton';
+import { wakeUpBackend } from './services/apiClient';
 
 // Pages
 import { Home } from './pages/Home';
@@ -21,6 +23,10 @@ import { PrivacyPage } from './pages/PrivacyPage';
 import { AdminPage } from './pages/AdminPage';
 
 export function App() {
+  useEffect(() => {
+    wakeUpBackend();
+  }, []);
+
   return (
     <ThemeProvider>
       <LanguageProvider>
