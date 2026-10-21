@@ -1,0 +1,70 @@
+{
+  "wave": {
+    "brand_name": "Wave Mobile Money",
+    "domains": [
+      { "domain": "wave.com", "verified": false },
+      { "domain": "wave.sn", "verified": false }
+    ],
+    "keywords": ["wave", "wav", "waveci", "wavesn"]
+  },
+  "orange": {
+    "brand_name": "Orange / Sonatel",
+    "domains": [
+      { "domain": "orange.sn", "verified": false },
+      { "domain": "orange.com", "verified": false },
+      { "domain": "sonatel.sn", "verified": false }
+    ],
+    "keywords": ["orange", "sonatel", "om-sn", "orangemoney"]
+  },
+  "free": {
+    "brand_name": "Free Sénégal",
+    "domains": [
+      { "domain": "free.sn", "verified": false }
+    ],
+    "keywords": ["free", "freemoney"]
+  },
+  "campusen": {
+    "brand_name": "Campusen (Bourses & Orientation)",
+    "domains": [
+      { "domain": "campusen.sn", "verified": false }
+    ],
+    "keywords": ["campusen", "bourse-senegal"]
+  },
+  "cbao": {
+    "brand_name": "CBAO Attijariwafa Bank",
+    "domains": [
+      { "domain": "cbao.sn", "verified": false },
+      { "domain": "attijariwafabank.com", "verified": false }
+    ],
+    "keywords": ["cbao", "attijariwafa", "attijari"]
+  },
+  "ecobank": {
+    "brand_name": "Ecobank",
+    "domains": [
+      { "domain": "ecobank.com", "verified": false }
+    ],
+    "keywords": ["ecobank"]
+  },
+  "senelec": {
+    "brand_name": "Senelec",
+    "domains": [
+      { "domain": "senelec.sn", "verified": false }
+    ],
+    "keywords": ["senelec"]
+  },
+  "seneau": {
+    "brand_name": "Sen'Eau",
+    "domains": [
+      { "domain": "seneau.sn", "verified": false }
+    ],
+    "keywords": ["seneau"]
+  },
+  "police": {
+    "brand_name": "Police Nationale / DSC",
+    "domains": [
+      { "domain": "signalementcyber.dgpn.sn", "verified": false },
+      { "domain": "policenationale.gouv.sn", "verified": false }
+    ],
+    "keywords": ["police", "signalementcyber", "dgpn"]
+  }
+}

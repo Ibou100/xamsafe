@@ -1,68 +1,41 @@
 """
 Defensive Domain & Infrastructure Intelligence Scanner (Brique 2).
 Prioritizes:
-1. Domain Age & Creation Time (RDAP / RFC 7480) with explicit uncertainty handling.
+1. Domain Age & Creation Time (RDAP / RFC 7480) with explicit uncertainty handling and LRU+TTL caching.
 2. Typosquatting & Brand Spoofing (calibrated Levenshtein + secondary confirmation signals).
-3. Reputation & High-risk TLDs.
-4. Infrastructure & ASN as secondary signals.
+3. Whitelist loaded from official_domains.json requiring manual verification ('verified': true).
+4. SSRF & Private/Loopback IP prevention (no outgoing calls for internal/private hosts).
+5. Reputation & High-risk TLDs.
+6. Infrastructure & ASN as secondary signals.
 Outputs strictly qualitative Risk Levels and explainable indicators.
 """
 
 import re
+import os
+import json
+import time
 import datetime
+import ipaddress
 from urllib.parse import urlparse
-from typing import Dict, Any, List, Optional, Tuple
+from collections import OrderedDict
+from typing import Dict, Any, List, Optional, Tuple, Set
 import httpx
 
-# Whitelist of known official domains targeting Senegal & West Africa
-# Each entry requires manual validation. Substring matches are strictly prohibited.
-PROTECTED_TARGETS = {
-    "wave": {
-        "official_domains": ["wave.com", "wave.sn"],
-        "brand_name": "Wave Mobile Money",
-        "keywords": ["wave", "wav", "waveci", "wavesn"]
-    },
-    "orange": {
-        "official_domains": ["orange.sn", "orange.com", "sonatel.sn"],
-        "brand_name": "Orange / Sonatel",
-        "keywords": ["orange", "sonatel", "om-sn", "orangemoney"]
-    },
-    "free": {
-        "official_domains": ["free.sn"],
-        "brand_name": "Free Sénégal",
-        "keywords": ["free", "freemoney"]
-    },
-    "campusen": {
-        "official_domains": ["campusen.sn"],
-        "brand_name": "Campusen (Bourses & Orientation)",
-        "keywords": ["campusen", "bourse-senegal"]
-    },
-    "cbao": {
-        "official_domains": ["cbao.sn", "attijariwafabank.com"],
-        "brand_name": "CBAO Attijariwafa Bank",
-        "keywords": ["cbao", "attijariwafa", "attijari"]
-    },
-    "ecobank": {
-        "official_domains": ["ecobank.com"],
-        "brand_name": "Ecobank",
-        "keywords": ["ecobank"]
-    },
-    "senelec": {
-        "official_domains": ["senelec.sn"],
-        "brand_name": "Senelec",
-        "keywords": ["senelec"]
-    },
-    "seneau": {
-        "official_domains": ["seneau.sn"],
-        "brand_name": "Sen'Eau",
-        "keywords": ["seneau"]
-    },
-    "police": {
-        "official_domains": ["signalementcyber.dgpn.sn", "policenationale.gouv.sn"],
-        "brand_name": "Police Nationale / DSC",
-        "keywords": ["police", "signalementcyber", "dgpn"]
-    }
-}
+# Path to configuration file
+CONFIG_PATH = os.path.join(os.path.dirname(__file__), "official_domains.json")
+
+
+def load_official_targets(path: Optional[str] = None) -> Dict[str, Any]:
+    """Loads official brand domains configuration."""
+    target_path = path or CONFIG_PATH
+    if os.path.exists(target_path):
+        try:
+            with open(target_path, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            pass
+    return {}
+
 
 # Common everyday words that must not be falsely flagged as typosquatting
 COMMON_DICTIONARY_EXCEPTIONS = {
@@ -81,6 +54,69 @@ AUTH_SENSITIVE_KEYWORDS = {
     "login", "auth", "verify", "verification", "secure", "securite", "compte",
     "otp", "connexion", "recompense", "transfert", "argent", "kiosque", "solde"
 }
+
+
+class RdapCache:
+    """
+    LRU Cache with Time-To-Live (TTL) eviction.
+    Default: 1000 items max, 24 hours (86400s) TTL.
+    """
+    def __init__(self, max_size: int = 1000, ttl_seconds: float = 86400.0):
+        self.max_size = max_size
+        self.ttl_seconds = ttl_seconds
+        self._cache: OrderedDict[str, Tuple[float, Dict[str, Any]]] = OrderedDict()
+
+    def get(self, domain: str) -> Optional[Dict[str, Any]]:
+        domain = domain.lower().strip()
+        if domain not in self._cache:
+            return None
+        cached_at, value = self._cache[domain]
+        if (time.time() - cached_at) > self.ttl_seconds:
+            del self._cache[domain]
+            return None
+        self._cache.move_to_end(domain)
+        return value
+
+    def set(self, domain: str, value: Dict[str, Any]) -> None:
+        domain = domain.lower().strip()
+        if domain in self._cache:
+            del self._cache[domain]
+        elif len(self._cache) >= self.max_size:
+            # Evict oldest entry (LRU)
+            self._cache.popitem(last=False)
+        self._cache[domain] = (time.time(), value)
+
+    def __len__(self) -> int:
+        return len(self._cache)
+
+    def clear(self) -> None:
+        self._cache.clear()
+
+
+def is_private_or_restricted_target(hostname: str) -> bool:
+    """
+    Detects private, loopback, link-local, multicast, or reserved IPs/hosts.
+    Includes: 127.0.0.0/8, 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16, 169.254.0.0/16, ::1, localhost.
+    """
+    clean_host = hostname.lower().strip()
+    if clean_host == "localhost" or clean_host.endswith(".localhost"):
+        return True
+
+    # Try parsing as IP address (IPv4 or IPv6)
+    try:
+        ip = ipaddress.ip_address(clean_host)
+        return (
+            ip.is_private or
+            ip.is_loopback or
+            ip.is_link_local or
+            ip.is_reserved or
+            ip.is_multicast or
+            ip.is_unspecified
+        )
+    except ValueError:
+        pass
+
+    return False
 
 
 def compute_levenshtein(s1: str, s2: str) -> int:
@@ -103,14 +139,29 @@ def compute_levenshtein(s1: str, s2: str) -> int:
     return previous_row[-1]
 
 
-def extract_domain_parts(raw_url: str) -> Tuple[str, str, str, str, str]:
+def extract_domain_parts(raw_url: str) -> Tuple[str, str, str, str, str, Optional[str]]:
     """
-    Extracts (clean_url, full_hostname, sld, tld, full_path).
-    Example: 'https://wave.com.auth.xyz/login' -> ('https://wave.com.auth.xyz/login', 'wave.com.auth.xyz', 'auth', '.xyz', '/login')
+    Extracts (clean_url, full_hostname, sld, tld, full_path, scheme).
+    Handles standard URLs as well as non-standard schemes (javascript:, data:, mailto:, etc.).
     """
     url = raw_url.strip()
-    if not re.match(r'^[a-zA-Z]+://', url):
-        url = "http://" + url
+    scheme = None
+
+    # 1. Scheme with :// (e.g. http://, https://, ftp://, gopher://, file:///)
+    scheme_match = re.match(r'^([a-zA-Z][a-zA-Z0-9+\-.]*)://', url)
+    if scheme_match:
+        scheme = scheme_match.group(1).lower()
+    else:
+        # 2. Check for opaque schemes like javascript:..., data:..., mailto:...
+        colon_match = re.match(r'^([a-zA-Z][a-zA-Z0-9+\-]*):', url)
+        if colon_match and colon_match.group(1).lower() in (
+            "javascript", "data", "file", "mailto", "tel", "about", "blob", "vbscript"
+        ):
+            scheme = colon_match.group(1).lower()
+        else:
+            # If no explicit scheme prefix, assume http for normalization
+            url = "http://" + url
+            scheme = "http"
 
     parsed = urlparse(url)
     hostname = (parsed.hostname or "").lower()
@@ -125,7 +176,7 @@ def extract_domain_parts(raw_url: str) -> Tuple[str, str, str, str, str]:
         tld = ""
         sld = hostname
 
-    return url, hostname, sld, tld, path
+    return url, hostname, sld, tld, path, scheme
 
 
 def is_official_domain_match(hostname: str, official_domain: str) -> bool:
@@ -144,15 +195,28 @@ def is_official_domain_match(hostname: str, official_domain: str) -> bool:
 class DomainInfrastructureScanner:
     """
     Defensive OSINT & Infrastructure Scanner:
-    - Domain Age Inspection (RDAP) with in-memory caching & uncertainty handling.
+    - Domain Age Inspection (RDAP) with LRU+TTL caching & uncertainty handling.
+    - SSRF prevention rejecting private IPs, loopback, link-local, and non-HTTP schemes.
     - Typosquatting & Brand Spoofing with calibrated thresholds & secondary confirmation.
-    - Whitelist comparison on exact registrable domains.
+    - Whitelist comparison on exact registrable domains with explicit 'verified' requirement.
     """
 
-    def __init__(self, rdap_timeout_sec: float = 3.5):
+    def __init__(
+        self,
+        rdap_timeout_sec: float = 3.5,
+        cache_max_size: int = 1000,
+        cache_ttl_sec: float = 86400.0,
+        config_path: Optional[str] = None
+    ):
         self.timeout = rdap_timeout_sec
-        # In-memory cache to prevent redundant external RDAP queries: {domain: rdap_dict}
-        self._rdap_cache: Dict[str, Dict[str, Any]] = {}
+        self.cache = RdapCache(max_size=cache_max_size, ttl_seconds=cache_ttl_sec)
+        self.config_path = config_path or CONFIG_PATH
+        self.targets = load_official_targets(self.config_path)
+
+    @property
+    def _rdap_cache(self):
+        """Backward-compatibility mapping for existing test fixtures."""
+        return self.cache._cache
 
     def check_typosquatting_and_spoofing(
         self,
@@ -164,17 +228,30 @@ class DomainInfrastructureScanner:
         """
         Detects brand impersonation, homoglyphs, subdomain abuse, and typosquatting.
         Applies calibrated Levenshtein limits and requires confirmation before escalating.
+        Only marks is_official: True if the domain is explicitly verified: True in official_domains.json.
         """
         # 1. Check exact official domain whitelist
-        for target_key, info in PROTECTED_TARGETS.items():
-            for official in info["official_domains"]:
+        for target_key, info in self.targets.items():
+            domains_list = info.get("domains", [])
+            for entry in domains_list:
+                official = entry.get("domain", "")
+                is_verified = entry.get("verified", False)
                 if is_official_domain_match(hostname, official):
-                    return {
-                        "is_official": True,
-                        "is_spoofing": False,
-                        "target_brand": info["brand_name"],
-                        "reason": "Correspond à un domaine officiel connu"
-                    }
+                    if is_verified:
+                        return {
+                            "is_official": True,
+                            "is_spoofing": False,
+                            "target_brand": info.get("brand_name"),
+                            "reason": "Correspond à un domaine officiel connu"
+                        }
+                    else:
+                        # Matches official list but pending manual user verification
+                        return {
+                            "is_official": False,
+                            "is_spoofing": False,
+                            "target_brand": info.get("brand_name"),
+                            "reason": "Domaine officiel en attente de vérification manuelle"
+                        }
 
         # 2. Check for punycode / homoglyphs
         has_punycode = hostname.startswith("xn--") or ".xn--" in hostname
@@ -191,9 +268,9 @@ class DomainInfrastructureScanner:
                 "reason": "Terme courant du dictionnaire"
             }
 
-        # 5. Check each protected brand
-        for target_key, info in PROTECTED_TARGETS.items():
-            official_domains = info["official_domains"]
+        # 5. Check each protected brand for spoofing & typosquatting
+        for target_key, info in self.targets.items():
+            official_domains = [d.get("domain", "") for d in info.get("domains", [])]
 
             # Subdomain Abuse: e.g. 'wave.com.evil.xyz' (contains official domain string but not ending in it)
             for official in official_domains:
@@ -201,7 +278,7 @@ class DomainInfrastructureScanner:
                     return {
                         "is_official": False,
                         "is_spoofing": True,
-                        "target_brand": info["brand_name"],
+                        "target_brand": info.get("brand_name"),
                         "technique": "ABUS_SOUS_DOMAINE",
                         "severity": "CRITIQUE",
                         "reason": f"Tentative d'usurpation par faux sous-domaine imitant '{official}'"
@@ -233,7 +310,7 @@ class DomainInfrastructureScanner:
                         return {
                             "is_official": False,
                             "is_spoofing": True,
-                            "target_brand": info["brand_name"],
+                            "target_brand": info.get("brand_name"),
                             "technique": "TYPOSQUATTING_CONFIRME",
                             "severity": "CRITIQUE",
                             "reason": f"Altération orthographique trompeuse de '{official_sld}' combinée à des signaux suspects"
@@ -242,49 +319,37 @@ class DomainInfrastructureScanner:
                         return {
                             "is_official": False,
                             "is_spoofing": True,
-                            "target_brand": info["brand_name"],
-                            "technique": "PROXIMITE_LEXICALE",
+                            "target_brand": info.get("brand_name"),
+                            "technique": "TYPOSQUATTING_FAIBLE",
                             "severity": "MODERE",
-                            "reason": f"Proximité lexicale avec la marque '{official_sld}', sans indice d'usurpation avéré"
+                            "reason": f"Proximité lexicale avec la marque '{official_sld}' sans signal malveillant aggravant avéré"
                         }
-
-            # Protected keyword check with high-risk TLD
-            for kw in info["keywords"]:
-                if kw in hostname and not any(is_official_domain_match(hostname, d) for d in official_domains):
-                    severity = "CRITIQUE" if (tld in HIGH_RISK_TLDS or has_auth_keyword) else "MODERE"
-                    return {
-                        "is_official": False,
-                        "is_spoofing": True,
-                        "target_brand": info["brand_name"],
-                        "technique": "MOT_CLE_IMPOSTURE",
-                        "severity": severity,
-                        "reason": f"Présence du terme protégé '{kw}' en dehors des domaines officiels connus"
-                    }
-
-        if has_punycode:
-            return {
-                "is_official": False,
-                "is_spoofing": True,
-                "target_brand": None,
-                "technique": "HOMOGLYPHE_PUNYCODE",
-                "severity": "CRITIQUE",
-                "reason": "Utilisation de caractères Unicode masqués (Punycode xn--)"
-            }
 
         return {
             "is_official": False,
             "is_spoofing": False,
             "target_brand": None,
-            "reason": "Aucune marque protégée détectée"
+            "reason": "Aucune usurpation de marque sénégalaise identifiée"
         }
 
     def fetch_domain_age_rdap(self, hostname: str) -> Dict[str, Any]:
         """
-        Interrogates RDAP bootstrap server to determine exact domain creation date.
-        Uses in-memory cache and returns 'inconnu' when registration date cannot be verified.
+        Inspects domain creation date via RDAP (RFC 7480).
+        Protects against SSRF: Does NOT query RDAP for private/loopback/restricted hosts.
+        Uses in-memory cache (LRU + TTL).
         """
-        # Direct IP check
-        if re.match(r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$', hostname):
+        if not hostname or is_private_or_restricted_target(hostname):
+            return {
+                "status": "NON_ANALYSABLE",
+                "domain_age_status": "inconnu",
+                "age_days": None,
+                "age_category": "INDETERMINE",
+                "creation_date": None,
+                "hosting_info": "Hôte local ou réseau privé non requêtable"
+            }
+
+        # Check if direct public IP
+        if re.match(r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$', hostname) or ":" in hostname:
             return {
                 "status": "IP_BRUTE",
                 "domain_age_status": "inconnu",
@@ -301,9 +366,10 @@ class DomainInfrastructureScanner:
         else:
             root_domain = hostname
 
-        # Check in-memory cache
-        if root_domain in self._rdap_cache:
-            return self._rdap_cache[root_domain]
+        # Check in-memory LRU+TTL cache
+        cached = self.cache.get(root_domain)
+        if cached is not None:
+            return cached
 
         rdap_url = f"https://rdap.org/domain/{root_domain}"
 
@@ -342,7 +408,7 @@ class DomainInfrastructureScanner:
                             "creation_date": clean_date_str,
                             "hosting_info": data.get("port43", "RDAP ICANN")
                         }
-                        self._rdap_cache[root_domain] = result
+                        self.cache.set(root_domain, result)
                         return result
         except Exception:
             pass
@@ -356,7 +422,7 @@ class DomainInfrastructureScanner:
             "creation_date": None,
             "hosting_info": "Serveur d'enregistrement non joignable ou extension non supportée"
         }
-        self._rdap_cache[root_domain] = result
+        self.cache.set(root_domain, result)
         return result
 
     def scan_url(
@@ -366,28 +432,48 @@ class DomainInfrastructureScanner:
     ) -> Dict[str, Any]:
         """
         Executes defensive domain scan:
-        1. Exact whitelist matching (Correspond à un domaine officiel connu)
-        2. Typosquatting & Brand Spoofing (calibrated Levenshtein)
-        3. Domain Age (RDAP) with uncertainty handling
-        4. Synthesizes qualitative Risk Level
+        1. Validates scheme (HTTP/HTTPS only). Rejects unsupported schemes without network requests.
+        2. Validates hostname against SSRF (loopback, private, link-local, localhost).
+        3. Exact whitelist matching (only if verified=True in config).
+        4. Typosquatting & Brand Spoofing (calibrated Levenshtein).
+        5. RDAP Domain Age & RFC 7480 checks with uncertainty handling.
         """
-        clean_url, hostname, sld, tld, path = extract_domain_parts(raw_url)
+        url, hostname, sld, tld, path, scheme = extract_domain_parts(raw_url)
 
-        if not hostname:
+        # 0. Scheme validation: only HTTP and HTTPS allowed
+        if scheme not in ("http", "https"):
             return {
                 "risk_level": "FAIBLE",
-                "risk_label": "URL invalide ou vide",
-                "hostname": "",
+                "risk_label": "Adresse non analysable",
+                "hostname": hostname or raw_url,
                 "domain_age_days": None,
                 "domain_age_status": "inconnu",
-                "explanations": ["Impossible d'extraire un nom d'hôte valide."],
-                "recommendation": "Vérifiez la saisie de l'adresse."
+                "creation_date": None,
+                "target_brand_spoofed": None,
+                "explanations": ["Adresse non analysable : seuls les protocoles HTTP et HTTPS sont pris en charge."],
+                "recommendation": "Vérifiez que l'adresse commence par http:// ou https://.",
+                "secondary_signal_hosting": None
             }
 
-        # 1. Typosquatting / Brand check
+        # 1. SSRF & Private / Loopback IP protection
+        if not hostname or is_private_or_restricted_target(hostname):
+            return {
+                "risk_level": "FAIBLE",
+                "risk_label": "Adresse non analysable",
+                "hostname": hostname or raw_url,
+                "domain_age_days": None,
+                "domain_age_status": "inconnu",
+                "creation_date": None,
+                "target_brand_spoofed": None,
+                "explanations": ["Adresse non analysable : cette adresse pointe vers une adresse IP privée, locale ou réservée."],
+                "recommendation": "L'analyse est réservée aux noms de domaine publics sur Internet.",
+                "secondary_signal_hosting": None
+            }
+
+        # 2. Typosquatting / Brand check
         spoofing = self.check_typosquatting_and_spoofing(hostname, sld, tld, path)
 
-        # Exact match with recognized official domain
+        # Exact match with recognized official domain (only if verified=True)
         if spoofing.get("is_official"):
             return {
                 "risk_level": "FAIBLE",
@@ -396,17 +482,18 @@ class DomainInfrastructureScanner:
                 "target_brand_spoofed": spoofing.get("target_brand"),
                 "domain_age_days": "> 365",
                 "domain_age_status": "connu",
+                "creation_date": None,
                 "explanations": [f"Ce domaine correspond au portail officiel connu de {spoofing.get('target_brand')}."],
                 "recommendation": "Accès officiel sécurisé.",
                 "secondary_signal_hosting": "Infrastructure officielle"
             }
 
-        # 2. Domain Age Check (Priority 1)
+        # 3. Domain Age Check (Priority 1)
         rdap = custom_rdap_result if custom_rdap_result else self.fetch_domain_age_rdap(hostname)
         domain_age_status = rdap.get("domain_age_status", "inconnu")
         age_days = rdap.get("age_days")
 
-        # 3. Compile Threat Signals
+        # 4. Compile Threat Signals
         explanations = []
         is_critical = False
         is_high = False
@@ -448,31 +535,28 @@ class DomainInfrastructureScanner:
         # Signal D: High Risk TLD
         if tld in HIGH_RISK_TLDS:
             explanations.append(f"Utilisation d'une extension à bas coût ({tld}) statistiquement surreprésentée dans les campagnes malveillantes.")
-            if not is_critical:
-                is_high = True
+            if is_critical or is_high:
+                pass
+            else:
+                is_moderate = True
 
-        # Secondary Signal: Hosting info
-        hosting = rdap.get("hosting_info")
-
-        # 4. Final Risk Level Calculation (Strictly Qualitative)
+        # 5. Determine Overall Qualitative Risk
         if is_critical:
             risk_level = "CRITIQUE"
-            risk_label = "Menace cyber imminente : domaine d'usurpation ou d'attaque active"
-            recommendation = "Ne visitez en aucun cas cette page. N'y saisissez aucun identifiant, mot de passe ou code bancaire."
+            risk_label = "Infrastructure de phishing hautement probable"
+            recommendation = "DANGER : Ne cliquez jamais sur ce lien et ne transmettez aucun identifiant."
         elif is_high:
             risk_level = "ELEVE"
-            risk_label = "Forte présomption de site frauduleux ou domaine suspect récent"
-            recommendation = "Évitez tout échange avec ce lien et privilégiez les applications mobiles officielles."
+            risk_label = "Risque d'usurpation élevé"
+            recommendation = "Méfiance absolue : domaine suspect non certifié."
         elif is_moderate:
             risk_level = "MODERE"
-            risk_label = "Vigilance : domaine récent ou structure non standard"
-            recommendation = "Vérifiez attentivement la provenance exacte avant de continuer."
+            risk_label = "Vigilance recommandée"
+            recommendation = "Vérifiez soigneusement l'origine du message avant toute interaction."
         else:
             risk_level = "FAIBLE"
-            risk_label = "Aucun indicateur d'infrastructure malveillante identifié"
-            recommendation = "Site conforme aux règles standard de navigation."
-            if not any(e for e in explanations if e != "Âge du domaine non vérifiable."):
-                explanations.append("Domaine sans antécédent d'usurpation et sans TLD douteux.")
+            risk_label = "Aucune menace d'infrastructure identifiée"
+            recommendation = "Aucun indicateur de menace technique détecté."
 
         return {
             "risk_level": risk_level,
@@ -484,5 +568,5 @@ class DomainInfrastructureScanner:
             "target_brand_spoofed": spoofing.get("target_brand"),
             "explanations": explanations,
             "recommendation": recommendation,
-            "secondary_signal_hosting": hosting
+            "secondary_signal_hosting": rdap.get("hosting_info")
         }

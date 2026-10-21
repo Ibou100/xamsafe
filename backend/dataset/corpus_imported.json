@@ -32,5 +32,39 @@
       "names": 1
     },
     "notes": ""
+  },
+  {
+    "id": "imported-20261021184245-de93",
+    "text": "Bonjour, tentative de phishing reçue sur le <TOKEN_PHONE> de la part de <TOKEN_PERSON>",
+    "label": 1,
+    "source": "contribution-citoyenne",
+    "language": "fr",
+    "consent_verified": true,
+    "imported_at": "2026-10-21T18:42:45.177763Z",
+    "redacted_counts": {
+      "phones": 1,
+      "amounts": 0,
+      "urls": 0,
+      "codes": 0,
+      "names": 1
+    },
+    "notes": ""
+  },
+  {
+    "id": "imported-20261021184419-fbe8",
+    "text": "Bonjour, tentative de phishing reçue sur le <TOKEN_PHONE> de la part de <TOKEN_PERSON>",
+    "label": 1,
+    "source": "contribution-citoyenne",
+    "language": "fr",
+    "consent_verified": true,
+    "imported_at": "2026-10-21T18:44:19.941551Z",
+    "redacted_counts": {
+      "phones": 1,
+      "amounts": 0,
+      "urls": 0,
+      "codes": 0,
+      "names": 1
+    },
+    "notes": ""
   }
 ]
