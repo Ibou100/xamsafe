@@ -312,13 +312,19 @@ export const MessageAnalyzerPage: React.FC = () => {
         ? '⚠️ RISQUE ÉLEVÉ (Arnaque très probable)'
         : result.riskLevel === 'moyen'
         ? '⚠️ VIGILANCE REQUISE (Éléments suspects)'
-        : '✅ RISQUE FAIBLE (Aucun piège détecté)';
+        : '✅ RISQUE FAIBLE (Aucun signal d\'arnaque connu repéré. Cela ne garantit pas que le message soit sûr : en cas de doute, vérifiez auprès de l\'organisme concerné.)';
+
+    const sourceLabel =
+      unifiedData || result.engineType === 'ai-remote'
+        ? 'Analyse complète (serveur)'
+        : 'Analyse simplifiée (hors ligne)';
 
     const textSnippet =
       inputText.length > 90 ? `${inputText.slice(0, 87)}...` : inputText;
 
     const lines: string[] = [
       '🛡️ XamSafe - Diagnostic de sécurité',
+      `Source : ${sourceLabel}`,
       `Niveau : ${levelLabel}`,
       `Message : "${textSnippet}"`,
       `Constat : ${result.summary}`,
@@ -683,30 +689,45 @@ export const MessageAnalyzerPage: React.FC = () => {
             {/* D3. Accessible Risk Header (Icon + Explicit Text + Color) */}
             <div className="space-y-3 pb-5 border-b border-slate-200 dark:border-slate-800">
               <div className="flex items-center justify-between gap-3 flex-wrap">
-                {result.riskLevel === 'eleve' && (
-                  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-100 dark:bg-red-950 text-red-800 dark:text-red-300 text-xs font-bold">
-                    <ShieldAlert className="w-4 h-4 text-red-600 shrink-0" />
-                    <span>Risque élevé : Arnaque très probable</span>
-                  </div>
-                )}
-                {result.riskLevel === 'moyen' && (
-                  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 text-xs font-bold">
-                    <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
-                    <span>Vigilance requise : Éléments suspects</span>
-                  </div>
-                )}
-                {result.riskLevel === 'faible' && (
-                  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-xs font-bold">
-                    <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <span>Risque faible : Aucun piège détecté</span>
-                  </div>
-                )}
-                {result.riskLevel === 'indetermine' && (
-                  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-300 text-xs font-bold">
-                    <HelpCircle className="w-4 h-4 text-slate-500 shrink-0" />
-                    <span>Indéterminé : Prudence recommandée</span>
-                  </div>
-                )}
+                <div className="flex items-center gap-2 flex-wrap">
+                  {result.riskLevel === 'eleve' && (
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-100 dark:bg-red-950 text-red-800 dark:text-red-300 text-xs font-bold">
+                      <ShieldAlert className="w-4 h-4 text-red-600 shrink-0" />
+                      <span>Risque élevé : Arnaque très probable</span>
+                    </div>
+                  )}
+                  {result.riskLevel === 'moyen' && (
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 text-xs font-bold">
+                      <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+                      <span>Vigilance requise : Éléments suspects</span>
+                    </div>
+                  )}
+                  {result.riskLevel === 'faible' && (
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-xs font-bold">
+                      <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>Risque faible : Aucun signal d'arnaque connu repéré</span>
+                    </div>
+                  )}
+                  {result.riskLevel === 'indetermine' && (
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-300 text-xs font-bold">
+                      <HelpCircle className="w-4 h-4 text-slate-500 shrink-0" />
+                      <span>Indéterminé : Prudence recommandée</span>
+                    </div>
+                  )}
+
+                  {/* Point 5: Transparence sur la source (Serveur vs Hors ligne) */}
+                  {unifiedData || result.engineType === 'ai-remote' ? (
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-900">
+                      <Zap className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                      Analyse complète (serveur)
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-900">
+                      <Zap className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                      Analyse simplifiée (hors ligne)
+                    </span>
+                  )}
+                </div>
 
                 {/* D3. Copier le résumé button */}
                 <button
@@ -753,9 +774,11 @@ export const MessageAnalyzerPage: React.FC = () => {
                       <div className="font-bold text-slate-900 dark:text-white">
                         {clue.title}
                       </div>
-                      <p className="text-slate-600 dark:text-slate-300 text-xs">
-                        {clue.description}
-                      </p>
+                      {clue.description && (
+                        <p className="text-slate-600 dark:text-slate-300 text-xs">
+                          {clue.description}
+                        </p>
+                      )}
                       {clue.detail && (
                         <p className="text-[11px] text-slate-400 italic pt-0.5">
                           💡 {clue.detail}

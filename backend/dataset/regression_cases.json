@@ -1,0 +1,39 @@
+[
+  {
+    "id": "regr-001",
+    "name": "code secret Wave",
+    "text": "Service Client Wave : Votre compte est temporairement bloqué pour vérification. Veuillez nous transmettre immédiatement votre code secret ou le code reçu par SMS pour réactiver vos services.",
+    "min_risk_level": "ELEVE"
+  },
+  {
+    "id": "regr-002",
+    "name": "faux remboursement 25 000 FCFA",
+    "text": "Alerte Wave : Vous avez reçu un virement de 25.000 FCFA par erreur de Fatou Sow. Renvoyez immédiatement les 25.000 FCFA au 771234567 sinon votre compte sera suspendu.",
+    "min_risk_level": "ELEVE"
+  },
+  {
+    "id": "regr-003",
+    "name": "bourse Campusen",
+    "text": "Campusen : vous êtes sélectionné pour une bourse complémentaire. Confirmez vos informations bancaires dans les 24h sur ce lien pour la recevoir.",
+    "min_risk_level": "ELEVE",
+    "forbidden_explanation_keywords": ["frais"]
+  },
+  {
+    "id": "regr-004",
+    "name": "tombola 2 000 000 FCFA",
+    "text": "Félicitations ! Vous avez gagné 2.000.000 FCFA au tirage au sort de la tombola Orange Money. Contactez rapidement le 771234567 pour récupérer votre lot.",
+    "min_risk_level": "ELEVE"
+  },
+  {
+    "id": "regr-005",
+    "name": "faux support Orange Money (PIN)",
+    "text": "Support Orange Money : Tentative d'accès suspecte. Veuillez composer le *144# ou communiquer votre code PIN au technicien pour sécuriser votre compte.",
+    "min_risk_level": "ELEVE"
+  },
+  {
+    "id": "regr-006",
+    "name": "menace de suspension + publication des données",
+    "text": "Dernier avertissement : régularisez votre dossier aujourd'hui sinon votre ligne sera suspendue et vos données publiées",
+    "min_risk_level": "ELEVE"
+  }
+]

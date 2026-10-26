@@ -56,7 +56,7 @@ def test_case_1_scam_message_with_official_link():
 
     # Final risk must remain elevated
     assert data["risk_level"] in ["ELEVE", "CRITIQUE"]
-    assert "DANGER" in data["recommendation"] or "Méfiance" in data["recommendation"]
+    assert any(term in data["recommendation"] for term in ["Ne renvoyez rien", "DANGER", "Méfiance", "application officielle"])
 
     # Component details check
     assert data["details"]["nlp"]["risk_level"] in ["ELEVE", "CRITIQUE"]

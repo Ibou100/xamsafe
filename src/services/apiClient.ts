@@ -72,6 +72,7 @@ export interface UnifiedAnalysisClientResult {
   isOfflineFallback: boolean;
   offlineMessage?: string;
   apiData?: UnifiedApiResponse;
+  sourceLabel?: string;
 }
 
 /**
@@ -116,6 +117,7 @@ export async function analyzeUnifiedMessage(
       },
       isOfflineFallback: true,
       offlineMessage: 'Analyse simplifiée (mode hors ligne). Le résultat peut être moins précis.',
+      sourceLabel: 'Analyse simplifiée (hors ligne)',
     };
   }
 
@@ -181,7 +183,7 @@ export async function analyzeUnifiedMessage(
         description:
           apiData.details.nlp.detected_clues.length > 0
             ? `Mots-clés repérés : ${apiData.details.nlp.detected_clues.join(', ')}`
-            : "Signal d'infrastructure ou structure sémantique détectée.",
+            : undefined,
       });
     });
 
@@ -202,7 +204,10 @@ export async function analyzeUnifiedMessage(
       riskLevel: mappedRisk,
       riskScore,
       title: apiData.risk_label,
-      summary: apiData.explanations.slice(0, 3).join(' '),
+      summary:
+        mappedRisk === 'faible'
+          ? "Aucun signal d'arnaque connu repéré. Cela ne garantit pas que le message soit sûr : en cas de doute, vérifiez auprès de l'organisme concerné."
+          : apiData.explanations.slice(0, 3).join(' '),
       detectedClues: clues,
       reassuringClues:
         mappedRisk === 'faible'
@@ -210,8 +215,9 @@ export async function analyzeUnifiedMessage(
               {
                 id: 'reassuring-1',
                 type: 'reassuring',
-                title: 'Aucune anomalie critique identifiée',
-                description: 'Ni les tournures du message ni les adresses web ne présentent de signaux malveillants répertoriés.',
+                title: "Aucun signal d'arnaque connu repéré",
+                description:
+                  "Aucun signal d'arnaque connu repéré. Cela ne garantit pas que le message soit sûr : en cas de doute, vérifiez auprès de l'organisme concerné.",
               },
             ]
           : [],
@@ -231,6 +237,7 @@ export async function analyzeUnifiedMessage(
       result,
       isOfflineFallback: false,
       apiData,
+      sourceLabel: 'Analyse complète (serveur)',
     };
   } catch (err: any) {
     clearTimeout(timeoutId);
@@ -245,6 +252,7 @@ export async function analyzeUnifiedMessage(
       },
       isOfflineFallback: true,
       offlineMessage: 'Analyse simplifiée (mode hors ligne). Le résultat peut être moins précis.',
+      sourceLabel: 'Analyse simplifiée (hors ligne)',
     };
   }
 }

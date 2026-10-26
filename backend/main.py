@@ -165,16 +165,16 @@ class UnifiedAnalysisResponse(BaseModel):
 RISK_RANKS = {"FAIBLE": 1, "MODERE": 2, "ELEVE": 3, "CRITIQUE": 4}
 RANK_TO_LEVEL = {1: "FAIBLE", 2: "MODERE", 3: "ELEVE", 4: "CRITIQUE"}
 RANK_TO_LABEL = {
-    1: "Aucune menace apparente identifiée",
+    1: "Aucun signal d'arnaque connu repéré. Cela ne garantit pas que le message soit sûr : en cas de doute, vérifiez auprès de l'organisme concerné.",
     2: "Vigilance recommandée",
     3: "Menace ou usurpation probable",
     4: "Tentative d'escroquerie ou phishing critique"
 }
 RANK_TO_RECOMMENDATION = {
-    1: "Restez vigilant : ne communiquez jamais vos codes secrets ni de code de validation par SMS.",
+    1: "Aucun signal d'arnaque connu repéré. Cela ne garantit pas que le message soit sûr : en cas de doute, vérifiez auprès de l'organisme concerné. En cas de doute, contactez votre opérateur via son numéro officiel (ex: 1441 pour Orange, support dans l'application Wave, 200244 pour Free).",
     2: "Vérifiez attentivement l'authenticité du message auprès de votre opérateur officiel.",
     3: "Méfiance absolue : ne cliquez sur aucun lien et ne validez aucun transfert d'argent.",
-    4: "DANGER : Ne cliquez sur aucun lien, ne partagez aucun code secret et bloquez l'expéditeur immédiatement."
+    4: "DANGER : Ne cliquez sur aucun lien, ne partagez aucun code secret et contactez le support officiel de l'opérateur."
 }
 
 
@@ -340,7 +340,10 @@ def analyze_unified(req: MessageAnalysisRequest, request: Request) -> UnifiedAna
         final_rank = max(nlp_rank, max_url_rank)
         final_level = RANK_TO_LEVEL[final_rank]
         final_label = RANK_TO_LABEL[final_rank]
-        final_recommendation = RANK_TO_RECOMMENDATION[final_rank]
+        if nlp_rank >= max_url_rank and nlp_res.get("recommendation"):
+            final_recommendation = nlp_res["recommendation"]
+        else:
+            final_recommendation = RANK_TO_RECOMMENDATION[final_rank]
 
         # 4. Merge explanations concisely (2 to 4 short sentences)
         merged_explanations: List[str] = []
@@ -358,7 +361,7 @@ def analyze_unified(req: MessageAnalysisRequest, request: Request) -> UnifiedAna
                     merged_explanations.append(formatted_exp)
 
         if not merged_explanations:
-            merged_explanations.append("Aucun indicateur suspect identifié dans le message ou les liens.")
+            merged_explanations.append("Aucun signal d'arnaque connu repéré. Cela ne garantit pas que le message soit sûr : en cas de doute, vérifiez auprès de l'organisme concerné.")
 
         # Limit to 4 sentences maximum for clarity
         merged_explanations = merged_explanations[:4]

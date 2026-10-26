@@ -19,6 +19,7 @@ describe('API Client & Offline Resilience (D1, D2)', () => {
     const res = await analyzeUnifiedMessage('Alerte Wave : donnez votre code secret immédiatement');
 
     expect(res.isOfflineFallback).toBe(true);
+    expect(res.sourceLabel).toBe('Analyse simplifiée (hors ligne)');
     expect(res.offlineMessage).toContain('mode hors ligne');
     expect(res.result).toBeDefined();
     expect(res.result.riskLevel).toBe('eleve'); // Local heuristic catches code secret theft
@@ -64,6 +65,7 @@ describe('API Client & Offline Resilience (D1, D2)', () => {
     const res = await analyzeUnifiedMessage('Alerte Wave http://wvve.com/login');
 
     expect(res.isOfflineFallback).toBe(false);
+    expect(res.sourceLabel).toBe('Analyse complète (serveur)');
     expect(res.apiData).toBeDefined();
     expect(res.result.riskLevel).toBe('eleve');
     expect(res.result.engineType).toBe('ai-remote');

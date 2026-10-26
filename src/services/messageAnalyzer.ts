@@ -87,12 +87,27 @@ export function analyzeMessageLocally(rawText: string): AnalysisResult {
     });
   }
 
+  // 2b. Detection of Threats / Intimidation / Ultimatums (Point 1: Menace + Urgence = Eleve)
+  const hasThreatWords = /(?:suspendu|suspendre|suspension|bloqu[ée]|bloquer|blocage|fermeture|fermer|coupure|couper|résili[ée]|résiliation|poursuites?|tribunal|huissier|plainte|mandat|police|commissariat|données.*publi[ée]es|publi.*données|divulgu|diffus|régularis|mettre à jour.*dossier|mise en demeure|sommation|tëj|yoon)/i.test(lower);
+  const hasUltimatumWords = /(?:dernier avertissement|dernier délai|dernière sommation|ultime avis|sinon|faute de quoi|sous peine|aujourd'?hui|ce jour|immédiatement|sans délai|dans les 24h|sous 24h|dans 24h|avant ce soir|sous 48h|en urgence|ci sàss)/i.test(lower);
+  const hasIntimidationScam = hasThreatWords && hasUltimatumWords;
+  if (hasIntimidationScam) {
+    score += 50; // Automatically elevates to at least 'eleve' (score >= 45)
+    detectedClues.push({
+      id: 'clue-intimidation-ultimatum',
+      type: 'danger',
+      title: 'Arnaque par intimidation et ultimatum temporel',
+      description: 'Le message combine menaces (coupure de ligne, poursuites, publication de données) et ultimatum temporel strict.',
+      detail: 'Technique d\'ingénierie sociale visant à court-circuiter la réflexion par la peur. Ne cédez à aucun chantage.',
+    });
+  }
+
   // 3. Detection of Unrealistic Gains / Lottery / Tombola (High Danger)
   const gainPatterns = [
-    /(?:gagn[ée]|remport[ée]|félicitations?|sélectionn[ée]).*(?:tirage|tombola|million|fcfa|chèque|iphone|voiture)/i,
+    /(?:gagn[ée]|remport[ée]|félicitations?|sélectionn[ée]).*(?:tirage|tombola|million|fcfa|chèque|iphone|voiture|bourse)/i,
     /am nga.*(?:xaalis|kado)/i,
   ];
-  const hasAdvanceFees = /(?:frais d'huissier|frais de retrait|frais de dossier|frais d'enregistrement|frais de dédouanement).*(?:payer|verser|envoyer|régler)/i.test(lower);
+  const hasAdvanceFees = /(?:frais d'huissier|frais de retrait|frais de dossier|frais d'enregistrement|frais de dédouanement|frais).*(?:payer|verser|envoyer|régler)/i.test(lower);
   const hasGains = gainPatterns.some((pattern) => pattern.test(lower)) || hasAdvanceFees;
 
   if (hasGains) {
@@ -101,8 +116,10 @@ export function analyzeMessageLocally(rawText: string): AnalysisResult {
       id: 'clue-gains',
       type: 'danger',
       title: 'Promesse de gain spectaculaire ou loterie inattendue',
-      description: 'Le message annonce un tirage au sort avantageux, souvent accompagné d\'une demande de frais préalable pour débloquer le lot.',
-      detail: 'Aucun jeu légitime ne réclame de verser de l\'argent par mobile money pour toucher un prix.',
+      description: hasAdvanceFees
+        ? 'Le message annonce un gain accompagné d\'une demande de paiement préalable de frais.'
+        : 'Le message annonce un gain, une bourse ou un tirage au sort avantageux non sollicité.',
+      detail: 'Aucun organisme sérieux ni jeu officiel ne réclame d\'avancer de l\'argent pour toucher un prix ou une bourse.',
     });
   }
 
@@ -287,13 +304,38 @@ export function analyzeMessageLocally(rawText: string): AnalysisResult {
     summary = 'Ce message comporte des signaux d\'alerte qui invitent à une grande prudence. N\'exécutez aucune action sans vérification indépendante.';
   } else if (detectedClues.length === 0 && score === 0) {
     riskLevel = 'faible';
-    title = 'Peu ou pas d\'indices suspects identifiés';
-    summary = 'Le moteur de règles n\'a pas relevé d\'indicateurs typiques de fraude dans ce texte. Restez toutefois attentif au contexte global de l\'échange.';
+    title = 'Risque faible : Aucun signal d\'arnaque connu repéré';
+    summary = 'Aucun signal d\'arnaque connu repéré. Cela ne garantit pas que le message soit sûr : en cas de doute, vérifiez auprès de l\'organisme concerné.';
   } else {
     riskLevel = 'indetermine';
     title = 'Niveau de risque indéterminé';
     summary = 'Impossible de déterminer avec certitude si ce message est frauduleux. Voici les vérifications complémentaires à effectuer.';
   }
+
+  const operatorSuffix = ' En cas de doute, contactez votre opérateur via son numéro officiel (ex: 1441 pour Orange, support dans l\'application Wave, 200244 pour Free).';
+  let primaryAdvice = 'Ne donnez pas suite à cette sollicitation.';
+  if (hasOtpRequest) {
+    primaryAdvice = 'Ne donnez jamais votre code ou PIN, même à quelqu\'un qui dit être de l\'opérateur.';
+  } else if (transferRefundPatterns.some((pattern) => pattern.test(lower))) {
+    primaryAdvice = 'Ne renvoyez rien. Vérifiez votre solde via l\'application officielle.';
+  } else if (hasGains) {
+    primaryAdvice = 'Aucun organisme sérieux ne demande de payer pour recevoir un gain.';
+  } else if (hasLink || /(?:informations?\s+bancaires?|coordonnées)/i.test(lower)) {
+    primaryAdvice = 'Ne cliquez pas et ne saisissez aucune information. Passez par le site ou l\'application officiels.';
+  } else if (hasIntimidationScam || hasUrgency) {
+    primaryAdvice = 'Ne paniquez pas. Contactez directement l\'organisme via son numéro officiel.';
+  }
+
+  const recommendedActions =
+    riskLevel === 'faible'
+      ? [
+          `Aucun signal d'arnaque connu repéré. Cela ne garantit pas que le message soit sûr : en cas de doute, vérifiez auprès de l'organisme concerné.${operatorSuffix}`,
+        ]
+      : [
+          `${primaryAdvice}${operatorSuffix}`,
+          'Ne communiquez JAMAIS de code secret, de code PIN ou de code SMS.',
+          'Consultez notre rubrique « Je suis victime » si vous avez déjà validé une opération.',
+        ];
 
   return {
     riskLevel,
@@ -312,12 +354,7 @@ export function analyzeMessageLocally(rawText: string): AnalysisResult {
       'Ouvrez directement votre application mobile officielle pour contrôler votre solde et votre historique.',
       'Si le message provient d\'un proche, joignez-le par un appel vocal classique pour entendre sa voix.',
     ],
-    recommendedActions: [
-      'Ne communiquez JAMAIS de code secret, de code PIN ou de code SMS.',
-      'Ne cliquez sur aucun lien web non vérifié.',
-      'En cas d\'insistance ou de menace, bloquez le numéro émetteur.',
-      'Consultez notre rubrique « Je suis victime » si vous avez déjà validé une opération.',
-    ],
+    recommendedActions,
     engineType: 'local-heuristic',
   };
 }

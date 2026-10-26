@@ -70,11 +70,23 @@ describe('Message Analyzer — Moteur Heuristique Local & Sécurité des Donnée
     expect(result.detectedClues.some((c) => c.id === 'clue-task-scam')).toBe(true);
   });
 
-  it('détecte une arnaque aux investissements crypto à rendement garanti', () => {
-    const message = 'Rejoignez notre groupe de trading crypto VIP : investissement sans risque, doublez votre capital en 24h avec notre robot bitcoin.';
+  it('détecte une arnaque par intimidation et ultimatum comme Risque Élevé', () => {
+    const message = 'Dernier avertissement : régularisez votre dossier aujourd\'hui sinon votre ligne sera suspendue et vos données publiées';
     const result = analyzeMessageLocally(message);
 
     expect(result.riskLevel).toBe('eleve');
-    expect(result.detectedClues.some((c) => c.id === 'clue-crypto-ponzi')).toBe(true);
+    expect(result.detectedClues.some((c) => c.id === 'clue-intimidation-ultimatum')).toBe(true);
+    expect(result.recommendedActions[0]).toContain('Ne paniquez pas');
+    expect(result.recommendedActions[0]).toContain('numéro officiel');
+  });
+
+  it('applique le wording exact pour le niveau faible avec réserve de vigilance', () => {
+    const message = 'Bonjour M. Diop, pouvez-vous me confirmer notre heure de rendez-vous pour demain ?';
+    const result = analyzeMessageLocally(message);
+
+    expect(result.riskLevel).toBe('faible');
+    expect(result.summary).toBe(
+      'Aucun signal d\'arnaque connu repéré. Cela ne garantit pas que le message soit sûr : en cas de doute, vérifiez auprès de l\'organisme concerné.'
+    );
   });
 });

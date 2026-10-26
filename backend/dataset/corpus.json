@@ -278,5 +278,173 @@
     "label": 0,
     "language": "fr",
     "category": "recu-officiel"
+  },
+  {
+    "id": "fraud-021",
+    "text": "Dernier délai : veuillez vous acquitter des frais de dossier immédiatement sinon votre compte sera clôturé définitivement et une plainte sera déposée.",
+    "label": 1,
+    "language": "fr",
+    "category": "menace-intimidation"
+  },
+  {
+    "id": "fraud-022",
+    "text": "Ultime rappel : régularisez votre situation avant ce soir faute de quoi votre ligne mobile sera résiliée et transmise au contentieux.",
+    "label": 1,
+    "language": "fr",
+    "category": "menace-intimidation"
+  },
+  {
+    "id": "fraud-023",
+    "text": "Avis de mise en demeure : sans régularisation immédiate aujourd'hui, vos informations seront transmises au tribunal et vos comptes gelés.",
+    "label": 1,
+    "language": "fr",
+    "category": "menace-intimidation"
+  },
+  {
+    "id": "fraud-024",
+    "text": "Dernier avis concernant votre ligne : confirmez vos coordonnées sous 24h sinon nous procédons à la coupure totale de vos accès et au transfert à l'huissier.",
+    "label": 1,
+    "language": "fr",
+    "category": "menace-intimidation"
+  },
+  {
+    "id": "fraud-025",
+    "text": "Urgence sécurité : veuillez régulariser votre compte dans les 24h faute de quoi toutes vos données personnelles seront diffusées sur internet.",
+    "label": 1,
+    "language": "fr",
+    "category": "menace-intimidation"
+  },
+  {
+    "id": "fraud-026",
+    "text": "Attention : dernier délai pour mettre à jour vos pièces d'identité aujourd'hui, sinon votre compte Wave sera suspendu et bloqué pour fraude.",
+    "label": 1,
+    "language": "fr",
+    "category": "menace-intimidation"
+  },
+  {
+    "id": "fraud-027",
+    "text": "Dernier avertissement avant poursuites judiciaires : payez l'amende réclamée aujourd'hui sinon un mandat sera émis contre vous.",
+    "label": 1,
+    "language": "fr",
+    "category": "menace-intimidation"
+  },
+  {
+    "id": "fraud-028",
+    "text": "Avertissement final : régularisez votre solde débiteur immédiatement faute de quoi votre ligne sera coupée et vos informations partagées avec la police.",
+    "label": 1,
+    "language": "fr",
+    "category": "menace-intimidation"
+  },
+  {
+    "id": "fraud-029",
+    "text": "Tëj kont ci sàss : régularisez sa dossier tay ci sàss sinon dagnuy tëj sa ligne te exposé say données ci internet.",
+    "label": 1,
+    "language": "wo",
+    "category": "menace-intimidation"
+  },
+  {
+    "id": "fraud-030",
+    "text": "Dernier délai ci sa ligne : feyal léegi tey bala ngone sinon danuy tëj sa compte te yobbu sa dossier ci yoon.",
+    "label": 1,
+    "language": "wo",
+    "category": "menace-intimidation"
+  },
+  {
+    "id": "fraud-031",
+    "text": "Avis de suspension immédiate : sans action de votre part dans les 24h, votre numéro sera résilié et vos données signalées aux autorités.",
+    "label": 1,
+    "language": "fr",
+    "category": "menace-intimidation"
+  },
+  {
+    "id": "fraud-032",
+    "text": "Sama xarit, feyal tay ci sàss faute de quoi dagnuy tëj sa compte Wave te yobbu sa tur ci commissariat.",
+    "label": 1,
+    "language": "wo",
+    "category": "menace-intimidation"
+  },
+  {
+    "id": "legit-021",
+    "text": "Orange Info : Votre facture internet du mois d'octobre est arrivée à échéance. Vous pouvez la régler via Orange Money ou en agence à votre convenance.",
+    "label": 0,
+    "language": "fr",
+    "category": "facturation-legitime"
+  },
+  {
+    "id": "legit-022",
+    "text": "Senelec : Rappel aimable d'échéance de votre facture Woyofal/Post-paiement N° 458921 d'un montant de 18.500 FCFA. Réglez en toute sécurité via vos canaux habituels.",
+    "label": 0,
+    "language": "fr",
+    "category": "facturation-legitime"
+  },
+  {
+    "id": "legit-023",
+    "text": "Canal+ Sénégal : Votre formule d'abonnement expire le 31 du mois. Rendez-vous sur votre espace client ou chez votre distributeur pour réabonnement.",
+    "label": 0,
+    "language": "fr",
+    "category": "rappel-abonnement"
+  },
+  {
+    "id": "legit-024",
+    "text": "Free Sénégal : Votre forfait mensuel arrive à son terme dans 3 jours. Rechargez via votre menu *150# ou votre boutique Free habituelle.",
+    "label": 0,
+    "language": "fr",
+    "category": "rappel-forfait"
+  },
+  {
+    "id": "legit-025",
+    "text": "Sen'Eau : Votre facture bimestrielle d'un montant de 12.300 FCFA est disponible. Date limite de paiement le 15 du mois prochain. Merci pour votre fidélité.",
+    "label": 0,
+    "language": "fr",
+    "category": "facturation-legitime"
+  },
+  {
+    "id": "legit-026",
+    "text": "Sonatel : Notification d'échéance. Votre facture mobile est consultable dans l'application Orange et Moi. Renseignements au 1441.",
+    "label": 0,
+    "language": "fr",
+    "category": "facturation-legitime"
+  },
+  {
+    "id": "legit-027",
+    "text": "Campus France Sénégal : Rappel - la date limite de soumission de votre dossier d'orientation est fixée au 15 décembre. Consultez votre compte officiel.",
+    "label": 0,
+    "language": "fr",
+    "category": "rappel-administratif"
+  },
+  {
+    "id": "legit-028",
+    "text": "Rappel : Votre abonnement annuel de transport arrive à échéance à la fin du mois. Rendez-vous en gare pour le renouveler.",
+    "label": 0,
+    "language": "fr",
+    "category": "rappel-service"
+  },
+  {
+    "id": "legit-029",
+    "text": "Orange Sénégal : Sa forfait expire na ci 2 jours. Mën nga ko renouveler ci application Orange et Moi walla *144#.",
+    "label": 0,
+    "language": "wo",
+    "category": "rappel-forfait"
+  },
+  {
+    "id": "legit-030",
+    "text": "Senelec : Fattali - facture bi amna échéance semaine bii. Feyal ci agence walla ci application yi.",
+    "label": 0,
+    "language": "wo",
+    "category": "facturation-legitime"
+  },
+  {
+    "id": "legit-031",
+    "text": "Wave : Rappel de votre transaction programmée de 20.000 FCFA prévue pour demain. Vous pouvez la modifier ou l'annuler dans votre application.",
+    "label": 0,
+    "language": "fr",
+    "category": "notification-legitime"
+  },
+  {
+    "id": "legit-032",
+    "text": "Banque Atlantique : Votre relevé de compte mensuel est disponible dans votre espace en ligne sécurisé. Bonne journée.",
+    "label": 0,
+    "language": "fr",
+    "category": "notification-legitime"
   }
 ]

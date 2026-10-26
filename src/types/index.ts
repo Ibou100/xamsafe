@@ -35,7 +35,7 @@ export interface ClueItem {
   id: string;
   type: 'danger' | 'warning' | 'info' | 'reassuring';
   title: string;
-  description: string;
+  description?: string;
   detail?: string;
 }
 
