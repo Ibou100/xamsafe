@@ -1,7 +1,8 @@
 """
 Regression Test Suite - Sovereign Defensive AI Shield.
-Replays the 6 critical real-world scam patterns on every test run.
-These regression cases are STRICTLY NEVER added to training corpus.
+Replays the critical real-world scam patterns on every test run.
+All tests target the real API endpoint POST /api/v1/analyze.
+These regression cases are STRICTLY NEVER added to the training corpus.
 """
 
 import os
@@ -12,7 +13,6 @@ from fastapi.testclient import TestClient
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from classifier import SocialEngineeringClassifier
 from main import app
 
 REGRESSION_PATH = os.path.join(os.path.dirname(__file__), "..", "dataset", "regression_cases.json")
@@ -28,14 +28,18 @@ def load_regression_cases():
 
 def test_regression_cases_dataset_integrity():
     cases = load_regression_cases()
-    assert len(cases) == 6, "Le jeu de régression doit contenir exactement 6 cas."
-    expected_ids = {"regr-001", "regr-002", "regr-003", "regr-004", "regr-005", "regr-006"}
-    assert {c["id"] for c in cases} == expected_ids
+    assert len(cases) >= 16, f"Le jeu de régression doit contenir au moins 16 cas, trouvé {len(cases)}."
+    expected_sample_ids = {"regr-001", "regr-002", "regr-003", "regr-004", "regr-005", "regr-006", "regr-015", "regr-016"}
+    case_ids = {c["id"] for c in cases}
+    for expected_id in expected_sample_ids:
+        assert expected_id in case_ids, f"ID de régression manquant : {expected_id}"
 
 
-def test_regression_cases_classifier_predictions():
-    classifier = SocialEngineeringClassifier()
-    classifier.train()
+def test_regression_cases_api_endpoint():
+    """
+    Règle R2 & Étape 7 :
+    Teste chaque cas via le chemin réel de l'endpoint POST /api/v1/analyze.
+    """
     cases = load_regression_cases()
 
     for case in cases:
@@ -43,34 +47,37 @@ def test_regression_cases_classifier_predictions():
         min_level = case["min_risk_level"]
         min_rank = RISK_RANK_MAP[min_level]
 
-        result = classifier.predict(text)
-        pred_level = result["risk_level"]
+        resp = client.post("/api/v1/analyze", json={"text": text})
+        assert resp.status_code == 200, f"Erreur HTTP {resp.status_code} sur {case['id']}: {resp.text}"
+        data = resp.json()
+
+        pred_level = data["risk_level"]
         pred_rank = RISK_RANK_MAP.get(pred_level, 0)
 
         # Assert risk level meets minimum threshold
         assert pred_rank >= min_rank, (
-            f"Échec régression pour '{case['name']}' (ID: {case['id']}): "
-            f"obtenu {pred_level}, attendu au minimum {min_level}."
+            f"Échec régression API pour '{case['name']}' (ID: {case['id']}): "
+            f"obtenu {pred_level}, attendu au minimum {min_level}. Réponse: {data}"
         )
 
         # Assert forbidden keywords are absent (e.g. no 'frais' for Campusen)
         if "forbidden_explanation_keywords" in case:
             for kw in case["forbidden_explanation_keywords"]:
-                for exp in result["explanations"]:
+                for exp in data["explanations"]:
                     assert kw.lower() not in exp.lower(), (
-                        f"Mot-clé interdit '{kw}' trouvé dans l'explication: '{exp}' "
+                        f"Mot-clé interdit '{kw}' trouvé dans l'explication API: '{exp}' "
                         f"pour le cas '{case['name']}'"
                     )
 
 
 def test_regression_threat_ultimatum_intimidation_message():
     """
-    Spécifique au point 1 :
+    Spécifique à l'Étape 1 :
     'Dernier avertissement : régularisez votre dossier aujourd'hui sinon votre ligne sera suspendue et vos données publiées'
-    Doit être au minimum ELEVE et comporter une explication de menace/ultimatum.
+    Doit être au minimum ELEVE et comporter une explication de menace/ultimatum via /api/v1/analyze.
     """
     text = "Dernier avertissement : régularisez votre dossier aujourd'hui sinon votre ligne sera suspendue et vos données publiées"
-    resp = client.post("/api/v1/analyze-message", json={"text": text})
+    resp = client.post("/api/v1/analyze", json={"text": text})
     assert resp.status_code == 200
     data = resp.json()
 
@@ -85,9 +92,9 @@ def test_regression_threat_ultimatum_intimidation_message():
 
 def test_regression_campusen_no_fees_in_api():
     """
-    Spécifique au point 2 :
+    Spécifique à l'Étape 2 :
     'Campusen : vous êtes sélectionné pour une bourse complémentaire. Confirmez vos informations bancaires dans les 24h sur ce lien pour la recevoir.'
-    Ne doit en aucun cas mentionner 'frais'.
+    Ne doit en aucun cas mentionner 'frais' via /api/v1/analyze.
     """
     text = "Campusen : vous êtes sélectionné pour une bourse complémentaire. Confirmez vos informations bancaires dans les 24h sur ce lien pour la recevoir."
     resp = client.post("/api/v1/analyze", json={"text": text})

@@ -3,7 +3,7 @@
     "id": "regr-001",
     "name": "code secret Wave",
     "text": "Service Client Wave : Votre compte est temporairement bloqué pour vérification. Veuillez nous transmettre immédiatement votre code secret ou le code reçu par SMS pour réactiver vos services.",
-    "min_risk_level": "ELEVE"
+    "min_risk_level": "CRITIQUE"
   },
   {
     "id": "regr-002",
@@ -28,12 +28,72 @@
     "id": "regr-005",
     "name": "faux support Orange Money (PIN)",
     "text": "Support Orange Money : Tentative d'accès suspecte. Veuillez composer le *144# ou communiquer votre code PIN au technicien pour sécuriser votre compte.",
-    "min_risk_level": "ELEVE"
+    "min_risk_level": "CRITIQUE"
   },
   {
     "id": "regr-006",
     "name": "menace de suspension + publication des données",
     "text": "Dernier avertissement : régularisez votre dossier aujourd'hui sinon votre ligne sera suspendue et vos données publiées",
     "min_risk_level": "ELEVE"
+  },
+  {
+    "id": "regr-007",
+    "name": "fausse offre d'emploi",
+    "text": "Offre d'emploi TotalEnergies : Vous êtes retenu pour le poste de superviseur. Envoyez 25.000 FCFA de frais de dossier et caution matériel avant ce soir.",
+    "min_risk_level": "ELEVE"
+  },
+  {
+    "id": "regr-008",
+    "name": "faux acheteur / transporteur mandaté",
+    "text": "J'achète votre ordinateur au prix demandé. Mon transporteur mandaté passera ce midi, versez d'abord 10.000 FCFA d'assurance livraison remboursable.",
+    "min_risk_level": "ELEVE"
+  },
+  {
+    "id": "regr-009",
+    "name": "romance scam",
+    "text": "Mon chéri, je suis bloquée à la douane de l'aéroport avec mes valises de cadeaux pour toi, envoie d'urgence 60.000 FCFA pour débloquer la situation.",
+    "min_risk_level": "ELEVE"
+  },
+  {
+    "id": "regr-010",
+    "name": "faux investissement / crypto",
+    "text": "Opportunité d'investissement : Déposez 50.000 FCFA et recevez 200.000 FCFA garantis sans risque en 24h avec notre plateforme trading.",
+    "min_risk_level": "ELEVE"
+  },
+  {
+    "id": "regr-011",
+    "name": "usurpation de proche (maman)",
+    "text": "Coucou c'est maman, j'ai eu un problème avec mon téléphone et j'ai changé de numéro. Envoie-moi vite 20.000 FCFA sur ce numéro pour une urgence.",
+    "min_risk_level": "ELEVE"
+  },
+  {
+    "id": "regr-012",
+    "name": "faux colis en dédouanement",
+    "text": "Votre colis n° 88392 est en attente de livraison. Des frais de douane de 3.500 FCFA sont impayés. Réglez sur ce lien pour reprogrammer la livraison.",
+    "min_risk_level": "ELEVE"
+  },
+  {
+    "id": "regr-013",
+    "name": "faux visa / immigration",
+    "text": "Ambassade du Canada : Votre dossier d'immigration a été approuvé. Versez 75.000 FCFA de frais consulaires express pour émission immédiate de votre visa.",
+    "min_risk_level": "ELEVE"
+  },
+  {
+    "id": "regr-014",
+    "name": "faux policier / gendarmerie / justice",
+    "text": "Convocation urgente de la Gendarmerie Nationale : Vous faites l'objet de poursuites pénales pour infraction grave. Réglez l'amende de 50.000 FCFA sous 24h sinon arrestation.",
+    "min_risk_level": "ELEVE"
+  },
+  {
+    "id": "regr-015",
+    "name": "vol de compte WhatsApp (code 6 chiffres)",
+    "text": "Salut c'est ton ami, je t'ai envoyé par erreur mon code WhatsApp à 6 chiffres par SMS, peux-tu me le renvoyer rapidement s'il te plaît ?",
+    "min_risk_level": "CRITIQUE"
+  },
+  {
+    "id": "regr-016",
+    "name": "chantage à la webcam / sextorsion",
+    "text": "Nous avons piraté votre webcam et enregistré une vidéo intime compromettante. Si vous ne payez pas 400.000 FCFA dans les 24h, nous la diffuserons à tous vos contacts.",
+    "min_risk_level": "CRITIQUE"
   }
 ]

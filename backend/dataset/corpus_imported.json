@@ -151,5 +151,56 @@
       "names": 1
     },
     "notes": ""
+  },
+  {
+    "id": "imported-20261026220210-1558",
+    "text": "Bonjour, tentative de phishing reçue sur le <TOKEN_PHONE> de la part de <TOKEN_PERSON>",
+    "label": 1,
+    "source": "contribution-citoyenne",
+    "language": "fr",
+    "consent_verified": true,
+    "imported_at": "2026-10-26T22:02:10.144415Z",
+    "redacted_counts": {
+      "phones": 1,
+      "amounts": 0,
+      "urls": 0,
+      "codes": 0,
+      "names": 1
+    },
+    "notes": ""
+  },
+  {
+    "id": "imported-20261026220455-85dd",
+    "text": "Bonjour, tentative de phishing reçue sur le <TOKEN_PHONE> de la part de <TOKEN_PERSON>",
+    "label": 1,
+    "source": "contribution-citoyenne",
+    "language": "fr",
+    "consent_verified": true,
+    "imported_at": "2026-10-26T22:04:55.710262Z",
+    "redacted_counts": {
+      "phones": 1,
+      "amounts": 0,
+      "urls": 0,
+      "codes": 0,
+      "names": 1
+    },
+    "notes": ""
+  },
+  {
+    "id": "imported-20261026221942-0ad1",
+    "text": "Bonjour, tentative de phishing reçue sur le <TOKEN_PHONE> de la part de <TOKEN_PERSON>",
+    "label": 1,
+    "source": "contribution-citoyenne",
+    "language": "fr",
+    "consent_verified": true,
+    "imported_at": "2026-10-26T22:19:42.436795Z",
+    "redacted_counts": {
+      "phones": 1,
+      "amounts": 0,
+      "urls": 0,
+      "codes": 0,
+      "names": 1
+    },
+    "notes": ""
   }
 ]

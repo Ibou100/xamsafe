@@ -206,7 +206,7 @@ export async function analyzeUnifiedMessage(
       title: apiData.risk_label,
       summary:
         mappedRisk === 'faible'
-          ? "Aucun signal d'arnaque connu repéré. Cela ne garantit pas que le message soit sûr : en cas de doute, vérifiez auprès de l'organisme concerné."
+          ? "Aucun signal d'arnaque connu repéré."
           : apiData.explanations.slice(0, 3).join(' '),
       detectedClues: clues,
       reassuringClues:
@@ -217,7 +217,7 @@ export async function analyzeUnifiedMessage(
                 type: 'reassuring',
                 title: "Aucun signal d'arnaque connu repéré",
                 description:
-                  "Aucun signal d'arnaque connu repéré. Cela ne garantit pas que le message soit sûr : en cas de doute, vérifiez auprès de l'organisme concerné.",
+                  "Cela ne garantit pas que le message soit sûr : en cas de doute, vérifiez auprès de l'organisme concerné.",
               },
             ]
           : [],
@@ -227,7 +227,7 @@ export async function analyzeUnifiedMessage(
       ],
       complementaryChecks: [
         apiData.recommendation,
-        'En cas de doute persistant, contactez directement votre opérateur via son numéro court officiel (ex: 1441 Orange, support Wave).',
+        "En cas de doute persistant, contactez directement l'organisme concerné via ses canaux officiels habituels.",
       ],
       recommendedActions: [apiData.recommendation],
       engineType: 'ai-remote',

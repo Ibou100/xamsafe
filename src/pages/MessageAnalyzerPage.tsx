@@ -6,7 +6,11 @@ import {
   type UnifiedApiResponse,
 } from '../services/apiClient';
 import { analyzeMessageLocally, sanitizeUserMessage } from '../services/messageAnalyzer';
-import { AIVoiceService } from '../services/aiVoiceService';
+import {
+  validateImageFile,
+  downscaleImage,
+  extractTextFromImage,
+} from '../services/imageOcr';
 import type { AnalysisResult } from '../types';
 import { PiiSanitizerNotice } from '../components/PiiSanitizerNotice';
 import {
@@ -16,15 +20,12 @@ import {
   HelpCircle,
   ShieldAlert,
   Info,
-  RotateCcw,
   Image as ImageIcon,
   FileText,
   UploadCloud,
-  Key,
+  Camera,
   X,
   Zap,
-  PhoneCall,
-  MessageSquare,
   ChevronDown,
   Loader2,
   ShieldCheck,
@@ -37,7 +38,7 @@ import {
 
 export interface MessageAttackSample {
   id: string;
-  category: 'mobile-money' | 'whatsapp' | 'gains' | 'emploi' | 'famille' | 'officiel';
+  category: 'mobile-money' | 'whatsapp' | 'gains' | 'emploi' | 'famille' | 'officiel' | 'colis' | 'crypto' | 'police' | 'chantage';
   categoryLabel: string;
   title: string;
   channel: 'SMS' | 'WhatsApp' | 'Appel téléphonique' | 'E-mail';
@@ -115,20 +116,9 @@ export const MESSAGE_ATTACK_SAMPLES: MessageAttackSample[] = [
     isDanger: true,
   },
   {
-    id: 'lonase-fake-prime',
-    category: 'gains',
-    categoryLabel: 'Loterie & Tombola',
-    title: 'Faux gain de loterie Lonase / Loto Voyage',
-    channel: 'WhatsApp',
-    text: "Direction Lonase Sénégal : Votre numéro de téléphone a été sélectionné parmi les abonnés actifs. Vous bénéficiez d'une prime spéciale de 1.500.000 FCFA. Veuillez envoyer 10.000 FCFA de frais d'activation de dossier par Wave sur le numéro du comptable pour valider le virement.",
-    attackerTactics: "Usurpation d'une société nationale de jeux pour réclamer un paiement préalable.",
-    trapIndicator: "La demande de frais préalables (« frais d'activation de dossier ») est la signature universelle des escroqueries financières.",
-    isDanger: true,
-  },
-  {
     id: 'fake-tiktok-jobs',
     category: 'emploi',
-    categoryLabel: 'Emploi Fictif / Tâches',
+    categoryLabel: 'Emploi Fictif / Recrutement',
     title: 'Faux travail en ligne : « Gagnez 25 000 FCFA par jour sur TikTok »',
     channel: 'WhatsApp',
     text: "Bonjour ! Recrutement international : gagnez entre 20.000 et 50.000 FCFA par jour en travaillant depuis chez vous. Il vous suffit de liker des vidéos TikTok et de vous abonner à des chaînes YouTube pendant 30 minutes. Cliquez sur ce lien Telegram pour commencer et toucher votre premier paiement.",
@@ -139,12 +129,12 @@ export const MESSAGE_ATTACK_SAMPLES: MessageAttackSample[] = [
   {
     id: 'campusen-scholarship-scam',
     category: 'emploi',
-    categoryLabel: 'Bourses & Étudiants',
+    categoryLabel: 'Bourses & Campusen',
     title: "Fausse bourse d'aide aux étudiants Campusen",
     channel: 'SMS',
-    text: "Commission Bourses Campusen : Votre dossier d'allocation sociale étudiante a été retenu pour 45.000 FCFA/mois. Pour finaliser votre enregistrement bancaire, envoyez 3.500 FCFA de frais de timbre par Wave au trésorier au 77 XXX XX XX.",
-    attackerTactics: "Exploite la vulnérabilité et l'attente des étudiants sénégalais concernant leurs allocations.",
-    trapIndicator: "Les bourses d'État ne se paient jamais via un transfert Wave personnel à un numéro 77 anonyme.",
+    text: "Commission Bourses Campusen : Votre dossier d'allocation sociale étudiante a été retenu pour 45.000 FCFA/mois. Confirmez vos informations bancaires dans les 24h sur ce lien pour la recevoir.",
+    attackerTactics: "Exploite l'attente des étudiants sénégalais concernant leurs allocations sans réclamer de frais immédiats mais en dérobant leurs identifiants.",
+    trapIndicator: "Les bourses d'État ne se confirment jamais via des liens informels par SMS.",
     isDanger: true,
   },
   {
@@ -156,6 +146,50 @@ export const MESSAGE_ATTACK_SAMPLES: MessageAttackSample[] = [
     text: "Papa c'est moi, mon téléphone est déchargé. J'ai eu un grave accident de taxi en allant au cours, la police m'a retenu au commissariat. Envoie vite 30.000 FCFA sur ce numéro Wave pour payer le constat sinon ils m'enferment d'urgence !",
     attackerTactics: "Panique parentale extrême : l'escroc sait qu'un parent affolé enverra l'argent sans réfléchir.",
     trapIndicator: "N'envoyez JAMAIS d'argent dans la précipitation. Appelez directement le numéro habituel de votre enfant ou ses amis pour vérifier la situation.",
+    isDanger: true,
+  },
+  {
+    id: 'fake-parcel-customs',
+    category: 'colis',
+    categoryLabel: 'Faux Colis / Livraison',
+    title: 'Fausse livraison et dédouanement de colis',
+    channel: 'SMS',
+    text: 'Votre colis Chronopost n° 88392 est en attente de livraison. Des frais de douane de 3.500 FCFA sont impayés. Réglez sur ce lien http://chronopost-senegal-taxe.xyz pour reprogrammer la livraison.',
+    attackerTactics: 'Exploite les achats en ligne pour réclamer de faux frais de douane sur un site clone.',
+    trapIndicator: 'Les transporteurs officiels ne demandent pas de paiement sur des domaines fantaisistes en .xyz.',
+    isDanger: true,
+  },
+  {
+    id: 'fake-crypto-trading',
+    category: 'crypto',
+    categoryLabel: 'Faux Investissement / Crypto',
+    title: 'Faux investissement crypto à gain garanti',
+    channel: 'WhatsApp',
+    text: 'Plateforme Trading Sénégal : Déposez 50.000 FCFA aujourd\'hui et recevez 250.000 FCFA garantis sans risque en 24h avec nos traders certifiés.',
+    attackerTactics: 'Promesse de rendement miraculeux sans risque pour soutirer le capital investi.',
+    trapIndicator: 'Aucun investissement financier ne génère 500% de rendement garanti en 24 heures sans risque.',
+    isDanger: true,
+  },
+  {
+    id: 'fake-police-fine',
+    category: 'police',
+    categoryLabel: 'Usurpation Police / Justice',
+    title: 'Fausse convocation policière avec amende immédiate',
+    channel: 'SMS',
+    text: 'Convocation urgente de la Gendarmerie Nationale : Vous faites l\'objet de poursuites pénales pour infraction grave. Réglez l\'amende de 50.000 FCFA sous 24h sinon arrestation.',
+    attackerTactics: 'Terreur juridique et menaces de poursuites pénales pour extorquer des fonds sous pression.',
+    trapIndicator: 'Les forces de l\'ordre et la justice ne convoquent jamais par SMS avec paiement d\'amende par mobile money.',
+    isDanger: true,
+  },
+  {
+    id: 'sextorsion-threat',
+    category: 'chantage',
+    categoryLabel: 'Chantage & Sextorsion',
+    title: 'Chantage à la webcam et menace de diffusion',
+    channel: 'E-mail',
+    text: 'Nous disposons d\'une vidéo intime enregistrée via votre webcam. Payez 400.000 FCFA dans les 24h sinon elle sera envoyée à tous vos contacts et publiée sur les réseaux sociaux.',
+    attackerTactics: 'Intimidation psychologique par la honte et la menace de ruine réputationnelle.',
+    trapIndicator: 'Bluff pur et simple envoyé en masse. Les escrocs ne possèdent aucune vidéo.',
     isDanger: true,
   },
   {
@@ -175,9 +209,9 @@ export const MESSAGE_ATTACK_SAMPLES: MessageAttackSample[] = [
     categoryLabel: 'Message Officiel Sûr',
     title: 'Notification officielle Orange Money (Sûr)',
     channel: 'SMS',
-    text: 'Votre transfert de 10.000 FCFA vers le 77XXXXXXX a été effectué avec succès. Référence de transaction: OM20261019. Service client disponible au 1441.',
+    text: 'Votre transfert de 10.000 FCFA vers le 77XXXXXXX a été effectué avec succès. Référence de transaction: OM20261019.',
     attackerTactics: 'Confirmation de transaction standard.',
-    trapIndicator: 'Numéro court officiel du service client (1441), pas de pression temporelle, aucune demande de code secret.',
+    trapIndicator: 'Pas de pression temporelle, aucune demande de code secret ni de lien externe suspect.',
     isDanger: false,
   },
 ];
@@ -186,7 +220,6 @@ export const MessageAnalyzerPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'text' | 'screenshot'>('text');
   const [inputText, setInputText] = useState('');
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [imageMime, setImageMime] = useState<string>('image/jpeg');
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [unifiedData, setUnifiedData] = useState<UnifiedApiResponse | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -194,15 +227,16 @@ export const MessageAnalyzerPage: React.FC = () => {
   const [offlineBanner, setOfflineBanner] = useState<string | null>(null);
   const [copiedSummary, setCopiedSummary] = useState(false);
   const [visionError, setVisionError] = useState<string | null>(null);
-  const [apiKeyInput, setApiKeyInput] = useState('');
-  const [showApiKeyInput, setShowApiKeyInput] = useState(false);
+  const [ocrProgress, setOcrProgress] = useState<number | null>(null);
+  const [ocrSuccessNotice, setOcrSuccessNotice] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [showGallery, setShowGallery] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
   const resultRef = useRef<HTMLDivElement>(null);
 
-  // D2. Silent ping wake-up when opening the analyzer page
+  // Silent ping wake-up when opening the analyzer page
   useEffect(() => {
     wakeUpBackend();
   }, []);
@@ -219,8 +253,12 @@ export const MessageAnalyzerPage: React.FC = () => {
     { id: 'mobile-money', label: 'Wave & Orange Money' },
     { id: 'whatsapp', label: 'Piratage WhatsApp' },
     { id: 'gains', label: 'Fausses Tombolas' },
-    { id: 'emploi', label: 'Faux Emplois' },
-    { id: 'famille', label: 'Urgences Familiales' },
+    { id: 'emploi', label: 'Faux Emplois / Bourses' },
+    { id: 'famille', label: 'Urgences Proches' },
+    { id: 'colis', label: 'Faux Colis' },
+    { id: 'crypto', label: 'Crypto & Prêts' },
+    { id: 'police', label: 'Police & Justice' },
+    { id: 'chantage', label: 'Chantage & Menaces' },
     { id: 'officiel', label: 'Messages Légitimes' },
   ];
 
@@ -253,7 +291,6 @@ export const MessageAnalyzerPage: React.FC = () => {
         setOfflineBanner(null);
       }
 
-      // Smooth scroll to result without sudden jumps
       setTimeout(() => {
         resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }, 100);
@@ -307,15 +344,20 @@ export const MessageAnalyzerPage: React.FC = () => {
 
   const handleCopySummary = async () => {
     if (!result) return;
-    const levelLabel =
-      result.riskLevel === 'eleve'
-        ? '⚠️ RISQUE ÉLEVÉ (Arnaque très probable)'
-        : result.riskLevel === 'moyen'
-        ? '⚠️ VIGILANCE REQUISE (Éléments suspects)'
-        : '✅ RISQUE FAIBLE (Aucun signal d\'arnaque connu repéré. Cela ne garantit pas que le message soit sûr : en cas de doute, vérifiez auprès de l\'organisme concerné.)';
+
+    let levelLabel = '';
+    if (unifiedData?.risk_level === 'CRITIQUE') {
+      levelLabel = '⚠️ MENACE IMMINENTE (Arnaque très probable)';
+    } else if (result.riskLevel === 'eleve') {
+      levelLabel = '⚠️ RISQUE ÉLEVÉ (Arnaque probable)';
+    } else if (result.riskLevel === 'moyen') {
+      levelLabel = '⚠️ VIGILANCE REQUISE (Éléments suspects)';
+    } else {
+      levelLabel = '✅ RISQUE FAIBLE : aucun signal connu repéré';
+    }
 
     const sourceLabel =
-      unifiedData || result.engineType === 'ai-remote'
+      unifiedData && !offlineBanner
         ? 'Analyse complète (serveur)'
         : 'Analyse simplifiée (hors ligne)';
 
@@ -326,11 +368,19 @@ export const MessageAnalyzerPage: React.FC = () => {
       '🛡️ XamSafe - Diagnostic de sécurité',
       `Source : ${sourceLabel}`,
       `Niveau : ${levelLabel}`,
-      `Message : "${textSnippet}"`,
-      `Constat : ${result.summary}`,
     ];
 
-    if (result.detectedClues.length > 0) {
+    if (result.riskLevel === 'faible') {
+      lines.push("Note : Cela ne garantit pas que le message soit sûr : en cas de doute, vérifiez auprès de l'organisme concerné.");
+    }
+
+    lines.push(`Message : "${textSnippet}"`);
+
+    if (result.riskLevel !== 'faible') {
+      lines.push(`Constat : ${result.summary}`);
+    }
+
+    if (result.detectedClues.length > 0 && result.riskLevel !== 'faible') {
       lines.push('Indices relevés :');
       result.detectedClues.slice(0, 3).forEach((c) => {
         lines.push(`• ${c.title}`);
@@ -341,7 +391,7 @@ export const MessageAnalyzerPage: React.FC = () => {
       lines.push(`Conseil : ${result.recommendedActions[0]}`);
     }
 
-    lines.push('\nAnalyse d\'aide à la vigilance réalisée sur https://xam-safe.vercel.app');
+    lines.push("\nAnalyse d'aide à la vigilance réalisée sur https://xam-safe.vercel.app");
 
     try {
       await navigator.clipboard.writeText(lines.join('\n'));
@@ -352,68 +402,50 @@ export const MessageAnalyzerPage: React.FC = () => {
     }
   };
 
-  const handleImageUpload = (file: File) => {
-    if (!file.type.startsWith('image/')) {
-      setVisionError('Le fichier sélectionné doit être une image (PNG, JPG, WEBP).');
+  // Browser-Side OCR Image Processing (Étape 4)
+  const handleImageFileSelected = async (file: File) => {
+    setVisionError(null);
+    setOcrSuccessNotice(null);
+
+    const validation = validateImageFile(file);
+    if (!validation.valid) {
+      setVisionError(validation.error || 'Fichier image non supporté.');
       return;
     }
-    setImageMime(file.type);
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const base64 = e.target?.result as string;
-      setImagePreview(base64);
-      setResult(null);
-      setUnifiedData(null);
-      setVisionError(null);
-    };
-    reader.readAsDataURL(file);
+
+    setIsAnalyzing(true);
+    setOcrProgress(10);
+
+    try {
+      // 1. Client-side canvas downscaling to max 1600px
+      const { blob, dataUrl } = await downscaleImage(file, 1600);
+      setImagePreview(dataUrl);
+
+      // 2. In-browser Tesseract.js OCR
+      const extracted = await extractTextFromImage(blob, (pct) => {
+        setOcrProgress(pct);
+      });
+
+      setInputText(extracted);
+      setActiveTab('text');
+      setOcrSuccessNotice('Texte transcrit avec succès depuis votre capture ! Relisez-le, modifiez-le si nécessaire, puis cliquez sur « Analyser le message ».');
+    } catch (err: any) {
+      setVisionError(err?.message || "Impossible d'extraire le texte de cette capture d'écran.");
+    } finally {
+      setIsAnalyzing(false);
+      setOcrProgress(null);
+    }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) handleImageUpload(file);
+    if (file) handleImageFileSelected(file);
   };
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     const file = e.dataTransfer.files?.[0];
-    if (file) handleImageUpload(file);
-  };
-
-  const handleAnalyzeScreenshot = async () => {
-    if (!imagePreview) return;
-
-    if (!AIVoiceService.hasActiveApiKey()) {
-      setShowApiKeyInput(true);
-      return;
-    }
-
-    setIsAnalyzing(true);
-    setVisionError(null);
-
-    try {
-      const res = await AIVoiceService.analyzeScreenshot(imagePreview, imageMime);
-      setResult(res);
-      setUnifiedData(null);
-      setOfflineBanner(null);
-    } catch (err: any) {
-      if (err.message === 'NO_API_KEY') {
-        setShowApiKeyInput(true);
-      } else {
-        setVisionError(err.message || 'Impossible d\'analyser la capture d\'écran.');
-      }
-    } finally {
-      setIsAnalyzing(false);
-    }
-  };
-
-  const handleSaveApiKey = () => {
-    if (apiKeyInput.trim().length > 10) {
-      AIVoiceService.saveApiKey(apiKeyInput.trim());
-      setShowApiKeyInput(false);
-      setVisionError(null);
-      handleAnalyzeScreenshot();
-    }
+    if (file) handleImageFileSelected(file);
   };
 
   const handleReset = () => {
@@ -424,11 +456,13 @@ export const MessageAnalyzerPage: React.FC = () => {
     setVisionError(null);
     setOfflineBanner(null);
     setWaitingNotice(null);
+    setOcrSuccessNotice(null);
+    setOcrProgress(null);
   };
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 space-y-6 sm:space-y-8 text-left">
-      {/* Page Header - Mobile-first, calm, reassuring */}
+      {/* Page Header */}
       <div className="space-y-2.5">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold">
           <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
@@ -438,7 +472,7 @@ export const MessageAnalyzerPage: React.FC = () => {
           Analyser un message suspect
         </h1>
         <p className="text-slate-600 dark:text-slate-400 text-sm sm:text-base leading-relaxed">
-          Collez le texte d'un SMS, d'un message WhatsApp ou déposez une capture d'écran. XamSafe détecte les pièges d'ingénierie sociale (fausse urgence, vol de code secret, rançon) et vérifie les liens suspects en préservant strictement votre anonymat.
+          Collez le texte d'un SMS, d'un message WhatsApp ou importez une capture d'écran. XamSafe détecte les arnaques d'ingénierie sociale (vol de code OTP, intimidation, fausses bourses, faux colis) en préservant strictement votre vie privée.
         </p>
       </div>
 
@@ -446,140 +480,214 @@ export const MessageAnalyzerPage: React.FC = () => {
       <div className="flex border-b border-slate-200 dark:border-slate-800 gap-6 text-sm">
         <button
           type="button"
-          onClick={() => { setActiveTab('text'); setResult(null); setUnifiedData(null); }}
+          onClick={() => { setActiveTab('text'); }}
           className={`pb-3 font-semibold flex items-center gap-2 border-b-2 transition-colors cursor-pointer ${
             activeTab === 'text'
               ? 'border-emerald-600 text-emerald-600 dark:text-emerald-400'
-              : 'border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400'
+              : 'border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-slate-300'
           }`}
         >
           <FileText className="w-4 h-4" />
-          <span>Texte ou SMS</span>
+          <span>Texte du message</span>
         </button>
+
         <button
           type="button"
-          onClick={() => { setActiveTab('screenshot'); setResult(null); setUnifiedData(null); }}
+          onClick={() => { setActiveTab('screenshot'); }}
           className={`pb-3 font-semibold flex items-center gap-2 border-b-2 transition-colors cursor-pointer ${
             activeTab === 'screenshot'
               ? 'border-emerald-600 text-emerald-600 dark:text-emerald-400'
-              : 'border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400'
+              : 'border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-slate-300'
           }`}
         >
           <ImageIcon className="w-4 h-4" />
-          <span>Capture d'écran</span>
+          <span>Capture d'écran (OCR local)</span>
         </button>
       </div>
 
-      {/* Privacy Sanitizer Notice */}
-      <PiiSanitizerNotice />
+      {/* Quick Example Chips */}
+      <div className="space-y-2">
+        <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 dark:text-slate-400">
+          <span>Exemples fréquents à tester en 1 clic :</span>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {quickChips.map((chip, idx) => (
+            <button
+              key={idx}
+              type="button"
+              onClick={() => handleSampleClick(chip.text)}
+              className="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/80 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors border border-slate-200 dark:border-slate-700/60 cursor-pointer"
+            >
+              {chip.label}
+            </button>
+          ))}
+        </div>
+      </div>
 
       {/* TAB 1: TEXT ANALYSIS */}
       {activeTab === 'text' && (
         <form onSubmit={handleAnalyzeText} className="space-y-4">
-          <div className="space-y-2">
-            <label htmlFor="message-input" className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-              Message à vérifier :
-            </label>
-            <textarea
-              id="message-input"
-              rows={4}
-              value={inputText}
-              onChange={(e) => setInputText(e.target.value)}
-              placeholder="Collez ici le message suspect... (Ex : « Alerte Wave : votre compte est bloqué, veuillez me dicter le code... »)"
-              style={{ fontSize: '16px' }}
-              className="w-full p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0C2438] text-slate-900 dark:text-white placeholder-slate-400 focus:ring-2 focus:ring-emerald-500 text-base shadow-2xs transition-colors"
-            />
-          </div>
-
-          {/* Quick sample chips - Touch-friendly target size >= 40px */}
-          <div className="space-y-2">
-            <span className="text-xs text-slate-500 dark:text-slate-400 block font-semibold uppercase tracking-wider">
-              Suggestions rapides à tester :
-            </span>
-            <div className="flex flex-wrap gap-2">
-              {quickChips.map((sample, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => handleSampleClick(sample.text)}
-                  className="px-3.5 py-2 min-h-[40px] rounded-lg text-xs sm:text-sm font-medium bg-slate-100 active:bg-slate-200 dark:bg-slate-800 dark:active:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors cursor-pointer"
-                >
-                  {sample.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Reassurance banner if analysis takes > 5s (D2) */}
-          {waitingNotice && (
-            <div className="p-3.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-xs text-amber-900 dark:text-amber-200 flex items-center gap-2.5">
-              <Loader2 className="w-4 h-4 animate-spin shrink-0 text-amber-600 dark:text-amber-400" />
-              <span>{waitingNotice}</span>
+          {/* OCR Success Notification */}
+          {ocrSuccessNotice && (
+            <div className="p-3.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-xs text-emerald-900 dark:text-emerald-200 flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>{ocrSuccessNotice}</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setOcrSuccessNotice(null)}
+                className="text-emerald-700 dark:text-emerald-300 hover:opacity-80 cursor-pointer p-1"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
             </div>
           )}
 
-          {/* Submit Actions - Ergonomic bottom-thumb zone, min 48px height (D4) */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 pt-2">
-            <button
-              type="submit"
-              disabled={!inputText.trim() || isAnalyzing}
-              className="inline-flex items-center justify-center gap-2 px-6 py-3.5 min-h-[48px] rounded-xl font-bold text-base text-white bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 disabled:opacity-50 disabled:pointer-events-none shadow-xs transition-colors cursor-pointer w-full sm:w-auto"
-            >
-              {isAnalyzing ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  <span>Analyse en cours...</span>
-                </>
-              ) : (
-                <>
-                  <Search className="w-5 h-5" />
-                  <span>Examiner les indices</span>
-                </>
-              )}
-            </button>
+          <div className="relative">
+            <label htmlFor="message-input" className="sr-only">
+              Texte du message à vérifier
+            </label>
+            <textarea
+              id="message-input"
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+              placeholder="Collez ici le SMS ou message reçu (ex: « Félicitations, vous avez gagné 2.000.000 FCFA... » ou « ALERTE WAVE : Votre compte est bloqué... »)..."
+              rows={5}
+              maxLength={2000}
+              className="w-full p-4 rounded-2xl bg-white dark:bg-[#0C2438] border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 text-sm sm:text-base focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-all shadow-sm resize-y"
+            />
+            <div className="absolute bottom-3 right-3 text-xs text-slate-400">
+              {inputText.length}/2000
+            </div>
+          </div>
 
-            {inputText && (
+          <PiiSanitizerNotice />
+
+          {/* Action Bar */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-1">
+            <div className="flex items-center gap-2">
               <button
-                type="button"
-                onClick={handleReset}
-                className="inline-flex items-center justify-center gap-2 px-4 py-3 min-h-[44px] rounded-xl text-sm font-semibold text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white active:bg-slate-100 dark:active:bg-slate-800 transition-colors cursor-pointer"
+                type="submit"
+                disabled={!inputText.trim() || isAnalyzing}
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 min-h-[48px] rounded-xl font-bold text-sm text-white bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 disabled:opacity-50 transition-colors shadow-sm cursor-pointer"
               >
-                <RotateCcw className="w-4 h-4" />
-                <span>Effacer le texte</span>
+                {isAnalyzing ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Analyse en cours...</span>
+                  </>
+                ) : (
+                  <>
+                    <Search className="w-4 h-4" />
+                    <span>Analyser le message</span>
+                    <span className="sr-only">Examiner les indices</span>
+                  </>
+                )}
               </button>
+
+              {inputText && (
+                <button
+                  type="button"
+                  onClick={handleReset}
+                  className="px-4 py-3 min-h-[48px] rounded-xl text-xs font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-white transition-colors cursor-pointer"
+                >
+                  Effacer
+                </button>
+              )}
+            </div>
+
+            {waitingNotice && (
+              <span className="text-xs text-amber-600 dark:text-amber-400 italic flex items-center gap-1.5 animate-pulse">
+                <Clock className="w-3.5 h-3.5" />
+                {waitingNotice}
+              </span>
             )}
           </div>
         </form>
       )}
 
-      {/* TAB 2: SCREENSHOT ANALYSIS */}
+      {/* TAB 2: SCREENSHOT OCR ANALYSIS (Étape 4) */}
       {activeTab === 'screenshot' && (
         <div className="space-y-4">
           <input
             type="file"
             ref={fileInputRef}
             onChange={handleFileChange}
-            accept="image/*"
+            accept="image/jpeg,image/png,image/webp"
             className="hidden"
           />
+
+          <input
+            type="file"
+            ref={cameraInputRef}
+            onChange={handleFileChange}
+            accept="image/jpeg,image/png,image/webp"
+            capture="environment"
+            className="hidden"
+          />
+
+          {/* OCR Progress Indicator */}
+          {ocrProgress !== null && (
+            <div className="space-y-2 p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+              <div className="flex justify-between text-xs font-bold text-slate-700 dark:text-slate-300">
+                <span className="flex items-center gap-2">
+                  <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-600" />
+                  Reconnaissance optique du texte dans votre navigateur...
+                </span>
+                <span>{ocrProgress}%</span>
+              </div>
+              <div className="w-full bg-slate-200 dark:bg-slate-700 h-2 rounded-full overflow-hidden">
+                <div
+                  className="bg-emerald-600 h-full transition-all duration-300"
+                  style={{ width: `${ocrProgress}%` }}
+                />
+              </div>
+              <p className="text-[11px] text-slate-500">
+                Traitement 100% local : votre image ne quitte jamais votre appareil.
+              </p>
+            </div>
+          )}
 
           {!imagePreview ? (
             <div
               onDragOver={(e) => e.preventDefault()}
               onDrop={handleDrop}
-              onClick={() => fileInputRef.current?.click()}
-              className="border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-emerald-500 rounded-2xl p-8 sm:p-10 text-center cursor-pointer transition-colors bg-white/40 dark:bg-slate-900/30 space-y-3"
+              className="border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-emerald-500 rounded-2xl p-8 sm:p-10 text-center transition-colors bg-white/40 dark:bg-slate-900/30 space-y-4"
             >
               <div className="w-12 h-12 mx-auto rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300">
                 <UploadCloud className="w-6 h-6" />
               </div>
+
               <div className="space-y-1">
                 <p className="text-sm font-bold text-slate-900 dark:text-white">
-                  Déposez votre capture d'écran ici, ou cliquez pour parcourir
+                  Déposez votre capture d'écran ici, ou choisissez un mode d'import
                 </p>
                 <p className="text-xs text-slate-500 dark:text-slate-400">
-                  Capturez une conversation WhatsApp ou un SMS reçu. Formats : PNG, JPG, WebP.
+                  WhatsApp, SMS, e-mails. Formats : JPG, PNG, WebP (max 8 Mo).
                 </p>
+              </div>
+
+              <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isAnalyzing}
+                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs text-white bg-emerald-600 hover:bg-emerald-700 transition-colors cursor-pointer"
+                >
+                  <UploadCloud className="w-4 h-4" />
+                  <span>Choisir un fichier</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => cameraInputRef.current?.click()}
+                  disabled={isAnalyzing}
+                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs text-slate-700 dark:text-slate-200 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                >
+                  <Camera className="w-4 h-4 text-emerald-600" />
+                  <span>Prendre une photo</span>
+                </button>
               </div>
             </div>
           ) : (
@@ -587,7 +695,7 @@ export const MessageAnalyzerPage: React.FC = () => {
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
                   <ImageIcon className="w-4 h-4 text-emerald-500" />
-                  Capture prête pour analyse
+                  Capture chargée
                 </span>
                 <button
                   type="button"
@@ -610,24 +718,8 @@ export const MessageAnalyzerPage: React.FC = () => {
               <div className="flex items-center gap-3 pt-1">
                 <button
                   type="button"
-                  onClick={handleAnalyzeScreenshot}
-                  disabled={isAnalyzing}
-                  className="inline-flex items-center justify-center gap-2 px-6 py-3 min-h-[48px] rounded-xl font-bold text-sm text-white bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 disabled:opacity-50 transition-colors cursor-pointer"
-                >
-                  {isAnalyzing ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Analyse optique...</span>
-                    </>
-                  ) : (
-                    <span>Lancer l'analyse de l'image</span>
-                  )}
-                </button>
-
-                <button
-                  type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="px-3 py-3 min-h-[44px] rounded-xl text-xs font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-white transition-colors cursor-pointer"
+                  className="px-3 py-2 rounded-xl text-xs font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-white transition-colors cursor-pointer"
                 >
                   Changer d'image
                 </button>
@@ -635,50 +727,32 @@ export const MessageAnalyzerPage: React.FC = () => {
             </div>
           )}
 
-          {showApiKeyInput && (
-            <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2">
-              <div className="flex items-center gap-2 text-slate-900 dark:text-white font-bold text-xs">
-                <Key className="w-3.5 h-3.5 text-emerald-600" />
-                <span>Clé Gemini requise pour la reconnaissance optique</span>
-              </div>
-              <p className="text-xs text-slate-500 leading-relaxed">
-                Entrez votre clé API gratuite Google AI Studio pour activer la vision multimodale.
-              </p>
-              <div className="flex gap-2">
-                <input
-                  type="password"
-                  value={apiKeyInput}
-                  onChange={(e) => setApiKeyInput(e.target.value)}
-                  placeholder="Collez votre clé AIzaSy..."
-                  className="flex-1 p-2 rounded-lg text-xs border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
-                />
-                <button
-                  type="button"
-                  onClick={handleSaveApiKey}
-                  className="px-3 py-2 rounded-lg text-xs font-bold text-white bg-slate-900 dark:bg-emerald-600 hover:bg-slate-800 transition-colors"
-                >
-                  Valider
-                </button>
-              </div>
-            </div>
-          )}
-
-          {visionError && (
-            <div className="p-3 rounded-xl bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900 text-xs text-red-700 dark:text-red-300">
-              {visionError}
-            </div>
-          )}
+          {/* Privacy Guarantee Notice */}
+          <div className="p-3.5 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/60 dark:border-emerald-800/40 text-xs text-emerald-900 dark:text-emerald-200 flex items-start gap-2.5">
+            <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+            <p className="leading-relaxed">
+              <strong>Confidentialité garantie :</strong> aucune image n'est stockée ni envoyée au serveur. La reconnaissance optique s'exécute directement dans votre navigateur et seule la transcription textuelle est transmise à l'analyseur.
+            </p>
+          </div>
         </div>
       )}
 
-      {/* ANALYSIS RESULT SECTION */}
+      {/* Error Notices */}
+      {visionError && (
+        <div className="p-4 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 text-xs sm:text-sm text-red-800 dark:text-red-300 flex items-start gap-2.5">
+          <AlertTriangle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
+          <p>{visionError}</p>
+        </div>
+      )}
+
+      {/* RESULTS SECTION (Étape 5: Affichage harmonisé et non redondant) */}
       <div ref={resultRef}>
         {result && (
           <section
             aria-live="polite"
-            className="bg-white dark:bg-[#0C2438] rounded-2xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 space-y-5 shadow-xs"
+            className="mt-6 p-5 sm:p-6 rounded-2xl bg-white dark:bg-[#0C2438] border border-slate-200 dark:border-slate-800 shadow-md space-y-5"
           >
-            {/* D2. Discrete Offline Fallback Notice */}
+            {/* Discrete Offline Fallback Notice */}
             {offlineBanner && (
               <div className="p-3 rounded-xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-xs text-slate-700 dark:text-slate-300 flex items-center gap-2">
                 <Info className="w-4 h-4 text-slate-500 shrink-0" />
@@ -686,26 +760,32 @@ export const MessageAnalyzerPage: React.FC = () => {
               </div>
             )}
 
-            {/* D3. Accessible Risk Header (Icon + Explicit Text + Color) */}
+            {/* Risk Header & Source Transparency */}
             <div className="space-y-3 pb-5 border-b border-slate-200 dark:border-slate-800">
               <div className="flex items-center justify-between gap-3 flex-wrap">
                 <div className="flex items-center gap-2 flex-wrap">
-                  {result.riskLevel === 'eleve' && (
+                  {unifiedData?.risk_level === 'CRITIQUE' && (
                     <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-100 dark:bg-red-950 text-red-800 dark:text-red-300 text-xs font-bold">
                       <ShieldAlert className="w-4 h-4 text-red-600 shrink-0" />
-                      <span>Risque élevé : Arnaque très probable</span>
+                      <span>Menace imminente : arnaque très probable</span>
+                    </div>
+                  )}
+                  {result.riskLevel === 'eleve' && unifiedData?.risk_level !== 'CRITIQUE' && (
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-100 dark:bg-red-950 text-red-800 dark:text-red-300 text-xs font-bold">
+                      <ShieldAlert className="w-4 h-4 text-red-600 shrink-0" />
+                      <span>Risque élevé : arnaque probable</span>
                     </div>
                   )}
                   {result.riskLevel === 'moyen' && (
                     <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 text-xs font-bold">
                       <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
-                      <span>Vigilance requise : Éléments suspects</span>
+                      <span>Vigilance requise : éléments suspects</span>
                     </div>
                   )}
                   {result.riskLevel === 'faible' && (
                     <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-xs font-bold">
                       <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span>Risque faible : Aucun signal d'arnaque connu repéré</span>
+                      <span>Niveau : RISQUE FAIBLE : aucun signal connu repéré</span>
                     </div>
                   )}
                   {result.riskLevel === 'indetermine' && (
@@ -715,21 +795,21 @@ export const MessageAnalyzerPage: React.FC = () => {
                     </div>
                   )}
 
-                  {/* Point 5: Transparence sur la source (Serveur vs Hors ligne) */}
-                  {unifiedData || result.engineType === 'ai-remote' ? (
+                  {/* Transparence de la source */}
+                  {unifiedData && !offlineBanner ? (
                     <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-900">
                       <Zap className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-                      Analyse complète (serveur)
+                      Source : Analyse complète (serveur)
                     </span>
                   ) : (
                     <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-900">
                       <Zap className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
-                      Analyse simplifiée (hors ligne)
+                      Source : Analyse simplifiée (hors ligne)
                     </span>
                   )}
                 </div>
 
-                {/* D3. Copier le résumé button */}
+                {/* Copier le résumé */}
                 <button
                   type="button"
                   onClick={handleCopySummary}
@@ -749,17 +829,30 @@ export const MessageAnalyzerPage: React.FC = () => {
                 </button>
               </div>
 
-              <h2 className="text-xl font-bold text-slate-950 dark:text-white">
-                {result.title}
-              </h2>
-
-              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                {result.summary}
-              </p>
+              {/* Étape 5: Si risque faible, une seule ligne claire suivie d'une note séparée */}
+              {result.riskLevel === 'faible' ? (
+                <div className="space-y-1.5 pt-1">
+                  <div className="text-base sm:text-lg font-bold text-emerald-900 dark:text-emerald-300">
+                    Niveau : RISQUE FAIBLE : aucun signal connu repéré
+                  </div>
+                  <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 italic">
+                    Cela ne garantit pas que le message soit sûr : en cas de doute, vérifiez auprès de l'organisme concerné.
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <h2 className="text-xl font-bold text-slate-950 dark:text-white">
+                    {result.title}
+                  </h2>
+                  <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                    {result.summary}
+                  </p>
+                </>
+              )}
             </div>
 
-            {/* D3. Detected Clues (Clear & Accessible) */}
-            {result.detectedClues.length > 0 && (
+            {/* Detected Clues */}
+            {result.detectedClues.length > 0 && result.riskLevel !== 'faible' && (
               <div className="space-y-2.5">
                 <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
                   <AlertTriangle className="w-3.5 h-3.5 text-red-500" />
@@ -790,7 +883,7 @@ export const MessageAnalyzerPage: React.FC = () => {
               </div>
             )}
 
-            {/* D3. Analyzed URLs (Domain Age + Brand Spoofing) */}
+            {/* Analyzed URLs */}
             {unifiedData && unifiedData.details.urls.length > 0 && (
               <div className="space-y-2.5 pt-1">
                 <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
@@ -859,7 +952,7 @@ export const MessageAnalyzerPage: React.FC = () => {
               </ul>
             </div>
 
-            {/* D3. Next steps CTA banner towards Urgence Victime if high danger */}
+            {/* Next steps CTA banner towards Urgence Victime if high danger */}
             {result.riskLevel === 'eleve' && (
               <div className="pt-3 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 text-xs">
                 <span className="text-slate-600 dark:text-slate-400">
@@ -875,7 +968,6 @@ export const MessageAnalyzerPage: React.FC = () => {
               </div>
             )}
 
-            {/* D3. Mention de sobriété */}
             <p className="text-[11px] text-slate-500 dark:text-slate-400 italic text-center pt-1">
               Cette analyse automatique est une aide à la vigilance et ne constitue pas une certitude absolue.
             </p>
@@ -883,7 +975,7 @@ export const MessageAnalyzerPage: React.FC = () => {
         )}
       </div>
 
-      {/* TRAINING REPOSITORY (Collapsible Drawer) */}
+      {/* TRAINING REPOSITORY */}
       <section className="pt-4 border-t border-slate-200 dark:border-slate-800 space-y-4">
         <div className="flex items-center justify-between">
           <div>
@@ -892,7 +984,7 @@ export const MessageAnalyzerPage: React.FC = () => {
               <span>Bibliothèque des arnaques fréquentes ({MESSAGE_ATTACK_SAMPLES.length} cas réels)</span>
             </h2>
             <p className="text-xs text-slate-500 mt-0.5">
-              Entraînez-vous à repérer les prétextes Wave, WhatsApp, fausses tombolas et bourses.
+              Entraînez-vous à repérer les prétextes Wave, faux colis, crypto, usurpation et intimidation.
             </p>
           </div>
 
@@ -909,7 +1001,6 @@ export const MessageAnalyzerPage: React.FC = () => {
         {/* Expandable Grid */}
         {showGallery && (
           <div className="space-y-4 pt-2">
-            {/* Category Filter Pills */}
             <div className="flex flex-wrap gap-1.5">
               {categories.map((cat) => (
                 <button
@@ -927,44 +1018,34 @@ export const MessageAnalyzerPage: React.FC = () => {
               ))}
             </div>
 
-            {/* Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
               {filteredSamples.map((sample) => (
                 <div
                   key={sample.id}
-                  className="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0C2438] space-y-3 flex flex-col justify-between"
+                  className="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/60 dark:bg-[#0C2438]/40 hover:border-emerald-500/50 transition-all flex flex-col justify-between gap-3 text-xs"
                 >
                   <div className="space-y-2">
-                    <div className="flex items-center justify-between text-[11px]">
-                      <span className="font-semibold text-slate-500 flex items-center gap-1">
-                        {sample.channel === 'WhatsApp' ? (
-                          <MessageSquare className="w-3 h-3 text-emerald-500" />
-                        ) : (
-                          <PhoneCall className="w-3 h-3 text-blue-500" />
-                        )}
-                        <span>{sample.channel} • {sample.categoryLabel}</span>
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-bold text-slate-900 dark:text-white text-xs sm:text-sm">
+                        {sample.title}
                       </span>
                       {sample.isDanger ? (
-                        <span className="text-[10px] font-bold text-red-600 uppercase">Piège</span>
+                        <span className="text-[10px] font-bold text-red-600 uppercase">Arnaque</span>
                       ) : (
-                        <span className="text-[10px] font-bold text-emerald-600 uppercase">Officiel</span>
+                        <span className="text-[10px] font-bold text-emerald-600 uppercase">Légitime</span>
                       )}
                     </div>
 
-                    <h3 className="font-bold text-sm text-slate-950 dark:text-white leading-snug">
-                      {sample.title}
-                    </h3>
-
-                    <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-900 text-xs italic text-slate-700 dark:text-slate-300">
+                    <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-900/60 font-mono text-[11px] text-slate-700 dark:text-slate-300 border border-slate-200/60 dark:border-slate-800">
                       « {sample.text} »
                     </div>
 
-                    <div className="text-xs space-y-1">
-                      <p className="text-slate-500 text-[11px] leading-relaxed">
-                        <strong>Piège :</strong> {sample.attackerTactics}
+                    <div className="space-y-1 text-slate-600 dark:text-slate-400">
+                      <p>
+                        <strong>Mécanique :</strong> {sample.attackerTactics}
                       </p>
-                      <p className="text-slate-700 dark:text-slate-300 text-[11px] font-mono">
-                        🚩 {sample.trapIndicator}
+                      <p className="text-emerald-700 dark:text-emerald-300">
+                        <strong>Indicateur clé :</strong> {sample.trapIndicator}
                       </p>
                     </div>
                   </div>
@@ -972,10 +1053,9 @@ export const MessageAnalyzerPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => handleSampleClick(sample.text)}
-                    className="w-full inline-flex items-center justify-center gap-1.5 py-2.5 px-3 min-h-[40px] rounded-lg text-xs font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 transition-colors cursor-pointer"
+                    className="w-full py-2 px-3 rounded-lg font-semibold text-xs text-center bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-900 dark:text-white transition-colors cursor-pointer"
                   >
-                    <Zap className="w-3 h-3" />
-                    <span>Tester ce message</span>
+                    Tester ce cas dans l'analyseur
                   </button>
                 </div>
               ))}
@@ -984,49 +1064,30 @@ export const MessageAnalyzerPage: React.FC = () => {
         )}
       </section>
 
-      {/* PARTIE E1 : COMMENT ÇA MARCHE ET LIMITES (Pédagogie & Transparence) */}
-      <section className="pt-6 border-t border-slate-200 dark:border-slate-800 space-y-4">
-        <div className="p-5 sm:p-6 rounded-2xl bg-slate-50/80 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 space-y-4">
-          <div className="flex items-center gap-2">
-            <Info className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-            <h2 className="text-sm sm:text-base font-bold text-slate-950 dark:text-white">
-              Comment ça marche et limites du diagnostic
-            </h2>
-          </div>
+      {/* PEDAGOGICAL SECTION: Limites et Fonctionnement */}
+      <section className="pt-6 border-t border-slate-200 dark:border-slate-800 space-y-4 text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+        <h2 className="text-base font-bold text-slate-950 dark:text-white">
+          Comment fonctionne ce diagnostic et quelles sont ses limites ?
+        </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-            <div className="space-y-1.5 p-3.5 rounded-xl bg-white dark:bg-[#0C2438] border border-slate-200 dark:border-slate-800">
-              <h3 className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-                <CheckCircle className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                <span>Ce que l'outil fait</span>
-              </h3>
-              <p>
-                Il détecte les motifs récurrents d'ingénierie sociale (fausse urgence, menace de blocage, promesse de gain, demande de code secret) et examine l'infrastructure des adresses web (ancienneté du domaine, ressemblance orthographique avec les marques officielles). Les données sensibles sont préalablement anonymisées.
-              </p>
-            </div>
+        <div className="space-y-3">
+          <p>
+            Ce scanner combine un modèle d'apprentissage supervisé souverain (TF-IDF + Régression Logistique pondérée) et une détection par règles heuristiques spécifiques aux arnaques numériques observées au Sénégal : Mobile Money (Wave, Orange Money, Free Money), vol de compte WhatsApp, fausses offres d'emploi, faux colis, faux investissements crypto, usurpation de proches et menaces d'intimidation.
+          </p>
 
-            <div className="space-y-1.5 p-3.5 rounded-xl bg-white dark:bg-[#0C2438] border border-slate-200 dark:border-slate-800">
-              <h3 className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-                <AlertTriangle className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-                <span>Ce que l'outil ne fait pas</span>
-              </h3>
-              <p>
-                Il ne lit pas dans les pensées de l'expéditeur, ne garantit jamais à 100 % qu'un message est inoffensif ou frauduleux, et ne remplace pas votre vigilance personnelle ni une vérification directe auprès du service officiel.
-              </p>
-            </div>
-
-            <div className="space-y-1.5 p-3.5 rounded-xl bg-white dark:bg-[#0C2438] border border-slate-200 dark:border-slate-800">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+            <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 space-y-1">
               <h3 className="font-bold text-slate-900 dark:text-white">
-                Pourquoi une arnaque peut passer inaperçue
+                Risque de faux négatifs
               </h3>
               <p>
-                Une nouvelle tactique encore inconnue, des formulations très courtoises sans mots d'alerte, ou l'utilisation d'un vieux domaine web légitime piraté peuvent échapper au radar.
+                Un escroc utilisant une formulation courtoise sans mot-clé agressif ou un numéro récemment activé peut ne pas être détecté d'emblée. Ne baissez jamais votre garde.
               </p>
             </div>
 
-            <div className="space-y-1.5 p-3.5 rounded-xl bg-white dark:bg-[#0C2438] border border-slate-200 dark:border-slate-800">
+            <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 space-y-1">
               <h3 className="font-bold text-slate-900 dark:text-white">
-                Pourquoi un message officiel peut être signalé
+                Risque de faux positifs
               </h3>
               <p>
                 Une véritable alerte administrative rédigée avec insistance (« sous 24h ») ou un nouveau site officiel récemment lancé sans historique peuvent déclencher un signal d'attention par précaution.
@@ -1035,7 +1096,7 @@ export const MessageAnalyzerPage: React.FC = () => {
           </div>
 
           <div className="p-3.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/50 text-xs text-emerald-900 dark:text-emerald-200 leading-relaxed">
-            <strong>Que faire en cas de doute ?</strong> Ne cliquez sur aucun lien, ne dictez jamais de code reçu par SMS, et contactez l'organisme officiel par un canal connu (ex : 1441 pour Orange, support dans l'application Wave, guichet de votre banque).
+            <strong>Que faire en cas de doute ?</strong> Ne cliquez sur aucun lien sans certitude, ne dictez jamais de code reçu par SMS, et contactez directement l'organisme officiel via son application ou un canal connu de vous (site officiel, agence physique).
           </div>
         </div>
       </section>

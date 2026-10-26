@@ -67,7 +67,7 @@ export const Home: React.FC = () => {
                     <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
                       {language === 'wo'
                         ? 'SMS Wave, Orange Money walla bataaxal WhatsApp'
-                        : 'SMS Wave, Orange Money, alerte de blocage ou code secret'}
+                        : 'Wave, Orange Money, WhatsApp, faux colis, crypto ou menaces'}
                     </p>
                   </div>
                 </div>

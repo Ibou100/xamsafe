@@ -1,0 +1,57 @@
+{
+  "orange": {
+    "name": "Orange Money",
+    "phone": "1441",
+    "verified": true
+  },
+  "free": {
+    "name": "Free Money",
+    "phone": "200244",
+    "verified": true
+  },
+  "wave": {
+    "name": "Wave",
+    "phone": null,
+    "verified": false
+  },
+  "campusen": {
+    "name": "Campusen",
+    "phone": null,
+    "verified": false
+  },
+  "cbao": {
+    "name": "CBAO Attijariwafa",
+    "phone": null,
+    "verified": false
+  },
+  "ecobank": {
+    "name": "Ecobank",
+    "phone": null,
+    "verified": false
+  },
+  "senelec": {
+    "name": "Senelec",
+    "phone": null,
+    "verified": false
+  },
+  "sen'eau": {
+    "name": "Sen'Eau",
+    "phone": null,
+    "verified": false
+  },
+  "police": {
+    "name": "la Police Nationale",
+    "phone": null,
+    "verified": false
+  },
+  "gendarmerie": {
+    "name": "la Gendarmerie Nationale",
+    "phone": null,
+    "verified": false
+  },
+  "douane": {
+    "name": "la Douane Sénégalaise",
+    "phone": null,
+    "verified": false
+  }
+}

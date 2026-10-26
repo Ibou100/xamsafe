@@ -165,16 +165,16 @@ class UnifiedAnalysisResponse(BaseModel):
 RISK_RANKS = {"FAIBLE": 1, "MODERE": 2, "ELEVE": 3, "CRITIQUE": 4}
 RANK_TO_LEVEL = {1: "FAIBLE", 2: "MODERE", 3: "ELEVE", 4: "CRITIQUE"}
 RANK_TO_LABEL = {
-    1: "Aucun signal d'arnaque connu repéré. Cela ne garantit pas que le message soit sûr : en cas de doute, vérifiez auprès de l'organisme concerné.",
-    2: "Vigilance recommandée",
-    3: "Menace ou usurpation probable",
-    4: "Tentative d'escroquerie ou phishing critique"
+    1: "Risque faible : aucun signal connu repéré",
+    2: "Vigilance recommandée : éléments suspects",
+    3: "Risque élevé : arnaque probable",
+    4: "Menace imminente : arnaque très probable"
 }
 RANK_TO_RECOMMENDATION = {
-    1: "Aucun signal d'arnaque connu repéré. Cela ne garantit pas que le message soit sûr : en cas de doute, vérifiez auprès de l'organisme concerné. En cas de doute, contactez votre opérateur via son numéro officiel (ex: 1441 pour Orange, support dans l'application Wave, 200244 pour Free).",
-    2: "Vérifiez attentivement l'authenticité du message auprès de votre opérateur officiel.",
-    3: "Méfiance absolue : ne cliquez sur aucun lien et ne validez aucun transfert d'argent.",
-    4: "DANGER : Ne cliquez sur aucun lien, ne partagez aucun code secret et contactez le support officiel de l'opérateur."
+    1: "Cela ne garantit pas que le message soit sûr. Contactez l'organisme concerné par un canal officiel que vous connaissez déjà (application, site, agence). N'utilisez pas les coordonnées du message.",
+    2: "Restez sur vos gardes. Contactez l'organisme concerné par un canal officiel que vous connaissez déjà (application, site, agence).",
+    3: "Méfiance absolue : ne donnez aucune suite. Contactez l'organisme concerné via son application ou son site officiel.",
+    4: "Danger immédiat : ne communiquez aucun code, ne cliquez sur aucun lien et ne transférez aucun fond."
 }
 
 
@@ -182,7 +182,8 @@ RANK_TO_RECOMMENDATION = {
 @app.get("/health")
 def root_health():
     """Vérification ultra-légère pour les sondes de santé Render/Railway."""
-    return {"status": "ok", "service": "XamSafe Defensive AI Core"}
+    version = os.getenv("RENDER_GIT_COMMIT", "dev")
+    return {"status": "ok", "service": "XamSafe Defensive AI Core", "version": version}
 
 
 @app.get("/api/v1/health")
@@ -190,9 +191,11 @@ def health_check() -> Dict[str, Any]:
     """
     Vérification légère de l'état du microservice et des métadonnées du modèle ML.
     """
+    version = os.getenv("RENDER_GIT_COMMIT", "dev")
     return {
         "status": "healthy",
         "service": "XamSafe Defensive AI Core",
+        "version": version,
         "engine": "TF-IDF + Regularized Logistic Regression (Brique 1) & RDAP Domain Scanner (Brique 2)",
         "features_count": len(classifier.feature_names) if classifier.feature_names is not None else 0,
         "evaluation_metrics": classifier.eval_metrics,
@@ -361,7 +364,7 @@ def analyze_unified(req: MessageAnalysisRequest, request: Request) -> UnifiedAna
                     merged_explanations.append(formatted_exp)
 
         if not merged_explanations:
-            merged_explanations.append("Aucun signal d'arnaque connu repéré. Cela ne garantit pas que le message soit sûr : en cas de doute, vérifiez auprès de l'organisme concerné.")
+            merged_explanations.append("Aucun signal d'arnaque connu repéré.")
 
         # Limit to 4 sentences maximum for clarity
         merged_explanations = merged_explanations[:4]

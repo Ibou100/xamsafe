@@ -446,5 +446,1795 @@
     "label": 0,
     "language": "fr",
     "category": "notification-legitime"
+  },
+  {
+    "id": "fraud-emp-01",
+    "text": "Recrutement urgent ONG humanitaire Dakar : salaire 450.000 FCFA/mois. Envoyez 15.000 FCFA de frais de dossier pour valider votre entretien.",
+    "label": 1,
+    "language": "fr",
+    "category": "faux-emploi"
+  },
+  {
+    "id": "fraud-emp-02",
+    "text": "Offre d'emploi télétravail : gagnez 35.000 FCFA par jour en likant des vidéos TikTok et Telegram. Premier versement de 10.000 FCFA pour débloquer votre pack.",
+    "label": 1,
+    "language": "fr",
+    "category": "faux-emploi"
+  },
+  {
+    "id": "fraud-emp-03",
+    "text": "Société minière recrute 50 chauffeurs et agents de sécurité à Kédougou. Frais de visite médicale obligatoires de 25.000 FCFA à envoyer par Wave.",
+    "label": 1,
+    "language": "fr",
+    "category": "faux-emploi"
+  },
+  {
+    "id": "fraud-emp-04",
+    "text": "Amazon recrute à distance : 500.000 FCFA par mois sans expérience. Inscrivez-vous vite en versant les frais d'accréditation de 20.000 FCFA.",
+    "label": 1,
+    "language": "fr",
+    "category": "faux-emploi"
+  },
+  {
+    "id": "fraud-emp-05",
+    "text": "ONU Sénégal recherche assistants administratifs. Dépôt de candidature soumis à 12.000 FCFA de frais d'enregistrement par Orange Money.",
+    "label": 1,
+    "language": "fr",
+    "category": "faux-emploi"
+  },
+  {
+    "id": "fraud-emp-06",
+    "text": "Liggéey bu gaaw ci kër : joxe 25.000 FCFA ngir am machine bi te di touché 100.000 FCFA weer wu nekk.",
+    "label": 1,
+    "language": "wo",
+    "category": "faux-emploi"
+  },
+  {
+    "id": "fraud-emp-07",
+    "text": "Embauche immédiate au Port Autonome de Dakar. Contactez le recruteur et versez la caution d'embauche de 50.000 FCFA sur ce numéro.",
+    "label": 1,
+    "language": "fr",
+    "category": "faux-emploi"
+  },
+  {
+    "id": "fraud-emp-08",
+    "text": "Recrutement direct chez Total Sénégal : envoyez votre CV et 15.000 FCFA pour le badge d'accès au site.",
+    "label": 1,
+    "language": "fr",
+    "category": "faux-emploi"
+  },
+  {
+    "id": "fraud-emp-09",
+    "text": "Programme de stage rémunéré à 200.000 FCFA : payez 10.000 FCFA de frais de timbre fiscal par transfert pour confirmer votre place.",
+    "label": 1,
+    "language": "fr",
+    "category": "faux-emploi"
+  },
+  {
+    "id": "fraud-emp-10",
+    "text": "Liggéey Port de Dakar : feyal 30.000 FCFA léegi bala suba ngir ñu jox la sa contrat liggéey.",
+    "label": 1,
+    "language": "wo",
+    "category": "faux-emploi"
+  },
+  {
+    "id": "legit-emp-01",
+    "text": "Sonatel Recrutement : Votre candidature au poste d'ingénieur réseau a bien été reçue. Aucun frais n'est exigé lors de nos recrutements.",
+    "label": 0,
+    "language": "fr",
+    "category": "emploi-legitime"
+  },
+  {
+    "id": "legit-emp-02",
+    "text": "Cabinet RH Dakar : Nous vous confirmons votre entretien d'embauche pour jeudi à 10h dans nos locaux aux Almadies. Munissez-vous de votre CV.",
+    "label": 0,
+    "language": "fr",
+    "category": "emploi-legitime"
+  },
+  {
+    "id": "legit-emp-03",
+    "text": "Offre de stage Sonatel : Les entretiens se dérouleront sans frais au siège de la société. Consultez votre boîte mail.",
+    "label": 0,
+    "language": "fr",
+    "category": "emploi-legitime"
+  },
+  {
+    "id": "legit-emp-04",
+    "text": "Candidature enregistrée pour le concours de la fonction publique. Les listes des candidats autorisés sont publiées sur le site officiel.",
+    "label": 0,
+    "language": "fr",
+    "category": "emploi-legitime"
+  },
+  {
+    "id": "legit-emp-05",
+    "text": "Liggéey bi ñu doon wax, ñëwal suba 9h ci bureau bi ñu waxtaan ci conditions yi.",
+    "label": 0,
+    "language": "wo",
+    "category": "emploi-legitime"
+  },
+  {
+    "id": "fraud-vend-01",
+    "text": "Promo iPhone 15 Pro Max à 150.000 FCFA ! Stock limité. Envoyez un acompte de 50.000 FCFA par Wave pour réserver la livraison aujourd'hui.",
+    "label": 1,
+    "language": "fr",
+    "category": "faux-vendeur"
+  },
+  {
+    "id": "fraud-vend-02",
+    "text": "Vente flash moto Jakarta neuve à 120.000 FCFA. Versez la moitié du montant par Orange Money pour bloquer l'expédition.",
+    "label": 1,
+    "language": "fr",
+    "category": "faux-vendeur"
+  },
+  {
+    "id": "fraud-vend-03",
+    "text": "Boutique chic Dakar : perruque brésilienne 30 pouces bradée à 40.000 FCFA. Paiement obligatoire avant expédition par livreur.",
+    "label": 1,
+    "language": "fr",
+    "category": "faux-vendeur"
+  },
+  {
+    "id": "fraud-vend-04",
+    "text": "Vente téléviseur Smart 55 pouces à 80.000 FCFA. Avance de transport de 15.000 FCFA exigée avant tout envoi.",
+    "label": 1,
+    "language": "fr",
+    "category": "faux-vendeur"
+  },
+  {
+    "id": "fraud-vend-05",
+    "text": "Sac de luxe authentique à prix cassé. Envoyez 20.000 FCFA d'acompte sur le 771234567 sinon l'article sera vendu à un autre client.",
+    "label": 1,
+    "language": "fr",
+    "category": "faux-vendeur"
+  },
+  {
+    "id": "fraud-vend-06",
+    "text": "Jaay moto bu yomb : feyal acompte 30.000 FCFA ci Wave ngir ñu livré la ko tay ci sa kër.",
+    "label": 1,
+    "language": "wo",
+    "category": "faux-vendeur"
+  },
+  {
+    "id": "fraud-vend-07",
+    "text": "Vente mouton de Tabaski ladoum à 90.000 FCFA. Payez la réservation par mobile money immédiatement.",
+    "label": 1,
+    "language": "fr",
+    "category": "faux-vendeur"
+  },
+  {
+    "id": "fraud-vend-08",
+    "text": "Ordinateur portable HP Core i7 à 95.000 FCFA. Vendeur situé à Saint-Louis, envoyez l'argent du colis par Wave pour envoi.",
+    "label": 1,
+    "language": "fr",
+    "category": "faux-vendeur"
+  },
+  {
+    "id": "fraud-vend-09",
+    "text": "Achat en ligne sécurisé : versez l'acompte sur notre compte personnel pour confirmer la commande avant rupture de stock.",
+    "label": 1,
+    "language": "fr",
+    "category": "faux-vendeur"
+  },
+  {
+    "id": "fraud-vend-10",
+    "text": "Dafa am promo ci téléphone yi : yónnee 25.000 FCFA d'avance léegi ngir ñu gardeel la sa téléphone.",
+    "label": 1,
+    "language": "wo",
+    "category": "faux-vendeur"
+  },
+  {
+    "id": "legit-vend-01",
+    "text": "Jumia Sénégal : Votre commande #98214 est en cours de livraison. Vous paierez le montant exact à la réception en espèces ou par Wave.",
+    "label": 0,
+    "language": "fr",
+    "category": "commerce-legitime"
+  },
+  {
+    "id": "legit-vend-02",
+    "text": "Boutique en ligne : Votre colis est prêt. Le livreur vous contactera pour convenir de l'heure. Paiement à la livraison accepté.",
+    "label": 0,
+    "language": "fr",
+    "category": "commerce-legitime"
+  },
+  {
+    "id": "legit-vend-03",
+    "text": "Notification commande : Le montant de votre achat a été validé. Retrait gratuit disponible en magasin.",
+    "label": 0,
+    "language": "fr",
+    "category": "commerce-legitime"
+  },
+  {
+    "id": "legit-vend-04",
+    "text": "Livreur Dakar Express : Bonjour, j'ai votre colis commandé sur le site officiel. Êtes-vous disponible à votre domicile ?",
+    "label": 0,
+    "language": "fr",
+    "category": "commerce-legitime"
+  },
+  {
+    "id": "legit-vend-05",
+    "text": "Commande confirmée : Vous pouvez inspecter les articles avant d'effectuer le paiement au livreur.",
+    "label": 0,
+    "language": "fr",
+    "category": "commerce-legitime"
+  },
+  {
+    "id": "fraud-sent-01",
+    "text": "Mon amour, je suis bloqué à l'aéroport de Dakar avec mes bagages diplomatiques. Envoie-moi vite 75.000 FCFA pour payer la taxe de sortie.",
+    "label": 1,
+    "language": "fr",
+    "category": "arnaque-sentimentale"
+  },
+  {
+    "id": "fraud-sent-02",
+    "text": "Bébé, ma mère a eu une crise subite et l'hôpital refuse de la soigner sans avance. Transfère-moi 50.000 FCFA par Wave en urgence s'il te plaît.",
+    "label": 1,
+    "language": "fr",
+    "category": "arnaque-sentimentale"
+  },
+  {
+    "id": "fraud-sent-03",
+    "text": "Mon cœur, j'ai envoyé un colis contenant 50.000 dollars et des bijoux pour notre futur mariage. Paye les 40.000 FCFA de douane pour le recevoir.",
+    "label": 1,
+    "language": "fr",
+    "category": "arnaque-sentimentale"
+  },
+  {
+    "id": "fraud-sent-04",
+    "text": "Chéri, j'ai perdu mon portefeuille en voyage et je n'ai plus rien pour manger. Envoie-moi un mandat de 30.000 FCFA pour m'aider.",
+    "label": 1,
+    "language": "fr",
+    "category": "arnaque-sentimentale"
+  },
+  {
+    "id": "fraud-sent-05",
+    "text": "Je t'aime tellement, aide-moi à payer mon billet d'avion pour te rejoindre à Dakar la semaine prochaine, envoie 100.000 FCFA par transfert.",
+    "label": 1,
+    "language": "fr",
+    "category": "arnaque-sentimentale"
+  },
+  {
+    "id": "fraud-sent-06",
+    "text": "Sama xol, dafa am problème ci hôpital bi, yónnee ma 35.000 FCFA ci sàss bala ñuy tëj dossier bi.",
+    "label": 1,
+    "language": "wo",
+    "category": "arnaque-sentimentale"
+  },
+  {
+    "id": "fraud-sent-07",
+    "text": "Mon amour, le notaire a besoin de 45.000 FCFA de frais de dossier pour débloquer l'héritage de 2 millions d'euros que je veux partager avec toi.",
+    "label": 1,
+    "language": "fr",
+    "category": "arnaque-sentimentale"
+  },
+  {
+    "id": "fraud-sent-08",
+    "text": "Chère amie, mon orphelinat a un besoin urgent de vivres, faites un don d'amour de 25.000 FCFA sur ce numéro personnel.",
+    "label": 1,
+    "language": "fr",
+    "category": "arnaque-sentimentale"
+  },
+  {
+    "id": "fraud-sent-09",
+    "text": "Bébé, la police m'a arrêté pour défaut de visa, envoie 60.000 FCFA à l'officier sur ce numéro pour me libérer rapidement.",
+    "label": 1,
+    "language": "fr",
+    "category": "arnaque-sentimentale"
+  },
+  {
+    "id": "fraud-sent-10",
+    "text": "Sama coono ak sama beug laa la bëgg wax : yónnee ma 50.000 FCFA ngir ma mëna ñëw gise ak yow tay.",
+    "label": 1,
+    "language": "wo",
+    "category": "arnaque-sentimentale"
+  },
+  {
+    "id": "legit-sent-01",
+    "text": "Coucou mon chéri, passe une excellente journée au travail. N'oublie pas qu'on dîne chez mes parents ce soir.",
+    "label": 0,
+    "language": "fr",
+    "category": "conversation-legitime"
+  },
+  {
+    "id": "legit-sent-02",
+    "text": "Salam mon amour, j'ai bien reçu tes messages. Je termine ma réunion et je t'appelle dès que je rentre.",
+    "label": 0,
+    "language": "fr",
+    "category": "conversation-legitime"
+  },
+  {
+    "id": "legit-sent-03",
+    "text": "Bonne fête mon cœur ! Merci pour le beau cadeau, je t'aime fort.",
+    "label": 0,
+    "language": "fr",
+    "category": "conversation-legitime"
+  },
+  {
+    "id": "legit-sent-04",
+    "text": "Chérie, j'ai fait les courses pour la maison comme convenu, tout est au frigo. Bisous !",
+    "label": 0,
+    "language": "fr",
+    "category": "conversation-legitime"
+  },
+  {
+    "id": "legit-sent-05",
+    "text": "Sama xarit bu baax, jàmm nga am, na nga def ak liggéey bi ? Nu gise ci kanam.",
+    "label": 0,
+    "language": "wo",
+    "category": "conversation-legitime"
+  },
+  {
+    "id": "fraud-pret-01",
+    "text": "Offre de prêt rapide entre particuliers : obtenez de 500.000 à 10.000.000 FCFA en 24h sans justificatif. Frais d'assurance préalables de 35.000 FCFA.",
+    "label": 1,
+    "language": "fr",
+    "category": "faux-pret"
+  },
+  {
+    "id": "fraud-pret-02",
+    "text": "Investissez 20.000 FCFA dans notre robot de trading crypto et recevez 100.000 FCFA chaque jour sans aucun risque garanti à 100%.",
+    "label": 1,
+    "language": "fr",
+    "category": "fausse-crypto"
+  },
+  {
+    "id": "fraud-pret-03",
+    "text": "Plateforme Binance Sénégal VIP : doublez vos Bitcoins en 3 heures. Envoyez vos USDT sur notre wallet pour activer le bot de minage.",
+    "label": 1,
+    "language": "fr",
+    "category": "fausse-crypto"
+  },
+  {
+    "id": "fraud-pret-04",
+    "text": "Crédit solidaire sans intérêt : versez les frais d'ouverture de dossier de 20.000 FCFA par Wave pour recevoir 2.000.000 FCFA sur votre compte.",
+    "label": 1,
+    "language": "fr",
+    "category": "faux-pret"
+  },
+  {
+    "id": "fraud-pret-05",
+    "text": "Gagnez 500.000 FCFA par semaine grâce au minage automatique de cryptomonnaie. Dépôt minimal de 50.000 FCFA à transférer aujourd'hui.",
+    "label": 1,
+    "language": "fr",
+    "category": "fausse-crypto"
+  },
+  {
+    "id": "fraud-pret-06",
+    "text": "Xaalis bu gaaw ci 24h : joxe 15.000 FCFA frais de dossier ngir ñu prête la 1.000.000 FCFA sans garantie.",
+    "label": 1,
+    "language": "wo",
+    "category": "faux-pret"
+  },
+  {
+    "id": "fraud-pret-07",
+    "text": "Microfinance en ligne : votre prêt de 3.000.000 FCFA est pré-approuvé. Réglez les frais de virement bancaire de 40.000 FCFA pour déblocage.",
+    "label": 1,
+    "language": "fr",
+    "category": "faux-pret"
+  },
+  {
+    "id": "fraud-pret-08",
+    "text": "Opportunité d'investissement Forex certifiée : rendement de 300% par mois. Rejoignez le groupe Telegram et déposez vos fonds dès maintenant.",
+    "label": 1,
+    "language": "fr",
+    "category": "fausse-crypto"
+  },
+  {
+    "id": "fraud-pret-09",
+    "text": "Compte épargne crypto à 50% d'intérêts hebdomadaires. Envoyez vos fonds par mobile money pour commencer à encaisser vos gains.",
+    "label": 1,
+    "language": "fr",
+    "category": "fausse-crypto"
+  },
+  {
+    "id": "fraud-pret-10",
+    "text": "Prêt d'argent immédiat : feyal 25.000 FCFA de timbres fiscaux ngir jot sa 1.500.000 FCFA ci sa compte Wave.",
+    "label": 1,
+    "language": "wo",
+    "category": "faux-pret"
+  },
+  {
+    "id": "legit-pret-01",
+    "text": "Banque de l'Habitat du Sénégal : Votre demande de simulation de prêt immobilier a été traitée. Prenez rendez-vous avec un conseiller en agence.",
+    "label": 0,
+    "language": "fr",
+    "category": "banque-officiel"
+  },
+  {
+    "id": "legit-pret-02",
+    "text": "CBAO Attijariwafa : Votre échéance de prêt N° 78912 d'un montant de 45.000 FCFA a été prélevée sur votre compte courant.",
+    "label": 0,
+    "language": "fr",
+    "category": "banque-officiel"
+  },
+  {
+    "id": "legit-pret-03",
+    "text": "Microcred / Baobab : Votre relevé de compte professionnel du mois est disponible en agence ou sur l'application sécurisée.",
+    "label": 0,
+    "language": "fr",
+    "category": "banque-officiel"
+  },
+  {
+    "id": "legit-pret-04",
+    "text": "Notification bancaire : Aucun virement de fonds ne vous sera accordé sans signature préalable d'un contrat en agence physique.",
+    "label": 0,
+    "language": "fr",
+    "category": "banque-officiel"
+  },
+  {
+    "id": "legit-pret-05",
+    "text": "Simulation de crédit : Consultez les conditions officielles et taux d'intérêt réglementés sur le portail sécurisé de votre banque.",
+    "label": 0,
+    "language": "fr",
+    "category": "banque-officiel"
+  },
+  {
+    "id": "fraud-proch-01",
+    "text": "Salut maman, c'est moi. Mon téléphone est tombé dans l'eau et ne s'allume plus. Enregistre ce nouveau numéro et envoie-moi 30.000 FCFA par Wave pour urgence.",
+    "label": 1,
+    "language": "fr",
+    "category": "faux-proche"
+  },
+  {
+    "id": "fraud-proch-02",
+    "text": "Bonjour papa, j'ai perdu mon téléphone dans le taxi, ceci est mon numéro temporaire. J'ai un gros souci d'argent, envoie 25.000 FCFA ici vite.",
+    "label": 1,
+    "language": "fr",
+    "category": "faux-proche"
+  },
+  {
+    "id": "fraud-proch-03",
+    "text": "Coucou maman, c'est Fatou. Je suis au commissariat après un contrôle, mon ancien téléphone est confisqué. Envoie 40.000 FCFA sur ce numéro pour l'amende.",
+    "label": 1,
+    "language": "fr",
+    "category": "faux-proche"
+  },
+  {
+    "id": "fraud-proch-04",
+    "text": "Salam papa, c'est Modou. Ma moto est tombée en panne sur l'autoroute à péage, envoie-moi 20.000 FCFA par Orange Money tout de suite.",
+    "label": 1,
+    "language": "fr",
+    "category": "faux-proche"
+  },
+  {
+    "id": "fraud-proch-05",
+    "text": "Salut maman, mon nouveau WhatsApp est sur ce numéro. Peux-tu me dépanner de 35.000 FCFA pour payer le loyer de ma chambre étudiante ?",
+    "label": 1,
+    "language": "fr",
+    "category": "faux-proche"
+  },
+  {
+    "id": "fraud-proch-06",
+    "text": "Papa man la sama téléphone dafa fay, dama am urgence ci hôpital bi, yónnee ma 30.000 FCFA ci numéro bi léegi ci sàss.",
+    "label": 1,
+    "language": "wo",
+    "category": "faux-proche"
+  },
+  {
+    "id": "fraud-proch-07",
+    "text": "Coucou maman, je t'écris avec le téléphone d'un ami car le mien a été volé. Envoie-moi vite 15.000 FCFA pour que je puisse rentrer en taxi.",
+    "label": 1,
+    "language": "fr",
+    "category": "faux-proche"
+  },
+  {
+    "id": "fraud-proch-08",
+    "text": "Bonjour maman, nouveau numéro temporaire. Peux-tu régler cette facture de 28.000 FCFA pour moi par Wave ? Je te rembourse ce soir.",
+    "label": 1,
+    "language": "fr",
+    "category": "faux-proche"
+  },
+  {
+    "id": "fraud-proch-09",
+    "text": "Salam papa, mon numéro principal est bloqué. Envoie 50.000 FCFA sur ce compte pour ma réinscription à l'université avant la clôture.",
+    "label": 1,
+    "language": "fr",
+    "category": "faux-proche"
+  },
+  {
+    "id": "fraud-proch-10",
+    "text": "Yaay man la sama téléphone dafa daanu ci ndox mi, yónnee ma 20.000 FCFA ci numéro bi ma fayee sama facture.",
+    "label": 1,
+    "language": "wo",
+    "category": "faux-proche"
+  },
+  {
+    "id": "legit-proch-01",
+    "text": "Bonjour maman, j'espère que tu te portes bien. Je passerai te voir ce week-end avec les enfants inchaAllah.",
+    "label": 0,
+    "language": "fr",
+    "category": "conversation-legitime"
+  },
+  {
+    "id": "legit-proch-02",
+    "text": "Salam papa, j'ai bien reçu les commissions que tu as envoyées par le car rapide, merci beaucoup.",
+    "label": 0,
+    "language": "fr",
+    "category": "conversation-legitime"
+  },
+  {
+    "id": "legit-proch-03",
+    "text": "Salut frangin, n'oublie pas qu'on doit aller rendre visite à tante Awa samedi après-midi.",
+    "label": 0,
+    "language": "fr",
+    "category": "conversation-legitime"
+  },
+  {
+    "id": "legit-proch-04",
+    "text": "Maman, je suis bien arrivé à destination à Thiès. Le voyage s'est très bien passé. Bonne soirée !",
+    "label": 0,
+    "language": "fr",
+    "category": "conversation-legitime"
+  },
+  {
+    "id": "legit-proch-05",
+    "text": "Papa, sama examen yi jéex na te lëpp jaar na yoon. Dinaa ñëw kër gi suba.",
+    "label": 0,
+    "language": "wo",
+    "category": "conversation-legitime"
+  },
+  {
+    "id": "fraud-col-01",
+    "text": "Chronopost Sénégal : Votre colis FR-89214 est bloqué au centre de tri pour adresse incomplète. Réglez 2.500 FCFA de frais de réexpédition sur ce lien.",
+    "label": 1,
+    "language": "fr",
+    "category": "faux-colis"
+  },
+  {
+    "id": "fraud-col-02",
+    "text": "DHL Express : Vous avez un colis international en attente à Dakar. Des frais de douane de 18.000 FCFA doivent être réglés sous 24h pour livraison.",
+    "label": 1,
+    "language": "fr",
+    "category": "faux-colis"
+  },
+  {
+    "id": "fraud-col-03",
+    "text": "La Poste Info : Votre paquet N° PK-781 ne peut être livré. Cliquez ici pour mettre à jour vos coordonnées et vous acquitter des frais de garde de 3.000 FCFA.",
+    "label": 1,
+    "language": "fr",
+    "category": "faux-colis"
+  },
+  {
+    "id": "fraud-col-04",
+    "text": "FedEx Sénégal : Notification de livraison suspendue. Veuillez verser 7.500 FCFA par mobile money pour débloquer votre marchandise aujourd'hui.",
+    "label": 1,
+    "language": "fr",
+    "category": "faux-colis"
+  },
+  {
+    "id": "fraud-col-05",
+    "text": "Alerte colis : Votre colis cadeau en provenance de France est retenu à l'aéroport. Payez la taxe de dédouanement de 15.000 FCFA pour l'acheminer.",
+    "label": 1,
+    "language": "fr",
+    "category": "faux-colis"
+  },
+  {
+    "id": "fraud-col-06",
+    "text": "Colis bi bloqué na ci douane : feyal 12.000 FCFA ci numéro bi ngir ñu mëna la ko livré tay ci sa kër.",
+    "label": 1,
+    "language": "wo",
+    "category": "faux-colis"
+  },
+  {
+    "id": "fraud-col-07",
+    "text": "Centre de distribution : Colis sous séquestre douanier. Dernier délai pour payer les frais de dossier de 25.000 FCFA sinon le colis sera détruit.",
+    "label": 1,
+    "language": "fr",
+    "category": "faux-colis"
+  },
+  {
+    "id": "fraud-col-08",
+    "text": "UPS Info : Votre colis volumineux nécessite un supplément de transport de 5.000 FCFA. Réglez immédiatement par Wave pour planifier la course.",
+    "label": 1,
+    "language": "fr",
+    "category": "faux-colis"
+  },
+  {
+    "id": "fraud-col-09",
+    "text": "Colis international bloqué : confirmez vos données de carte bancaire sur ce lien pour autoriser la réception de votre colis.",
+    "label": 1,
+    "language": "fr",
+    "category": "faux-colis"
+  },
+  {
+    "id": "fraud-col-10",
+    "text": "Sa colis amna frais de douane yu ko tëj : yónnee 10.000 FCFA ci Orange Money ngir ñu jox la sa bagage.",
+    "label": 1,
+    "language": "wo",
+    "category": "faux-colis"
+  },
+  {
+    "id": "legit-col-01",
+    "text": "DHL Sénégal : Votre expédition N° 458921 a été livrée à l'adresse indiquée. Merci de votre confiance.",
+    "label": 0,
+    "language": "fr",
+    "category": "livraison-legitime"
+  },
+  {
+    "id": "legit-col-02",
+    "text": "La Poste Sénégal : Un recommandé N° 789 vous attend à l'agence de Dakar Médina. Présentez-vous avec votre pièce d'identité.",
+    "label": 0,
+    "language": "fr",
+    "category": "livraison-legitime"
+  },
+  {
+    "id": "legit-col-03",
+    "text": "Chronopost : Votre envoi a été pris en charge par notre transporteur et sera livré demain entre 9h et 12h.",
+    "label": 0,
+    "language": "fr",
+    "category": "livraison-legitime"
+  },
+  {
+    "id": "legit-col-04",
+    "text": "Suivi de colis : Votre commande est en transit vers le centre de distribution régional. Aucune action n'est requise de votre part.",
+    "label": 0,
+    "language": "fr",
+    "category": "livraison-legitime"
+  },
+  {
+    "id": "legit-col-05",
+    "text": "Avis de mise à disposition : Votre pli est disponible au guichet de votre agence postale habituelle.",
+    "label": 0,
+    "language": "fr",
+    "category": "livraison-legitime"
+  },
+  {
+    "id": "fraud-vis-01",
+    "text": "Programme Immigration Canada 2026 : Vous êtes sélectionné pour un visa de résident permanent. Envoyez 75.000 FCFA de frais de dossier d'ambassade.",
+    "label": 1,
+    "language": "fr",
+    "category": "faux-visa"
+  },
+  {
+    "id": "fraud-vis-02",
+    "text": "Visa de travail garanti pour l'Europe et le Golfe. Versez un acompte de 100.000 FCFA par Wave pour l'édition de votre contrat officiel.",
+    "label": 1,
+    "language": "fr",
+    "category": "faux-visa"
+  },
+  {
+    "id": "fraud-vis-03",
+    "text": "Ambassade du Canada Sénégal : Tirage au sort de bourses et visas d'immigration. Payez 50.000 FCFA de frais biométriques pour valider votre dossier.",
+    "label": 1,
+    "language": "fr",
+    "category": "faux-visa"
+  },
+  {
+    "id": "fraud-vis-04",
+    "text": "Obtenez votre visa Schengen sans garant en 7 jours. Frais d'intermédiaire de 150.000 FCFA à transférer avant le rendez-vous consulaire.",
+    "label": 1,
+    "language": "fr",
+    "category": "faux-visa"
+  },
+  {
+    "id": "fraud-vis-05",
+    "text": "Loterie Visa USA Sénégal : Félicitations, votre profil a été retenu ! Payez 45.000 FCFA de frais d'enregistrement par Orange Money aujourd'hui.",
+    "label": 1,
+    "language": "fr",
+    "category": "faux-visa"
+  },
+  {
+    "id": "fraud-vis-06",
+    "text": "Visa Canada bu garanti : feyal 80.000 FCFA ci Wave ngir ñu génneel la sa permis de travail ci 15 jours.",
+    "label": 1,
+    "language": "wo",
+    "category": "faux-visa"
+  },
+  {
+    "id": "fraud-vis-07",
+    "text": "Recrutement d'agriculteurs au Portugal : voyage et logement payés. Frais d'assurance consulaire de 60.000 FCFA à payer sans délai.",
+    "label": 1,
+    "language": "fr",
+    "category": "faux-visa"
+  },
+  {
+    "id": "fraud-vis-08",
+    "text": "Visa étudiant France garanti : pas besoin de Campus France. Versez 90.000 FCFA pour obtenir votre pré-inscription et visa direct.",
+    "label": 1,
+    "language": "fr",
+    "category": "faux-visa"
+  },
+  {
+    "id": "fraud-vis-09",
+    "text": "Ambassade USA : Dernière étape pour l'obtention de votre visa immigrant. Réglez les frais d'expédition de passeport de 30.000 FCFA par mobile money.",
+    "label": 1,
+    "language": "fr",
+    "category": "faux-visa"
+  },
+  {
+    "id": "fraud-vis-10",
+    "text": "Jot nga visa travail ci France : yónnee 50.000 FCFA léegi bala place yi di jéex.",
+    "label": 1,
+    "language": "wo",
+    "category": "faux-visa"
+  },
+  {
+    "id": "legit-vis-01",
+    "text": "Campus France Sénégal : Votre dossier a été transmis à la commission pédagogique. Connectez-vous sur votre espace sécurisé Pastel.",
+    "label": 0,
+    "language": "fr",
+    "category": "rappel-administratif"
+  },
+  {
+    "id": "legit-vis-02",
+    "text": "Consulat Général de France à Dakar : Votre passeport avec visa est prêt à être retiré au centre TLScontact. Munissez-vous de votre reçu.",
+    "label": 0,
+    "language": "fr",
+    "category": "rappel-administratif"
+  },
+  {
+    "id": "legit-vis-03",
+    "text": "Ambassade du Canada : Rappel de votre rendez-vous de données biométriques le 12 novembre à 8h30. Aucun paiement n'est perçu par mobile money.",
+    "label": 0,
+    "language": "fr",
+    "category": "rappel-administratif"
+  },
+  {
+    "id": "legit-vis-04",
+    "text": "VFS Global : Votre demande de visa a été transmise aux autorités consulaires compétentes pour instruction.",
+    "label": 0,
+    "language": "fr",
+    "category": "rappel-administratif"
+  },
+  {
+    "id": "legit-vis-05",
+    "text": "Notification officielle d'immigration : Tous les paiements de droits consulaires s'effectuent exclusivement au guichet agréé de la banque.",
+    "label": 0,
+    "language": "fr",
+    "category": "rappel-administratif"
+  },
+  {
+    "id": "fraud-pol-01",
+    "text": "Convocation judiciaire urgente : Un mandat d'amener a été délivré contre vous. Payez l'amende forfaitaire de 50.000 FCFA par Wave pour annuler la procédure.",
+    "label": 1,
+    "language": "fr",
+    "category": "fausse-police"
+  },
+  {
+    "id": "fraud-pol-02",
+    "text": "Direction de la Police Judiciaire : Une plainte pour escroquerie est déposée contre votre numéro. Réglez 70.000 FCFA sous 24h pour arrangement à l'amiable.",
+    "label": 1,
+    "language": "fr",
+    "category": "fausse-police"
+  },
+  {
+    "id": "fraud-pol-03",
+    "text": "Tribunal de Grande Instance de Dakar : Dernier avis avant perquisition et saisie de vos comptes bancaires. Réglez les dépens de 45.000 FCFA immédiatement.",
+    "label": 1,
+    "language": "fr",
+    "category": "fausse-police"
+  },
+  {
+    "id": "fraud-pol-04",
+    "text": "Brigade Spéciale de Cybercriminalité : Votre numéro est impliqué dans un réseau illicite. Versez la caution de 60.000 FCFA pour stopper les poursuites.",
+    "label": 1,
+    "language": "fr",
+    "category": "fausse-police"
+  },
+  {
+    "id": "fraud-pol-05",
+    "text": "Avis d'huissier de justice : Sans paiement de votre amende de 35.000 FCFA aujourd'hui sur ce numéro, les forces de l'ordre interviendront à votre domicile.",
+    "label": 1,
+    "language": "fr",
+    "category": "fausse-police"
+  },
+  {
+    "id": "fraud-pol-06",
+    "text": "Police nationale dafa am mandat ci sa kaw : feyal 40.000 FCFA ci numéro bi tay bala ñuy ñëw tëj la ci kasso.",
+    "label": 1,
+    "language": "wo",
+    "category": "fausse-police"
+  },
+  {
+    "id": "fraud-pol-07",
+    "text": "Gendarmerie Nationale : Convocation pour délit d'outrage. Pour éviter votre placement en garde à vue, contactez l'officier et réglez les 50.000 FCFA.",
+    "label": 1,
+    "language": "fr",
+    "category": "fausse-police"
+  },
+  {
+    "id": "fraud-pol-08",
+    "text": "Mandat d'arrêt international Interpol : Vos données ont été signalées. Payez 100.000 FCFA de frais de régularisation juridique sur ce lien.",
+    "label": 1,
+    "language": "fr",
+    "category": "fausse-police"
+  },
+  {
+    "id": "fraud-pol-09",
+    "text": "Notification pénale : Dernier avertissement avant arrestation par la police. Régularisez votre amende de 30.000 FCFA immédiatement par transfert.",
+    "label": 1,
+    "language": "fr",
+    "category": "fausse-police"
+  },
+  {
+    "id": "fraud-pol-10",
+    "text": "Tribunal Dakar : yónnee 50.000 FCFA léegi ci Wave sinon ñu tëj say compte bancaire te yobbu la commissariat.",
+    "label": 1,
+    "language": "wo",
+    "category": "fausse-police"
+  },
+  {
+    "id": "legit-pol-01",
+    "text": "Police Nationale Sénégal : Rappel à la vigilance citoyenne. Signalez tout fait suspect auprès de votre commissariat le plus proche.",
+    "label": 0,
+    "language": "fr",
+    "category": "police-officiel"
+  },
+  {
+    "id": "legit-pol-02",
+    "text": "Direction de la Sécurité Publique : Les convocations officielles sont remises physiquement en main propre contre décharge, jamais par SMS.",
+    "label": 0,
+    "language": "fr",
+    "category": "police-officiel"
+  },
+  {
+    "id": "legit-pol-03",
+    "text": "Tribunal de Commerce de Dakar : Votre extrait de registre de commerce est disponible au greffe. Retrait sur présentation de votre pièce d'identité.",
+    "label": 0,
+    "language": "fr",
+    "category": "justice-officiel"
+  },
+  {
+    "id": "legit-pol-04",
+    "text": "Gendarmerie Nationale : Campagne de sensibilisation à la sécurité routière sur les axes autoroutiers. Bonne route à tous.",
+    "label": 0,
+    "language": "fr",
+    "category": "police-officiel"
+  },
+  {
+    "id": "legit-pol-05",
+    "text": "Maison de Justice : Séances de médiation gratuites du lundi au vendredi de 8h à 16h sans aucun frais.",
+    "label": 0,
+    "language": "fr",
+    "category": "justice-officiel"
+  },
+  {
+    "id": "fraud-wa-01",
+    "text": "Salam mon frère, s'il te plaît ma nièce participe à un concours de récitation. Je t'ai envoyé un code par SMS, renvoie-moi ce code à 6 chiffres barakallahoufik.",
+    "label": 1,
+    "language": "fr",
+    "category": "piratage-whatsapp"
+  },
+  {
+    "id": "fraud-wa-02",
+    "text": "WhatsApp Support : Pour vérifier que vous êtes bien le propriétaire du compte, dictez le code de sécurité à 6 chiffres que vous venez de recevoir par SMS.",
+    "label": 1,
+    "language": "fr",
+    "category": "piratage-whatsapp"
+  },
+  {
+    "id": "fraud-wa-03",
+    "text": "Urgent : J'ai mis ton numéro par erreur pour valider mon nouveau compte WhatsApp. Renvoie-moi le code reçu par SMS pour que je puisse me connecter.",
+    "label": 1,
+    "language": "fr",
+    "category": "piratage-whatsapp"
+  },
+  {
+    "id": "fraud-wa-04",
+    "text": "Vote pour la finale du concours Coranique : renvoie le code SMS de confirmation à 6 chiffres pour attribuer tes 5 votes gratuits.",
+    "label": 1,
+    "language": "fr",
+    "category": "piratage-whatsapp"
+  },
+  {
+    "id": "fraud-wa-05",
+    "text": "Alerte de sécurité WhatsApp : Votre compte va être supprimé. Envoyez le code de vérification reçu à 6 chiffres pour conserver vos messages.",
+    "label": 1,
+    "language": "fr",
+    "category": "piratage-whatsapp"
+  },
+  {
+    "id": "fraud-wa-06",
+    "text": "Salam sa xarit la, dama bëgg votel sama doom ci concours bi, yónnee ma code 6 chiffres bi nga jot ci sa SMS ci sàss.",
+    "label": 1,
+    "language": "wo",
+    "category": "piratage-whatsapp"
+  },
+  {
+    "id": "fraud-wa-07",
+    "text": "Groupe WhatsApp de la famille : Une mise à jour obligatoire nécessite que chaque membre partage son code de validation SMS à 6 chiffres ici.",
+    "label": 1,
+    "language": "fr",
+    "category": "piratage-whatsapp"
+  },
+  {
+    "id": "fraud-wa-08",
+    "text": "Loterie WhatsApp annuelle : Vous avez gagné 500.000 FCFA. Pour valider votre numéro, dictez le code secret à 6 chiffres reçu par SMS.",
+    "label": 1,
+    "language": "fr",
+    "category": "piratage-whatsapp"
+  },
+  {
+    "id": "fraud-wa-09",
+    "text": "Mon ami, je me suis trompé de numéro pour recevoir mon code WhatsApp. Renvoyez-moi le code immédiatement s'il vous plaît.",
+    "label": 1,
+    "language": "fr",
+    "category": "piratage-whatsapp"
+  },
+  {
+    "id": "fraud-wa-10",
+    "text": "WhatsApp dafay tëju suba : yónnee code 6 chiffres bi nga jot ci SMS ngir réactiver sa compte.",
+    "label": 1,
+    "language": "wo",
+    "category": "piratage-whatsapp"
+  },
+  {
+    "id": "legit-wa-01",
+    "text": "WhatsApp : Votre code de vérification est 782-914. Ne partagez ce code avec personne.",
+    "label": 0,
+    "language": "fr",
+    "category": "recu-officiel"
+  },
+  {
+    "id": "legit-wa-02",
+    "text": "WhatsApp Business : Votre code de sécurité à 6 chiffres est 458-123. Les équipes de WhatsApp ne vous le demanderont jamais.",
+    "label": 0,
+    "language": "fr",
+    "category": "recu-officiel"
+  },
+  {
+    "id": "legit-wa-03",
+    "text": "Code de sécurité : Utilisez 921-654 pour valider la connexion à votre nouveau téléphone. Gardez-le secret.",
+    "label": 0,
+    "language": "fr",
+    "category": "recu-officiel"
+  },
+  {
+    "id": "legit-wa-04",
+    "text": "Notification WhatsApp : Si vous n'avez pas demandé de code de vérification, ignorez simplement ce message. Votre compte reste sécurisé.",
+    "label": 0,
+    "language": "fr",
+    "category": "recu-officiel"
+  },
+  {
+    "id": "legit-wa-05",
+    "text": "Vérification en 2 étapes WhatsApp : Votre code de confirmation est généré. Ne le transmettez à aucun tiers.",
+    "label": 0,
+    "language": "fr",
+    "category": "recu-officiel"
+  },
+  {
+    "id": "fraud-chan-01",
+    "text": "J'ai piraté votre caméra de téléphone et enregistré vos vidéos intimes. Payez 150.000 FCFA sur ce compte sinon je diffuse tout à vos contacts et sur Facebook.",
+    "label": 1,
+    "language": "fr",
+    "category": "chantage-sextorsion"
+  },
+  {
+    "id": "fraud-chan-02",
+    "text": "Dernier avertissement : Nous possédons des captures d'écran compromettantes de vos conversations. Envoyez 200.000 FCFA par Wave dans les 24h sinon vos données seront publiées.",
+    "label": 1,
+    "language": "fr",
+    "category": "chantage-sextorsion"
+  },
+  {
+    "id": "fraud-chan-03",
+    "text": "Votre écran et webcam ont été filmés lors de vos visites sur des sites pour adultes. Versez 100.000 FCFA en Bitcoin ou Wave avant ce soir pour supprimer la vidéo.",
+    "label": 1,
+    "language": "fr",
+    "category": "chantage-sextorsion"
+  },
+  {
+    "id": "fraud-chan-04",
+    "text": "Chantage intime : Toutes vos photos personnelles seront envoyées à votre famille, vos collègues et votre employeur si vous ne payez pas 75.000 FCFA immédiatement.",
+    "label": 1,
+    "language": "fr",
+    "category": "chantage-sextorsion"
+  },
+  {
+    "id": "fraud-chan-05",
+    "text": "Nous avons copié la totalité de vos contacts et photos privées. Sans virement de 120.000 FCFA de votre part aujourd'hui, votre réputation sera ruinée.",
+    "label": 1,
+    "language": "fr",
+    "category": "chantage-sextorsion"
+  },
+  {
+    "id": "fraud-chan-06",
+    "text": "Am naa say vidéo intime : feyal 100.000 FCFA tay ci Wave sinon ma partagé ko ci tout say contacts WhatsApp ak Facebook.",
+    "label": 1,
+    "language": "wo",
+    "category": "chantage-sextorsion"
+  },
+  {
+    "id": "fraud-chan-07",
+    "text": "Piratage de votre galerie photo confirmé. Vous avez 12 heures pour payer la somme de 80.000 FCFA sinon publication intégrale sur internet.",
+    "label": 1,
+    "language": "fr",
+    "category": "chantage-sextorsion"
+  },
+  {
+    "id": "fraud-chan-08",
+    "text": "Avis de chantage : Vos échanges intimes sont entre nos mains. Transférez 50.000 FCFA sur ce numéro avant 20h pour éviter le scandale.",
+    "label": 1,
+    "language": "fr",
+    "category": "chantage-sextorsion"
+  },
+  {
+    "id": "fraud-chan-09",
+    "text": "Menace de diffusion : Nous diffusons vos photos compromettantes sur tous les réseaux sociaux si vous ne réglez pas la rançon demandée immédiatement.",
+    "label": 1,
+    "language": "fr",
+    "category": "chantage-sextorsion"
+  },
+  {
+    "id": "fraud-chan-10",
+    "text": "Say données ak say photos dinañu ko exposé ci internet bu fékkee feyoo 60.000 FCFA tay ci numéro bi.",
+    "label": 1,
+    "language": "wo",
+    "category": "chantage-sextorsion"
+  },
+  {
+    "id": "legit-chan-01",
+    "text": "Commission de Protection des Données Personnelles (CDP) : Ne partagez jamais vos contenus privés en ligne et signalez toute tentative de chantage.",
+    "label": 0,
+    "language": "fr",
+    "category": "sensibilisation-legitime"
+  },
+  {
+    "id": "legit-chan-02",
+    "text": "Alerte sécurité numérique : En cas de tentative d'extorsion ou chantage en ligne, conservez les messages et portez plainte à la Division Spéciale de Cybersécurité.",
+    "label": 0,
+    "language": "fr",
+    "category": "sensibilisation-legitime"
+  },
+  {
+    "id": "legit-chan-03",
+    "text": "Notification de sécurité Google : Un nouvel appareil s'est connecté à votre compte. S'il s'agit de vous, aucune action n'est requise.",
+    "label": 0,
+    "language": "fr",
+    "category": "securite-officiel"
+  },
+  {
+    "id": "legit-chan-04",
+    "text": "Rappel de confidentialité : Ne communiquez jamais d'images ou d'informations confidentielles à des tiers inconnus sur les réseaux.",
+    "label": 0,
+    "language": "fr",
+    "category": "sensibilisation-legitime"
+  },
+  {
+    "id": "legit-chan-05",
+    "text": "Conseil citoyen : Les menaces de chantage sont des infractions pénales punies par la loi sénégalaise. Contactez la police au 17.",
+    "label": 0,
+    "language": "fr",
+    "category": "sensibilisation-legitime"
+  },
+  {
+    "id": "legit-bal-00",
+    "text": "Bonjour monsieur, voici la confirmation de votre commande chez Auchan Dakar. Bonne journée.",
+    "label": 0,
+    "language": "fr",
+    "category": "quotidien-legitime"
+  },
+  {
+    "id": "legit-bal-01",
+    "text": "Senelec Woyofal : Recharge de 5.000 FCFA effectuée avec succès. Code compteur : 7892-1243-9812-4521.",
+    "label": 0,
+    "language": "fr",
+    "category": "quotidien-legitime"
+  },
+  {
+    "id": "legit-bal-02",
+    "text": "Wave : Vous avez reçu 15.000F CFA de Fatou Ndiaye. Nouveau solde : 42.500F CFA.",
+    "label": 0,
+    "language": "fr",
+    "category": "quotidien-legitime"
+  },
+  {
+    "id": "legit-bal-03",
+    "text": "Orange Money : Achat de pass illimité 30 jours confirmé. Réf : OM-89217. Solde restant : 8.200 FCFA.",
+    "label": 0,
+    "language": "fr",
+    "category": "quotidien-legitime"
+  },
+  {
+    "id": "legit-bal-04",
+    "text": "Votre réservation de table au restaurant Le Lagon 1 pour ce samedi à 20h est confirmée.",
+    "label": 0,
+    "language": "fr",
+    "category": "quotidien-legitime"
+  },
+  {
+    "id": "legit-bal-05",
+    "text": "Air Sénégal : Enregistrement en ligne ouvert pour votre vol Dakar - Paris de demain.",
+    "label": 0,
+    "language": "fr",
+    "category": "quotidien-legitime"
+  },
+  {
+    "id": "legit-bal-06",
+    "text": "Pharmacie Guigon : Vos médicaments commandés sont prêts au comptoir de retrait.",
+    "label": 0,
+    "language": "fr",
+    "category": "quotidien-legitime"
+  },
+  {
+    "id": "legit-bal-07",
+    "text": "Salam mon ami, peux-tu me renvoyer le document PDF du projet par email quand tu auras le temps ?",
+    "label": 0,
+    "language": "fr",
+    "category": "quotidien-legitime"
+  },
+  {
+    "id": "legit-bal-08",
+    "text": "Rappel rendez-vous dentiste demain mardi à 15h30 au cabinet médical du Point E.",
+    "label": 0,
+    "language": "fr",
+    "category": "quotidien-legitime"
+  },
+  {
+    "id": "legit-bal-09",
+    "text": "Sen'Eau : Votre facture d'eau du mois est consultable en ligne. Date d'échéance le 25 du mois.",
+    "label": 0,
+    "language": "fr",
+    "category": "quotidien-legitime"
+  },
+  {
+    "id": "legit-bal-10",
+    "text": "Boutique L'Or du Baobab : Merci pour votre visite, votre carte de fidélité a été créditée de 50 points.",
+    "label": 0,
+    "language": "fr",
+    "category": "quotidien-legitime"
+  },
+  {
+    "id": "legit-bal-11",
+    "text": "Free Sénégal : Votre recharge de crédit de 2.000 FCFA a bien été effectuée.",
+    "label": 0,
+    "language": "fr",
+    "category": "quotidien-legitime"
+  },
+  {
+    "id": "legit-bal-12",
+    "text": "Salam Awa, ndax yóbbu nga xale yi ci lekool bi ? Wax ma bu ñu wàccee.",
+    "label": 0,
+    "language": "wo",
+    "category": "quotidien-legitime"
+  },
+  {
+    "id": "legit-bal-13",
+    "text": "Université Amadou Mahtar Mbow : Les cours magistraux débuteront lundi prochain à 8h dans l'amphithéâtre A.",
+    "label": 0,
+    "language": "fr",
+    "category": "quotidien-legitime"
+  },
+  {
+    "id": "legit-bal-14",
+    "text": "Wave Business : Paiement marchand de 3.200F CFA validé au supermarché Casino.",
+    "label": 0,
+    "language": "fr",
+    "category": "quotidien-legitime"
+  },
+  {
+    "id": "legit-bal-15",
+    "text": "Boutique artisanale : Votre commande de tissus bogolan est prête à être récupérée à l'atelier.",
+    "label": 0,
+    "language": "fr",
+    "category": "quotidien-legitime"
+  },
+  {
+    "id": "legit-bal-16",
+    "text": "TotalEnergies : Merci pour votre passage en station. Votre reçu électronique est disponible.",
+    "label": 0,
+    "language": "fr",
+    "category": "quotidien-legitime"
+  },
+  {
+    "id": "legit-bal-17",
+    "text": "Salam Cheikh, dinaa am réunion ak yow suba ngir dossier chantier bi.",
+    "label": 0,
+    "language": "wo",
+    "category": "quotidien-legitime"
+  },
+  {
+    "id": "legit-bal-18",
+    "text": "Cabinet d'ophtalmologie : Vos lunettes de vue sont prêtes à être ajustées en boutique.",
+    "label": 0,
+    "language": "fr",
+    "category": "quotidien-legitime"
+  },
+  {
+    "id": "legit-bal-19",
+    "text": "Sonatel : Votre demande de raccordement fibre optique a été transmise à l'équipe technique.",
+    "label": 0,
+    "language": "fr",
+    "category": "quotidien-legitime"
+  },
+  {
+    "id": "legit-bal-20",
+    "text": "Bonjour, je vous confirme la réception des documents demandés pour votre dossier d'assurance.",
+    "label": 0,
+    "language": "fr",
+    "category": "quotidien-legitime"
+  },
+  {
+    "id": "legit-bal-21",
+    "text": "Wave : Transfert de 8.000F CFA envoyé à Mamadou Fall. Frais : 80F CFA.",
+    "label": 0,
+    "language": "fr",
+    "category": "quotidien-legitime"
+  },
+  {
+    "id": "legit-bal-22",
+    "text": "Clinique de la Madeleine : Les résultats de vos analyses de sang sont disponibles au secrétariat.",
+    "label": 0,
+    "language": "fr",
+    "category": "quotidien-legitime"
+  },
+  {
+    "id": "legit-bal-23",
+    "text": "Orange Sénégal : Vous bénéficiez de 50 SMS gratuits valables jusqu'à minuit.",
+    "label": 0,
+    "language": "fr",
+    "category": "quotidien-legitime"
+  },
+  {
+    "id": "legit-bal-24",
+    "text": "Waaw xarit, jote naa sa message bi, dinaa la woo ci kanam bu ma noppee ci liggéey bi.",
+    "label": 0,
+    "language": "wo",
+    "category": "quotidien-legitime"
+  },
+  {
+    "id": "legit-bal-25",
+    "text": "Sénégal Numérique : Confirmation de votre inscription au séminaire national sur la cybersécurité.",
+    "label": 0,
+    "language": "fr",
+    "category": "quotidien-legitime"
+  },
+  {
+    "id": "legit-bal-26",
+    "text": "Boutique électroménager : Livraison de votre réfrigérateur planifiée pour demain entre 14h et 17h.",
+    "label": 0,
+    "language": "fr",
+    "category": "quotidien-legitime"
+  },
+  {
+    "id": "legit-bal-27",
+    "text": "Rappel réunion de copropriété ce samedi à 10h dans la salle commune de la résidence.",
+    "label": 0,
+    "language": "fr",
+    "category": "quotidien-legitime"
+  },
+  {
+    "id": "legit-bal-28",
+    "text": "CBAO Info : Votre nouvelle carte bancaire Visa est disponible dans votre agence de rattachement.",
+    "label": 0,
+    "language": "fr",
+    "category": "quotidien-legitime"
+  },
+  {
+    "id": "legit-bal-29",
+    "text": "Free Money : Transfert de 10.000 FCFA reçu de Babacar Sy. Solde disponible : 22.000 FCFA.",
+    "label": 0,
+    "language": "fr",
+    "category": "quotidien-legitime"
+  },
+  {
+    "id": "legit-bal-30",
+    "text": "Jàmm nga am yaay, ndax faje nga sa garab yi tey ? Dinaa la ñëw seeti suba.",
+    "label": 0,
+    "language": "wo",
+    "category": "quotidien-legitime"
+  },
+  {
+    "id": "legit-bal-31",
+    "text": "Institut Français de Dakar : Votre place pour le spectacle de danse de vendredi est confirmée.",
+    "label": 0,
+    "language": "fr",
+    "category": "quotidien-legitime"
+  },
+  {
+    "id": "legit-bal-32",
+    "text": "Station Shell : Paiement carburant de 25.000 FCFA accepté par carte bancaire.",
+    "label": 0,
+    "language": "fr",
+    "category": "quotidien-legitime"
+  },
+  {
+    "id": "legit-bal-33",
+    "text": "Agence Immobilière : La quittance de loyer du mois en cours a été envoyée sur votre adresse email.",
+    "label": 0,
+    "language": "fr",
+    "category": "quotidien-legitime"
+  },
+  {
+    "id": "legit-bal-34",
+    "text": "Société Générale Sénégal : Votre relevé de compte trimestriel a été généré.",
+    "label": 0,
+    "language": "fr",
+    "category": "quotidien-legitime"
+  },
+  {
+    "id": "legit-bal-35",
+    "text": "Mairie de Dakar : Votre acte de naissance demandé en ligne est prêt pour retrait au guichet état civil.",
+    "label": 0,
+    "language": "fr",
+    "category": "quotidien-legitime"
+  },
+  {
+    "id": "legit-bal-36",
+    "text": "Wave : Retrait de 20.000F CFA chez l'agent Wave Almadies réussi. Solde restant : 54.000F CFA.",
+    "label": 0,
+    "language": "fr",
+    "category": "quotidien-legitime"
+  },
+  {
+    "id": "legit-bal-37",
+    "text": "Orange et Moi : Votre facture mensuelle de 14.900 FCFA est consultable sur votre espace client.",
+    "label": 0,
+    "language": "fr",
+    "category": "quotidien-legitime"
+  },
+  {
+    "id": "legit-bal-38",
+    "text": "Salam Moussa, jërejëf ci ndimbal li, lëpp baax na lool.",
+    "label": 0,
+    "language": "wo",
+    "category": "quotidien-legitime"
+  },
+  {
+    "id": "legit-bal-39",
+    "text": "Centre de Contrôle Technique Automobile : Votre visite technique est programmée pour le 18 novembre.",
+    "label": 0,
+    "language": "fr",
+    "category": "quotidien-legitime"
+  },
+  {
+    "id": "legit-bal-40",
+    "text": "Librairie Clairafrique : Le livre que vous avez réservé est arrivé en rayon.",
+    "label": 0,
+    "language": "fr",
+    "category": "quotidien-legitime"
+  },
+  {
+    "id": "legit-bal-41",
+    "text": "Banque Islamique du Sénégal : Notification de crédit de votre salaire mensuel.",
+    "label": 0,
+    "language": "fr",
+    "category": "quotidien-legitime"
+  },
+  {
+    "id": "legit-bal-42",
+    "text": "Senelec : Facture N° 5891 payée avec succès via votre compte mobile money.",
+    "label": 0,
+    "language": "fr",
+    "category": "quotidien-legitime"
+  },
+  {
+    "id": "legit-bal-43",
+    "text": "Canal+ : Votre réabonnement à la formule Tout Canal a été activé pour 30 jours.",
+    "label": 0,
+    "language": "fr",
+    "category": "quotidien-legitime"
+  },
+  {
+    "id": "legit-bal-44",
+    "text": "Dakar Dem Dikk : Votre carte d'abonnement mensuelle a été rechargée en agence.",
+    "label": 0,
+    "language": "fr",
+    "category": "quotidien-legitime"
+  },
+  {
+    "id": "legit-bal-45",
+    "text": "Kër docteur : Na nga faje say garab ci waxtu, bu subaa dinaa la seeti.",
+    "label": 0,
+    "language": "wo",
+    "category": "quotidien-legitime"
+  },
+  {
+    "id": "legit-bal-46",
+    "text": "Hôtel Terrou-Bi : Confirmation de votre réservation de chambre pour le 22 novembre.",
+    "label": 0,
+    "language": "fr",
+    "category": "quotidien-legitime"
+  },
+  {
+    "id": "legit-bal-47",
+    "text": "Wave : Paiement de facture Sen'Eau d'un montant de 11.200F CFA réussi.",
+    "label": 0,
+    "language": "fr",
+    "category": "quotidien-legitime"
+  },
+  {
+    "id": "legit-bal-48",
+    "text": "Orange Money : Vous avez envoyé 5.000 FCFA à Awa Diop. Nouveau solde : 19.300 FCFA.",
+    "label": 0,
+    "language": "fr",
+    "category": "quotidien-legitime"
+  },
+  {
+    "id": "legit-bal-49",
+    "text": "Bonjour, je vous confirme notre accord pour la location du bureau à partir du mois prochain.",
+    "label": 0,
+    "language": "fr",
+    "category": "quotidien-legitime"
+  },
+  {
+    "text": "Avis d'huissier : Dernier délai avant saisie de vos comptes bancaires et poursuites pénales, régularisez sous 24h.",
+    "label": 1,
+    "category": "threat"
+  },
+  {
+    "text": "Attention : Votre ligne mobile sera bloquée et résiliée ce soir pour défaut de mise à jour d'identité.",
+    "label": 1,
+    "category": "threat"
+  },
+  {
+    "text": "Sommation juridique : sans paiement immédiat de votre dette, votre dossier est transmis au procureur de la République.",
+    "label": 1,
+    "category": "threat"
+  },
+  {
+    "text": "Urgent : Nous disposons d'une vidéo intime enregistrée via votre webcam. Payez 500.000 FCFA dans les 12h sinon elle sera envoyée à vos contacts.",
+    "label": 1,
+    "category": "sextorsion"
+  },
+  {
+    "text": "Sécurité compte : Faute de confirmation aujourd'hui, fermeture définitive de votre accès et signalement aux autorités.",
+    "label": 1,
+    "category": "threat"
+  },
+  {
+    "text": "Alerte fraude : Vos accès seront révoqués et vos informations personnelles diffusées si vous ne mettez pas à jour vos données.",
+    "label": 1,
+    "category": "threat"
+  },
+  {
+    "text": "Dernier rappel avant suspension totale de vos services télécoms et coupure de ligne dans les 2 heures.",
+    "label": 1,
+    "category": "threat"
+  },
+  {
+    "text": "Dëgëlal sa dossier tey tey ji ci sàss, bu ko deful dagnuy tëj sa ligne te sotti say données.",
+    "label": 1,
+    "category": "threat_wolof"
+  },
+  {
+    "text": "Dernier délai pour régler votre contentieux, sinon saisie conservatoire immédiate et publication de votre identité.",
+    "label": 1,
+    "category": "threat"
+  },
+  {
+    "text": "Avis de clôture : Votre compte sera résilié immédiatement et vos coordonnées signalées en cas de non-réponse.",
+    "label": 1,
+    "category": "threat"
+  },
+  {
+    "text": "Offre exclusive : Investissez 50.000 FCFA dans notre plateforme crypto et gagnez 250.000 FCFA garantis en 24h sans risque.",
+    "label": 1,
+    "category": "fake_crypto"
+  },
+  {
+    "text": "Prêt d'argent express sans justificatif jusqu'à 5.000.000 FCFA. Versez 25.000 FCFA de frais de dossier pour déblocage immédiat.",
+    "label": 1,
+    "category": "fake_loan"
+  },
+  {
+    "text": "Opportunité trading : Déposez 100.000 FCFA et recevez le double chaque semaine avec retour sur investissement 100% garanti.",
+    "label": 1,
+    "category": "fake_crypto"
+  },
+  {
+    "text": "Am nga prêt bu gaw te amul caution, feyal 15.000 FCFA frais dossier rek nu leebal la 1.000.000 FCFA.",
+    "label": 1,
+    "category": "fake_loan_wolof"
+  },
+  {
+    "text": "Plateforme crypto Sénégal : Multipliez vos économies par 5 dès aujourd'hui avec nos traders certifiés, inscription payante.",
+    "label": 1,
+    "category": "fake_crypto"
+  },
+  {
+    "text": "Crédit rapide pour commerçants : avancez 30.000 F de frais d'assurance pour recevoir votre virement de 2.000.000 F sous 2h.",
+    "label": 1,
+    "category": "fake_loan"
+  },
+  {
+    "text": "Mon chéri, je suis bloquée à la douane de l'aéroport avec mes valises, envoie-moi d'urgence 80.000 FCFA pour payer la taxe.",
+    "label": 1,
+    "category": "romance"
+  },
+  {
+    "text": "Mon amour, mon fils est tombé gravement malade et hospitalisé d'urgence, je n'ai pas d'argent pour les médicaments, aide-moi vite.",
+    "label": 1,
+    "category": "romance"
+  },
+  {
+    "text": "Bonjour mon trésor, mes bagages contenant mes cadeaux pour toi sont retenus à la frontière, paie les frais de douane pour les récupérer.",
+    "label": 1,
+    "category": "romance"
+  },
+  {
+    "text": "Sama xol, dama am urgence médicale ci hopital bi, envoie-moi 50.000 FCFA légui pour sama opération.",
+    "label": 1,
+    "category": "romance_wolof"
+  },
+  {
+    "text": "Mon amour je viens te rejoindre à Dakar mais mon billet d'avion est bloqué, envoie 75.000 F à l'agence pour finaliser l'embarquement.",
+    "label": 1,
+    "category": "romance"
+  },
+  {
+    "text": "Sama beug, dama sonn ci voyage bi te dagnu ma tëj ci douane, yoneel ma xaalis nu bayyi ma.",
+    "label": 1,
+    "category": "romance_wolof"
+  },
+  {
+    "text": "Je prends votre iPhone. Mon livreur passe récupérer le colis, versez 5.000 FCFA d'assurance livraison avant qu'il arrive.",
+    "label": 1,
+    "category": "fake_buyer"
+  },
+  {
+    "text": "Marchandise disponible à prix réduit. Payez l'acompte de 50% par Wave avant toute expédition du colis.",
+    "label": 1,
+    "category": "fake_seller"
+  },
+  {
+    "text": "Acheteur sérieux pour votre salon. J'ai mandaté un transporteur privé, veuillez avancer les frais d'enlèvement de 10.000 FCFA.",
+    "label": 1,
+    "category": "fake_buyer"
+  },
+  {
+    "text": "Jaaykat bi dafa bëgg jël say yéré, waaye feyal transport bi bala mu ñëw jël ko.",
+    "label": 1,
+    "category": "fake_buyer_wolof"
+  },
+  {
+    "text": "Pour valider la vente de votre moto, l'acheteur demande un dépôt de garantie de 20.000 F remboursable après livraison.",
+    "label": 1,
+    "category": "fake_buyer"
+  },
+  {
+    "text": "Salut c'est ton ami, j'ai cliqué sur ton numéro par erreur pour mon code WhatsApp à 6 chiffres, renvoie-le moi vite !",
+    "label": 1,
+    "category": "whatsapp_theft"
+  },
+  {
+    "text": "Salam, yone na la kod WhatsApp ci sa SMS ci jumte, yoneel ma ko ci sàss ma mëna connecté sama compte.",
+    "label": 1,
+    "category": "whatsapp_theft_wolof"
+  },
+  {
+    "text": "Senelec : Votre facture N° 84920 d'un montant de 24.500 FCFA arrive à échéance le 30 du mois. Réglez en toute simplicité en agence ou en ligne.",
+    "label": 0,
+    "category": "bill_legit"
+  },
+  {
+    "text": "Sen'Eau : Votre facture d'eau est disponible. Date limite de paiement le 5 du mois prochain. Renseignements au centre de relation client.",
+    "label": 0,
+    "category": "bill_legit"
+  },
+  {
+    "text": "Sonatel : Votre abonnement internet expire dans 5 jours. Pensez à renouveler votre forfait pour continuer à profiter de votre connexion.",
+    "label": 0,
+    "category": "bill_legit"
+  },
+  {
+    "text": "Orange : Le renouvellement de votre pass mensuel est prévu demain. Assurez-vous d'avoir un solde suffisant.",
+    "label": 0,
+    "category": "bill_legit"
+  },
+  {
+    "text": "Canal+ : Votre abonnement arrive à échéance le 28. Rendez-vous sur votre espace client ou chez votre distributeur pour vous réabonner.",
+    "label": 0,
+    "category": "bill_legit"
+  },
+  {
+    "text": "Senelec : Rappel aimable, votre relevé de compteur est prévu ce jeudi par nos techniciens.",
+    "label": 0,
+    "category": "bill_legit"
+  },
+  {
+    "text": "CBAO : Votre relevé mensuel de compte courant est disponible en téléchargement sur votre espace sécurisé e-banking.",
+    "label": 0,
+    "category": "bank_legit"
+  },
+  {
+    "text": "Ecobank : Information client : nos agences fermeront exceptionnellement à 16h ce vendredi en raison d'inventaire annuel.",
+    "label": 0,
+    "category": "bank_legit"
+  },
+  {
+    "text": "Banque Islamique du Sénégal : Votre demande de financement de projet a été transmise à votre conseiller pour examen.",
+    "label": 0,
+    "category": "bank_legit"
+  },
+  {
+    "text": "UBA : Votre solde bancaire a été mis à jour après votre achat par carte. Aucun frais supplémentaire facturé.",
+    "label": 0,
+    "category": "bank_legit"
+  },
+  {
+    "text": "SGBS : Votre conseiller clientèle reste à votre disposition du lundi au vendredi pour toute étude de crédit habitat.",
+    "label": 0,
+    "category": "bank_legit"
+  },
+  {
+    "text": "BNDE : Nous vous informons de la baisse des taux d'intérêt sur les comptes d'épargne logement à compter du mois prochain.",
+    "label": 0,
+    "category": "bank_legit"
+  },
+  {
+    "text": "Salam maman, j'espère que tu te portes bien. Je passe te voir ce soir à la maison après le travail inchallah.",
+    "label": 0,
+    "category": "family_legit"
+  },
+  {
+    "text": "Coucou mon fils, appelle-moi sur WhatsApp quand tu auras terminé tes cours, j'ai un message de ta tante.",
+    "label": 0,
+    "category": "family_legit"
+  },
+  {
+    "text": "Bonjour papa, j'ai bien reçu les documents pour l'inscription à l'université, merci beaucoup.",
+    "label": 0,
+    "category": "family_legit"
+  },
+  {
+    "text": "Sama doom, nanga def ? Sa yaay la, ma ngi ci kër gi bu nga pare ci liggey bi ñëwal.",
+    "label": 0,
+    "category": "family_legit_wolof"
+  },
+  {
+    "text": "Salut ma sœur, as-tu des nouvelles de grand-frère ? On doit organiser l'anniversaire de maman ce week-end.",
+    "label": 0,
+    "category": "family_legit"
+  },
+  {
+    "text": "Votre colis Chronopost n° CP849204 est pris en charge et sera livré à votre adresse demain entre 9h et 13h.",
+    "label": 0,
+    "category": "parcel_legit"
+  },
+  {
+    "text": "DHL Express : Votre envoi en provenance de Paris est arrivé au centre de tri de Dakar. Livraison prévue ce vendredi.",
+    "label": 0,
+    "category": "parcel_legit"
+  },
+  {
+    "text": "La Poste : Un courrier recommandé vous attend au bureau de poste central. Veuillez vous munir de votre pièce d'identité.",
+    "label": 0,
+    "category": "parcel_legit"
+  },
+  {
+    "text": "Jumia : Votre commande n° 49201 est expédiée. Vous pouvez suivre l'état d'acheminement depuis votre compte client.",
+    "label": 0,
+    "category": "parcel_legit"
+  },
+  {
+    "text": "Votre livreur est en route pour votre commande de repas. Merci de vous préparer pour la réception.",
+    "label": 0,
+    "category": "parcel_legit"
+  },
+  {
+    "text": "Boutique Touba : Votre colis est prêt à être retiré à notre agence des Almadies munis de votre numéro de commande.",
+    "label": 0,
+    "category": "parcel_legit"
+  },
+  {
+    "text": "Cabinet RH Dakar : Nous accusons réception de votre CV pour le poste de comptable. Notre équipe examinera votre profil.",
+    "label": 0,
+    "category": "job_legit"
+  },
+  {
+    "text": "Université Cheikh Anta Diop : Les résultats des délibérations de la session de rattrapage sont affichés sur le panneau du rectorat.",
+    "label": 0,
+    "category": "education_legit"
+  },
+  {
+    "text": "Campusen : Les inscriptions administratives pour l'année universitaire sont ouvertes jusqu'au 15 novembre sur le portail officiel.",
+    "label": 0,
+    "category": "campusen_legit"
+  },
+  {
+    "text": "Direction Générale des Impôts : Les déclarations d'impôt sur le revenu pour les salariés peuvent être déposées auprès de votre centre fiscal.",
+    "label": 0,
+    "category": "tax_legit"
+  },
+  {
+    "text": "Mairie de Dakar : La campagne de recensement citoyen pour les nouveaux résidents se tiendra du 1er au 15 du mois prochain.",
+    "label": 0,
+    "category": "admin_legit"
+  },
+  {
+    "text": "Ministère de l'Éducation : Le calendrier officiel des concours de la fonction publique est publié sur le site ministériel.",
+    "label": 0,
+    "category": "admin_legit"
+  },
+  {
+    "text": "Bébé je suis à l'hôpital pour ma mère, il nous manque 40.000 F pour la perfusion, transfère-moi ça sur Wave vite.",
+    "label": 1,
+    "category": "romance"
+  },
+  {
+    "text": "Chérie la douane réclame 60.000 F pour débloquer le colis de bijoux que je t'ai envoyé, paie et je te rembourse.",
+    "label": 1,
+    "category": "romance"
+  },
+  {
+    "text": "Sama sweetheart, dama am accident bu méti ci yoon bi, envoie-moi 35.000 F pour ambulans bi.",
+    "label": 1,
+    "category": "romance_wolof"
+  },
+  {
+    "text": "Mise en demeure préalable : Défaut de paiement sous 48h entraînera l'intervention des forces de l'ordre.",
+    "label": 1,
+    "category": "threat"
+  },
+  {
+    "text": "Dernier avis avant résiliation de votre abonnement et engagement d'une procédure de recouvrement forcé.",
+    "label": 1,
+    "category": "threat"
+  },
+  {
+    "text": "Votre ligne sera coupée définitivement à minuit sauf régularisation immédiate auprès de notre service contentieux.",
+    "label": 1,
+    "category": "threat"
+  },
+  {
+    "text": "Attention : Votre compte fera l'objet d'un blocage judiciaire sous 24 heures pour non-conformité administrative.",
+    "label": 1,
+    "category": "threat"
+  },
+  {
+    "text": "Mon amour, passe une très bonne journée au travail, je t'aime fort et je pense à toi.",
+    "label": 0,
+    "category": "romance_legit"
+  },
+  {
+    "text": "Chéri, n'oublie pas de prendre le pain en rentrant ce soir. Gros bisous.",
+    "label": 0,
+    "category": "romance_legit"
+  },
+  {
+    "text": "Sama beug, jërëjëf ci kado bi nga ma jox dëmb, neex na ma lool.",
+    "label": 0,
+    "category": "romance_legit_wolof"
+  },
+  {
+    "text": "Notification de sécurité : Votre mot de passe a été modifié avec succès depuis votre espace client.",
+    "label": 0,
+    "category": "security_legit"
+  },
+  {
+    "text": "Orange : Votre code de sécurité temporaire pour vous connecter est 729104. Ne le partagez pas.",
+    "label": 0,
+    "category": "security_legit"
+  },
+  {
+    "text": "Wave : Votre transfert de 5.000 F vers Amadou a bien été effectué. Nouveau solde : 14.200 F.",
+    "label": 0,
+    "category": "wave_legit"
+  },
+  {
+    "text": "Senelec : Une coupure d'électricité pour travaux de maintenance est programmée dans votre quartier ce dimanche de 8h à 12h.",
+    "label": 0,
+    "category": "maintenance_legit"
+  },
+  {
+    "text": "Boutique Dakar : Profitez de -20% sur toute la collection avec le code promo BIENVENUE lors de votre passage en caisse.",
+    "label": 0,
+    "category": "promo_legit"
+  },
+  {
+    "text": "Jumia Sénégal : Votre code promo FLASH10 vous donne droit à 10% de remise immédiate sur vos achats ce week-end.",
+    "label": 0,
+    "category": "promo_legit"
+  },
+  {
+    "text": "Restaurant Le Jardin : Bénéficiez d'une boisson offerte avec le code promo GOURMAND2026 à la commande.",
+    "label": 0,
+    "category": "promo_legit"
+  },
+  {
+    "text": "Recrutement ONG Dakar : Frais d'inscription de 20.000 F exigés par Wave pour valider votre dossier de candidature.",
+    "label": 1,
+    "category": "fake_job"
+  },
+  {
+    "text": "Votre colis est en attente au centre postal. Veuillez payer les frais de port de 2.000 F via ce lien pour le recevoir.",
+    "label": 1,
+    "category": "fake_parcel"
+  },
+  {
+    "text": "Investissement rentable : Placez 30.000 FCFA aujourd'hui et retirez 150.000 FCFA de bénéfices dans 48h sans aucun risque.",
+    "label": 1,
+    "category": "fake_crypto"
   }
 ]

@@ -51,13 +51,13 @@ export function analyzeMessageLocally(rawText: string): AnalysisResult {
   let score = 0;
 
   // 1. Detection of OTP / PIN / Secret Code request (Critical Danger)
+  const isWarningNegation = /(?:ne\s+(?:le\s+)?(?:partagez?|partager|donnez?|donner|communiquez?|communiquer|transmettez?|transmettre)\s+(?:jamais|pas|avec\s+personne|à\s+personne|personne)|ne\s+jamais\s+(?:partager|donner|communiquer|transmettre))/i.test(lower);
   const otpPatterns = [
-    /code.*(?:secret|otp|reçu|sms|4\s*chiffres|6\s*chiffres|validation|confirmation)/i,
-    /(?:dicter|partager|envoyer|donner|transférer).*(?:code|pin|mot de passe)/i,
-    /ne partagez (?:pas|jamais).*code/i,
-    /kod.*(?:4|6|secret)/i, // Wolof hints
+    /(?:donner?|donnez?|envoyer?|envoie|envoyez|transmettre|transmets?|transmettez|partager?|partagez?|renvoyer?|renvoie|renvoyez|confirmer?|confirme|confirmez|fournir|fournissez|communiquer?|communique|communiquez|entrer?|entrez|saisir|saisissez|taper?|tapez|dox|doxal|yobantel|yoneel)\b.{0,40}\b(?:code|pin|otp|mot\s+de\s+passe|secret|chiffres?|identifiant)/i,
+    /(?:code|pin|otp|mot\s+de\s+passe|secret|chiffres?)\b.{0,50}\b(?:renvoyer?|renvoie|renvoyez|donner?|donnez?|envoyer?|envoyez|partager?|partagez?|transmettre|transmets?|transmettez|que\s+tu\s+as\s+reçu|reçu\s+par\s+sms|envoyé\s+par\s+sms|pour\s+valider|pour\s+débloquer|pour\s+annuler|pour\s+confirmer)/i,
+    /kod\b.{0,40}\b(?:secret|whatsapp|pin)/i,
   ];
-  const hasOtpRequest = otpPatterns.some((pattern) => pattern.test(lower));
+  const hasOtpRequest = !isWarningNegation && otpPatterns.some((pattern) => pattern.test(lower));
   if (hasOtpRequest) {
     score += 45;
     detectedClues.push({
@@ -304,7 +304,7 @@ export function analyzeMessageLocally(rawText: string): AnalysisResult {
     summary = 'Ce message comporte des signaux d\'alerte qui invitent à une grande prudence. N\'exécutez aucune action sans vérification indépendante.';
   } else if (detectedClues.length === 0 && score === 0) {
     riskLevel = 'faible';
-    title = 'Risque faible : Aucun signal d\'arnaque connu repéré';
+    title = 'Risque faible : aucun signal connu repéré';
     summary = 'Aucun signal d\'arnaque connu repéré. Cela ne garantit pas que le message soit sûr : en cas de doute, vérifiez auprès de l\'organisme concerné.';
   } else {
     riskLevel = 'indetermine';
@@ -312,7 +312,25 @@ export function analyzeMessageLocally(rawText: string): AnalysisResult {
     summary = 'Impossible de déterminer avec certitude si ce message est frauduleux. Voici les vérifications complémentaires à effectuer.';
   }
 
-  const operatorSuffix = ' En cas de doute, contactez votre opérateur via son numéro officiel (ex: 1441 pour Orange, support dans l\'application Wave, 200244 pour Free).';
+  // Detect mentioned organism
+  let mentionedOrganism: string | null = null;
+  if (/\bwave\b/i.test(lower)) mentionedOrganism = 'Wave';
+  else if (/\b(?:orange(?:\s+money)?|sonatel)\b/i.test(lower)) mentionedOrganism = 'Orange Money';
+  else if (/\bfree(?:\s+money)?\b/i.test(lower)) mentionedOrganism = 'Free Money';
+  else if (/\bcampusen\b/i.test(lower)) mentionedOrganism = 'Campusen';
+  else if (/\bcbao\b/i.test(lower)) mentionedOrganism = 'CBAO';
+  else if (/\becobank\b/i.test(lower)) mentionedOrganism = 'Ecobank';
+  else if (/\bsenelec\b/i.test(lower)) mentionedOrganism = 'Senelec';
+  else if (/\bsen'?eau\b/i.test(lower)) mentionedOrganism = "Sen'Eau";
+  else if (/\bpolice\b/i.test(lower)) mentionedOrganism = 'la Police';
+  else if (/\bgendarmerie\b/i.test(lower)) mentionedOrganism = 'la Gendarmerie';
+  else if (/\bdouane\b/i.test(lower)) mentionedOrganism = 'la Douane';
+  else if (/\bbanque\b/i.test(lower)) mentionedOrganism = 'votre banque';
+
+  const doubtAdvice = mentionedOrganism
+    ? `Contactez ${mentionedOrganism} directement via son application ou son site officiel, pas via le message reçu.`
+    : `Contactez l'organisme concerné par un canal officiel que vous connaissez déjà (application, site, agence). N'utilisez pas les coordonnées du message.`;
+
   let primaryAdvice = 'Ne donnez pas suite à cette sollicitation.';
   if (hasOtpRequest) {
     primaryAdvice = 'Ne donnez jamais votre code ou PIN, même à quelqu\'un qui dit être de l\'opérateur.';
@@ -320,19 +338,21 @@ export function analyzeMessageLocally(rawText: string): AnalysisResult {
     primaryAdvice = 'Ne renvoyez rien. Vérifiez votre solde via l\'application officielle.';
   } else if (hasGains) {
     primaryAdvice = 'Aucun organisme sérieux ne demande de payer pour recevoir un gain.';
-  } else if (hasLink || /(?:informations?\s+bancaires?|coordonnées)/i.test(lower)) {
+  } else if (hasLink) {
     primaryAdvice = 'Ne cliquez pas et ne saisissez aucune information. Passez par le site ou l\'application officiels.';
+  } else if (/(?:informations?\s+bancaires?|coordonnées)/i.test(lower)) {
+    primaryAdvice = 'Ne saisissez ni ne transmettez aucune coordonnée bancaire. Passez par le site ou l\'application officiels.';
   } else if (hasIntimidationScam || hasUrgency) {
-    primaryAdvice = 'Ne paniquez pas. Contactez directement l\'organisme via son numéro officiel.';
+    primaryAdvice = 'Ne paniquez pas. Contactez directement l\'organisme via son numéro officiel ou son application.';
   }
 
   const recommendedActions =
     riskLevel === 'faible'
       ? [
-          `Aucun signal d'arnaque connu repéré. Cela ne garantit pas que le message soit sûr : en cas de doute, vérifiez auprès de l'organisme concerné.${operatorSuffix}`,
+          `Cela ne garantit pas que le message soit sûr. ${doubtAdvice}`,
         ]
       : [
-          `${primaryAdvice}${operatorSuffix}`,
+          `${primaryAdvice} ${doubtAdvice}`,
           'Ne communiquez JAMAIS de code secret, de code PIN ou de code SMS.',
           'Consultez notre rubrique « Je suis victime » si vous avez déjà validé une opération.',
         ];
