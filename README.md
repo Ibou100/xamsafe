@@ -93,10 +93,12 @@ xamsafe/
 │   │   ├── AboutPage.tsx    # Présentation, valeurs et indépendance
 │   │   ├── PrivacyPage.tsx  # Politique de confidentialité et cadre légal CDP
 │   │   └── AdminPage.tsx    # Console éditoriale protégée par code d'accès
-│   ├── services/            # Moteurs heuristiques et syntaxiques locaux
-│   │   ├── messageAnalyzer.ts # Détection d'OTP, fausse urgence, USSD, tombola
-│   │   └── urlAnalyzer.ts     # Analyse syntaxique, homoglyphes, marques imitées
-│   ├── test/                # Suite de tests automatisés Vitest
+│   ├── services/            # Moteurs heuristiques, OCR et communication API
+│   │   ├── apiClient.ts       # Client API avec timeout 15s et bascule hors-ligne automatique
+│   │   ├── imageOcr.ts        # Reconnaissance optique (OCR) 100% dans le navigateur via Tesseract.js & Canvas
+│   │   ├── messageAnalyzer.ts # Moteur heuristique local de secours (OTP, menaces, USSD, tombola)
+│   │   └── urlAnalyzer.ts     # Analyse syntaxique locale, homoglyphes, marques imitées
+│   ├── test/                # Suite de 46 tests automatisés Vitest
 │   ├── types/               # Définitions TypeScript
 │   ├── App.tsx              # Définition des routes
 │   └── main.tsx             # Point d'entrée de l'application

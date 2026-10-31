@@ -59,7 +59,7 @@ Moteur d'ingénierie défensive pour l'analyse de messages (Brique 1 NLP) et d'i
 ```text
 backend/
 ├── anonymizer.py              # Anonymisation multi-formats & détection de noms
-├── classifier.py              # Modèle TF-IDF + Logistic Regression, Split Train/Test
+├── classifier.py              # Modèle TF-IDF + Logistic Regression, Split Train/Test, Moteur de règles
 ├── domain_scanner.py          # Scanner RDAP (cache LRU+TTL), Levenshtein calibré, Whitelist
 ├── rate_limiter.py            # Limiteur de débit avec gestion sécurisée de TRUST_PROXY
 ├── shorteners.json            # Liste des noms de domaine de raccourcisseurs d'URL connus
@@ -67,14 +67,17 @@ backend/
 ├── import_data.py             # Pipeline d'ingestion de messages réels avec consentement
 ├── main.py                    # Microservice FastAPI (Points de terminaison REST & OpenAPI)
 ├── dataset/
-│   ├── corpus.json            # Jeu de données d'entraînement de référence
+│   ├── corpus.json            # Jeu de données d'entraînement de référence (342 échantillons équilibrés)
 │   ├── corpus_imported.json   # Données réelles anonymisées avec consentement
+│   ├── verified_contacts.json # Répertoire des canaux et numéros officiels vérifiés
+│   ├── regression_cases.json  # Suite de régression de 16 cas réels critiques
 │   └── frozen_test_set.json   # Jeu d'évaluation gelé indépendant (24 cas FR/WO)
 ├── tests/
 │   ├── test_model.py              # Tests unitaires ML & anonymisation
 │   ├── test_domain_scanner.py     # Tests RDAP, shorteners, whitelist 'verified: false'
 │   ├── test_api.py                # Tests API, sécurité headers, SSRF, proxy rate limit
 │   ├── test_unified_analysis.py   # Tests fusion brique 1 & brique 2 (4 cas obligatoires)
+│   ├── test_regression_cases.py   # Tests de non-régression sur l'API POST /api/v1/analyze
 │   └── test_frozen_evaluation.py  # Évaluation indépendante sur le jeu de test gelé
 └── README.md
 ```
